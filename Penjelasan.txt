@@ -1,0 +1,42 @@
+/*User dapat melakukan explorasi terhadap map yang diberikan dan ketika melakukan explorasi dapat bertemu
+dengan monster secara random, apabila user gagal mengalahkan monster (HP: 0), maka permainan gagal dan user
+harus mengulang permainan dari awal. User memenangkan permainan apabila sudah dapat mengalahkan boss dari
+permainan yaitu naga*/
+
+/*
+Fakta dan Rule yang digunakan:
+Fakta
+    1. Fakta tentang class player dan stats yang dimiliki
+	Ada tiga class player: swordsman, archer, dan sorcerer. Selain class, tiap pemain memiliki stat HP, mana, attack, def, level, dan XP.
+	HP player akan berkurang saat diserang dan bertambah saat mengonsumsi potion. Jika HP habis, player mati dan mengulang.
+	Mana player akan bertambah setiap turnnya dan akan berkurang saat dipakai. Mana dapat dipakai untuk special attack.
+	Attack player adalah besaran serangan yang dapat dikeluarkan player. Attack dapat bertambah jika memakai senjata (sword, bow, wand).
+	Defense player adalah besaran yang akan mengurangi damage yang diterima player. Defense dapat ditingkatkan dengan menggunakan armor.
+	XP adalah poin yang dimiliki oleh pemain. XP dapat diperoleh dengan membunuh enemy. Jika XP mencukupi, player akan naik level. 
+	Jika player naik level, statnya akan semakin bagus.
+    2. Fakta tentang jenis jenis item
+	Ketiga class player bisa menggunakan dua jenis item: senjata dan armor. Senjata tergantung dari class player.
+	Swordsman menggunakan sword, archer menggunakan bow, dan sorcerer menggunakan wand. Senjata menambah attack player.
+	Armor menambah defense pemain.
+    3. Fakta tentang enemy dan stats mereka
+	Enemy akan muncul secara random setiap pemain berpindah posisi. Ada setidaknya tiga jenis enemy yang muncul yaitu  slime, goblin, dan wolf.
+    4. Fakta tentang map secara keseluruhan
+	Ukuran map adalah 15*15. Pada map, ada satu store bertanda S untuk membeli potion dan bergacha. Ada juga satu kotak bertanda D tempat boss dragon berada.
+	Ada juga satu petak bertanda Q untuk mengambil quest.
+    5. Fakta tentang aturan pembelian gacha
+	Gacha akan dirandom berdasarkan XP dan gold pemain.
+    6. Fakta tentang aturan pengambilan quest
+	Quest akan dirandom berdasarkan XP dan total kill pemain.
+    7. Fakta kalah permainan
+	Pemain kalah jika HP nya mencapai 0.
+    8. Fakta menang permainan
+	Pemain menang jika berhasil mengalahkan dragon.
+Rule
+    1. Rule untuk menambah inventory (menggunakan list, dan rekurens)
+    2. Rule battle mechanism (menggunakan control loop)
+    3. Rule Exploring map (menggunakan rekursif dan list)
+    4. Rule pembelian gacha (menggunakan loop)
+    5. Rule kalah dari permainan (menggunakan cut dan fail)
+    6. Rule pengambilan quest (menggunakan loop)
+    7. Rule menang dari permainan
+*/
