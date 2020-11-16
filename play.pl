@@ -5,6 +5,7 @@
 /*player(masterTanur, swordsman).*/
 /*by using assertz you can add player below of this*/
 
+/*Yang akan dimunculkan pertama kali*/
 first_screen :-
     write('################################################'), nl,
     write('#        Welcome to your first journey         #'), nl,
@@ -166,9 +167,9 @@ choose_class :-
         )
         )
         )
-    ), write('Cok').
+    ).
     
-
+/* Untuk save dan load */
 /*read from file*/
 read_from_file(File) :-
     open(File, read, Stream),
