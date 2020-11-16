@@ -1,3 +1,6 @@
+/*Alur Kasar Permainan*/
+/*User mengetikkan start, lalu muncul tulisan tentang mechanism game, lalu user melakukan pemilihan class
+dan kemudian user dapat melakukan permainan */
 /*User dapat melakukan explorasi terhadap map yang diberikan dan ketika melakukan explorasi dapat bertemu
 dengan monster secara random, apabila user gagal mengalahkan monster (HP: 0), maka permainan gagal dan user
 harus mengulang permainan dari awal. User memenangkan permainan apabila sudah dapat mengalahkan boss dari
@@ -39,4 +42,7 @@ Rule
     5. Rule kalah dari permainan (menggunakan cut dan fail)
     6. Rule pengambilan quest (menggunakan loop)
     7. Rule menang dari permainan
+	8. Rule kendali dasar berupa start, help, quit, inventory
 */
+
+/*Program kasar yang baru dibuat adalah play.pl dan facts.pl*/

@@ -168,7 +168,12 @@ choose_class :-
         )
         )
     ).
-    
+/*
+help :-
+quit :-
+inventory :-
+*/
+
 /* Untuk save dan load */
 /*read from file*/
 read_from_file(File) :-
