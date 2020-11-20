@@ -1,11 +1,8 @@
 :- dynamic(count/1).
-/*this means there is a dynamic function called player with 2 parameter/argument input*/
+:- dynamic(player/1).
 
-/*by using asserta you can add player on top of this*/
-/*player(masterTanur, swordsman).*/
-/*by using assertz you can add player below of this*/
+:- include('facts.pl').
 
-/*Yang akan dimunculkan pertama kali*/
 first_screen :-
     write('  ############################################## '), nl,
     write(' ################################################'), nl,
@@ -19,72 +16,90 @@ first_screen :-
     write('## 7. d       : bergerak ke kanan satu langkah  ##'), nl,
     write('## 8. help    : menampilkan bantuan             ##'), nl,
     write(' ################################################'), nl,
-    write('  ############################################## ').
-
-start :-
-    write('Hello, adventurer, you are about to become the hero of this world'), nl,
-    write('First, tell me your name'), nl,
-    read(Name),
-    choose_class.
+    write('  ############################################## '), nl, nl.
 
 choose_class :-
-    write('Choose between these three!'), nl,
+    write('Hello, adventurer, welcome to our headquarter'), nl,
+    sleep(0.5),
+    write('Would you like to tell me your name??'), nl,
+    sleep(0.5),
+    write('Write your name: '), read(Name), asserta(player(Name)), nl, nl,
+    sleep(0.5),
+    write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
+    sleep(0.5),
+    write('Each class has its own unique stats and gameplay'), nl,
+    sleep(0.5),
+    write('CLASS DETAILS'), nl,
+    write('<------------------------------------->'), nl,
+    write('SWORDSMAN'), nl,
+    write('Max HP: '), nl,
+    write('Attack: '), nl,
+    write('Defense: '), nl,
+    write('<------------------------------------->'), nl,
+    write('Archer'), nl,
+    write('Max HP: '), nl,
+    write('Attack: '), nl,
+    write('Defense: '), nl,
+    write('<------------------------------------->'), nl,
+    write('Sorcerer'), nl,
+    write('Max HP: '), nl,
+    write('Attack: '), nl,
+    write('Defense: '), nl,
+    write('<------------------------------------->'), nl,
+    repeat,
+    write('Choose your class!'), nl,
     write('1. Swordsman'), nl,
     write('2. Archer'), nl,
     write('3. Sorcerer'), nl,
     write('4. See classes details'), nl,
-
-    read(Choice),
-    (   Choice =:= 1 ->
+    write('Choose your class: '), read(ClassType), nl,
+    class(ClassID, ClassType,_,_,_,_,_,_),
+    (   ClassID =:= 1 ->
         write('You have chosen Swordsman'), nl,
         write('You may begin your journey.'), nl;
         (
-        Choice =:= 2 ->
+        ClassID =:= 2 ->
         write('You have chosen Archer'), nl,                                                       
         write('You may begin your journey.'), nl;       
         (
-        Choice =:= 3 ->
+        ClassID =:= 3 ->
         write('You have chosen Sorcerer'), nl,
-        write('You may begin your journey.'), nl;
-        (
-        Choice =:= 4 ->    
-        nl,
-        write('CLASS DETAILS'), nl,
-        write('<------------------------------------->'), nl,
-        write('SWORDSMAN'), nl,
-        write('Max HP: '), nl,
-        write('Attack: '), nl,
-        write('Defense: '), nl,
-        write('<------------------------------------->'), nl,
-        write('Archer'), nl,
-        write('Max HP: '), nl,
-        write('Attack: '), nl,
-        write('Defense: '), nl,
-        write('<------------------------------------->'), nl,
-        write('Sorcerer'), nl,
-        write('Max HP: '), nl,
-        write('Attack: '), nl,
-        write('Defense: '), nl,
-        choose_class;
-        (
-        (Choice >4 ; Choice<0) -> 
-        nl,
-        nl,
-        write('**********************************************************'), nl,
-        write('****Cuma bisa pilih 4 pilihan neng mas, pilih lagi yok****'), nl,
-        write('**********************************************************'), nl,
-        choose_class                                    
+        write('You may begin your journey.'), nl
         )
         )
-        )
-        )
-    ).
+    ),
+    do(ClassID), nl,
+    end_condition(ClassID),
+    finalize.
+
+do(X) :- X=<3, !.
+do(_) :- write('haha.').
+do(end).
+
+end_condition(end).
+end_condition(ClassID) :-
+
+
+finalize :-
+    write('Halo').
+
 
 help :-
     write('Command you can use'),
     write('1. start. : untuk memulai game'),
     write('2. map. : untuk menampilkan peta'),
     write("3. status :").
+
+start :-
+    count(_),
+    write("Gamenya sudah dimulai bambank!").
+
+start :-
+    \+count(_),
+    first_screen,
+    asserta(count(1)),
+    choose_class.
+    
 
 quit :-
     \+count(_),
