@@ -1,8 +1,23 @@
+/* Logika Komputasional - IF2121 K2
+----------------------------------------------
+------ Tugas Besar Logika Komputasional ------
+------------ Kelas 2 - Kelompok 6 ------------
+| 13519146        Fadel Ananda Dotty         |
+| 13519170        La Ode Rajuh Emoko         |
+| 13519178       Akeyla Pradia Naufal        |
+| 13519214      Tanur Rizaldi Rahardjo       |
+----------------------------------------------
+*/
+% Inisialisasi
 :- dynamic(count/1).
 :- dynamic(player/1).
 
 :- include('facts.pl').
 
+% :- initialization(shell('clear')).
+:- initialization(first_screen).
+
+% Layar pertama ketika dijalankan
 first_screen :-
     write('  ############################################## '), nl,
     write(' ################################################'), nl,
@@ -59,8 +74,8 @@ choose_class :-
         write('You may begin your journey.'), nl;
         (
         ClassID =:= 2 ->
-        write('You have chosen Archer'), nl,                                                       
-        write('You may begin your journey.'), nl;       
+        write('You have chosen Archer'), nl,
+        write('You may begin your journey.'), nl;
         (
         ClassID =:= 3 ->
         write('You have chosen Sorcerer'), nl,
@@ -77,7 +92,7 @@ do(_) :- write('haha.').
 do(end).
 
 end_condition(end).
-end_condition(ClassID) :-
+% end_condition(ClassID) :-
 
 
 finalize :-
@@ -99,7 +114,7 @@ start :-
     first_screen,
     asserta(count(1)),
     choose_class.
-    
+
 
 quit :-
     \+count(_),
@@ -108,11 +123,6 @@ quit :-
 quit :-
     write('Yah masa baru segini quit sih, lemah!!!!').
     /* masih kurang beberapa argumen */
-
-
-
-
-
 
 /*
 inventory :-
@@ -128,7 +138,7 @@ read_from_file(File) :-
 
     /*Output all characters until end_of_file*/
     process_the_stream(Char1, Stream),
-    
+
     close(Stream).
 
 process_the_stream(end_of_file, _) :- !.
@@ -143,6 +153,3 @@ write_on_file(File, Text) :-
     /*open(File, appen, Stream), file will not get overwritten*/
     write(Stream, Text), nl,
     close(Stream).
-
-
-    
