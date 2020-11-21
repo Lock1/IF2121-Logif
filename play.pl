@@ -12,6 +12,7 @@
 % Load file yang dibutuhkan
 :- include('facts.pl').
 :- include('config.pl').
+:- include('map.pl').
 
 % Inisialisasi Dynamic Predicate
 :- dynamic(count/1).
