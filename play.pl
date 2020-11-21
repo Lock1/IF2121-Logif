@@ -14,8 +14,18 @@
 
 :- include('facts.pl').
 
-% :- initialization(shell('clear')).
+:- initialization(shell('clear')).
 :- initialization(first_screen).
+
+:- initialization(write('Tips : mantap gan\n')). % Disable if not using loading bar
+
+:- initialization(loadingBar(1)). % Disable if not using loading bar
+:- initialization(nl).
+
+loadingStepDuration(0.004).
+loadingBarSize(100).
+% Half frame loading bar
+
 
 % Layar pertama ketika dijalankan
 first_screen :-
@@ -31,7 +41,8 @@ first_screen :-
     write('## 7. d       : bergerak ke kanan satu langkah  ##'), nl,
     write('## 8. help    : menampilkan bantuan             ##'), nl,
     write(' ################################################'), nl,
-    write('  ############################################## '), nl, nl.
+    write('  ############################################## '), nl, nl, nl,
+    flush_output.
 
 choose_class :-
     write('Hello, adventurer, welcome to our headquarter'), nl,
@@ -153,3 +164,85 @@ write_on_file(File, Text) :-
     /*open(File, appen, Stream), file will not get overwritten*/
     write(Stream, Text), nl,
     close(Stream).
+
+% Loading bar
+loadingBar(X) :-
+    write('\33\[200D'),
+    loadingBarSize(Size),
+    write('╓'),
+    loadingVerticalBorder(1,Size+3),
+    write('╖'),
+    write('\33\[200D\33\[2B'),
+    flush_output,
+    write('╙'),
+    loadingVerticalBorder(1,Size+3),
+    write('╜'),
+    write('\33\[1A'),
+    flush_output,
+    loadingBarInner(X),
+    nl.
+
+loadingBarInner(X) :-
+    loadingBarSize(Size), X is 8*Size;
+    loadingBarSize(Size),
+    write('\33\[200D'),
+    flush_output,
+    write('┃'),
+    flush_output,
+    loadingProgressDraw(X),
+    horizontalCursorAbsolutePosition(Size+3),
+    flush_output,
+    write('┃'),
+    loadingStepDuration(TP),
+    sleep(TP),
+    Rx is X+1, loadingBarInner(Rx),!.
+
+loadingPBar(X) :-
+    X is 7, write('█'); % █ Full 1/8 step frame
+    X is 6, write('█'); % ▉ WSL Terminal doesnt support it
+    X is 5, write('█'); % ▊ Only half frame supported
+    X is 4, write('█'); % ▋
+    X is 3, write('▌'); % ▌
+    X is 2, write('▌'); % ▍
+    X is 1, write('▌'); % ▎
+    X is 0, write('▌'). % ▏
+
+loadingPFullBar(S,X) :-
+    S is X;
+    write('█'),
+    Rs is S+1, loadingPFullBar(Rs,X).
+
+loadingProgressDraw(X) :-
+    write('\33\[200D'),
+    write('\33\[2C'),
+    flush_output,
+    TPFull is div(X,8),
+    loadingPFullBar(0,TPFull),
+    flush_output,
+    TPNotFull is mod(X,8),
+    loadingPBar(TPNotFull),
+    loadingSpinDraw(X).
+
+loadingSpinDraw(X) :-
+    loadingBarSize(Size),
+    write('\33\[200D'),
+    horizontalCursorAbsolutePosition(Size+5),
+    flush_output,
+    Rm is mod(X,3),
+    (Rm is 0,write('-');
+    Rm is 1,write('\\');
+    Rm is 2,write('/')).
+
+loadingVerticalBorder(S,X) :-
+    S is X;
+    write('─'),
+    Rs is S+1, loadingVerticalBorder(Rs,X).
+
+horizontalCursorRightMove(X) :-
+    X is 1, write('\33\[1C');
+    write('\33\[1C'),
+    Rx is X-1, horizontalCursorRightMove(Rx).
+
+horizontalCursorAbsolutePosition(X) :-
+    write('\33\[200D'),
+    horizontalCursorRightMove(X).
