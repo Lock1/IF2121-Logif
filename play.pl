@@ -20,7 +20,7 @@
 % Inisialisasi program
 :- initialization(shell('clear')).
 :- initialization(first_screen).
-:- initialization(choose_class).
+% :- initialization(choose_class). % DEBUG
 
 :- initialization(write('Tips : mantap gan\n')). % Loading Bar
 :- initialization(loadingBar(1)).
@@ -43,50 +43,11 @@ errorMessage :-
 % Layar pertama ketika dijalankan
 first_screen :-
     write('Welcome to your journey!'), nl,
-    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
-    write('│     ┎─────────────────────────────────────────────┒    │ '), nl,
-    write('│     ┃ 1. start.  : Memulai petualanganmu          ┃    │ '), nl,
-    write('│     ┃ 2. map.    : Menampilkan peta               ┃    │ '), nl,
-    write('│     ┃ 3. status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
-    write('│     ┃ 4. w.      : Bergerak ke atas satu langkah  ┃    │ '), nl,
-    write('│     ┃ 5. a.      : Bergerak ke kiri satu langkah  ┃    │ '), nl,
-    write('│     ┃ 6. s.      : Bergerak ke bawah satu langkah ┃    │ '), nl,
-    write('│     ┃ 7. d.      : Bergerak ke kanan satu langkah ┃    │ '), nl,
-    write('│     ┃ 8. help.   : Menampilkan bantuan            ┃    │ '), nl,
-    write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
-    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl, nl, nl,
+    help,
     flush_output.
 
 choose_class :-
-    write('Hello, adventurer, welcome to our headquarter'), nl,
-    % sleep(0.5),
-    write('Would you like to tell me your name?'), nl,
-    % sleep(0.5),
-    write('Your name: '), read(Name), asserta(player(Name)), nl, nl,
-    % sleep(0.5),
-    write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
-    % sleep(0.5),
-    write('Each class has its own unique stats and gameplay'), nl,
-    % sleep(0.5),
-    write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
-    write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
-    write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
-    write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
-    write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
-    write('┃                 Atk  25                         Atk  21                        Atk  23                      ┃'), nl,
-    write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
-    write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl,
-
-    /* Class(ID_pilihan, class_type, HP, mana, attack, def, level, exp) //parameters could change*/
-    % class(1, swordsman, 300, 50, 25, 5, 1, 0).
-    % class(2, archer, 280, 60, 21, 3, 1, 0).
-    % class(3, sorcerer, 270, 100, 23, 2, 1, 0).
-    repeat,
-    write('Choose your class!'), nl,
-    write('1. Swordsman'), nl,
-    write('2. Archer'), nl,
-    write('3. Sorcerer'), nl,
-    write('4. See classes details'), nl,
+    write('(Type class name with lowercase)\n'),
     write('Choose your class: '), read(ClassType), nl,
     class(ClassID, ClassType,_,_,_,_,_,_),
     (
@@ -104,27 +65,44 @@ choose_class :-
         )
         )
     ),
-    do(ClassID), nl,
-    end_condition(ClassID),
-    finalize.
+    isIDValid(ClassID),!;
+    choose_class.
 
-do(X) :- X=<3, !.
-do(_) :- write('haha.').
-do(end).
+isIDValid(X) :- integer(X),X=<3.
 
-end_condition(end).
-% end_condition(ClassID) :-
-
-
-finalize :-
-    write('Halo').
-
+username_input :-
+    write('Hello, adventurer, welcome to our headquarter'), nl,
+    % sleep(0.5),
+    write('Would you like to tell me your name?'), nl,
+    % sleep(0.5),
+    write('Your name: '), read(Name), asserta(player(Name)), nl, nl,
+    % sleep(0.5),
+    write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
+    % sleep(0.5),
+    write('Each class has its own unique stats and gameplay'), nl,
+    % sleep(0.5),
+    write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
+    write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
+    write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
+    write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
+    write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
+    write('┃                 Atk  25                         Atk  21                        Atk  23                      ┃'), nl,
+    write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
+    write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl.
 
 help :-
-    write('Command you can use'),
-    write('1. start. : untuk memulai game'),
-    write('2. map. : untuk menampilkan peta'),
-    write("3. status :").
+    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
+    write('│     ┎─────────────────────────────────────────────┒    │ '), nl,
+    write('│     ┃ 1. start.  : Memulai petualanganmu          ┃    │ '), nl,
+    write('│     ┃ 2. map.    : Menampilkan peta               ┃    │ '), nl,
+    write('│     ┃ 3. status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
+    write('│     ┃ 4. w.      : Bergerak ke atas satu langkah  ┃    │ '), nl,
+    write('│     ┃ 5. a.      : Bergerak ke kiri satu langkah  ┃    │ '), nl,
+    write('│     ┃ 6. s.      : Bergerak ke bawah satu langkah ┃    │ '), nl,
+    write('│     ┃ 7. d.      : Bergerak ke kanan satu langkah ┃    │ '), nl,
+    write('│     ┃ 8. help.   : Menampilkan bantuan            ┃    │ '), nl,
+    write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
+    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl, nl, nl.
 
 start :-
     count(_),
@@ -133,6 +111,7 @@ start :-
 start :-
     \+count(_),
     asserta(count(1)),
+    username_input,
     choose_class.
 
 
