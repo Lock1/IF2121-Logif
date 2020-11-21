@@ -22,56 +22,50 @@
 :- initialization(loadingBar(1)). % Disable if not using loading bar
 :- initialization(nl).
 
-loadingStepDuration(0.004).
+loadingStepDuration(0.001).
 loadingBarSize(100).
 % Half frame loading bar
 
 
 % Layar pertama ketika dijalankan
 first_screen :-
-    write('  ############################################## '), nl,
-    write(' ################################################'), nl,
-    write('##        Welcome to your first journey         ##'), nl,
-    write('## 1. start   : memulai petualanganmu           ##'), nl,
-    write('## 2. map     : menampilkan peta                ##'), nl,
-    write('## 3. status  : menampilkan kondisi saat ini    ##'), nl,
-    write('## 4. w       : bergerak ke atas satu langkah   ##'), nl,
-    write('## 5. a       : bergerak ke kiri satu langkah   ##'), nl,
-    write('## 6. s       : bergerak ke bawah satu langkah  ##'), nl,
-    write('## 7. d       : bergerak ke kanan satu langkah  ##'), nl,
-    write('## 8. help    : menampilkan bantuan             ##'), nl,
-    write(' ################################################'), nl,
-    write('  ############################################## '), nl, nl, nl,
+    write('Welcome to your journey!'), nl,
+    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
+    write('│     ┎─────────────────────────────────────────────┒    │ '), nl,
+    write('│     ┃ 1. start.  : Memulai petualanganmu          ┃    │ '), nl,
+    write('│     ┃ 2. map.    : Menampilkan peta               ┃    │ '), nl,
+    write('│     ┃ 3. status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
+    write('│     ┃ 4. w.      : Bergerak ke atas satu langkah  ┃    │ '), nl,
+    write('│     ┃ 5. a.      : Bergerak ke kiri satu langkah  ┃    │ '), nl,
+    write('│     ┃ 6. s.      : Bergerak ke bawah satu langkah ┃    │ '), nl,
+    write('│     ┃ 7. d.      : Bergerak ke kanan satu langkah ┃    │ '), nl,
+    write('│     ┃ 8. help.   : Menampilkan bantuan            ┃    │ '), nl,
+    write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
+    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl, nl, nl,
     flush_output.
 
 choose_class :-
     write('Hello, adventurer, welcome to our headquarter'), nl,
     sleep(0.5),
-    write('Would you like to tell me your name??'), nl,
+    write('Would you like to tell me your name?'), nl,
     sleep(0.5),
-    write('Write your name: '), read(Name), asserta(player(Name)), nl, nl,
+    write('Your name: '), read(Name), asserta(player(Name)), nl, nl, 
     sleep(0.5),
     write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
     sleep(0.5),
     write('Each class has its own unique stats and gameplay'), nl,
     sleep(0.5),
-    write('CLASS DETAILS'), nl,
-    write('<------------------------------------->'), nl,
-    write('SWORDSMAN'), nl,
+    write('<─────────────────────────────────────>'), nl,
+    write('Swordsman Archer Sorcerer'), nl,
     write('Max HP: '), nl,
     write('Attack: '), nl,
     write('Defense: '), nl,
-    write('<------------------------------------->'), nl,
-    write('Archer'), nl,
-    write('Max HP: '), nl,
-    write('Attack: '), nl,
-    write('Defense: '), nl,
-    write('<------------------------------------->'), nl,
-    write('Sorcerer'), nl,
-    write('Max HP: '), nl,
-    write('Attack: '), nl,
-    write('Defense: '), nl,
-    write('<------------------------------------->'), nl,
+    write('<─────────────────────────────────────>'), nl,
+
+    /* Class(ID_pilihan, class_type, HP, mana, attack, def, level, exp) //parameters could change*/
+    class(1, swordsman, 300, 50, 25, 5, 1, 0).
+    class(2, archer, 280, 60, 21, 3, 1, 0).
+    class(3, sorcerer, 270, 100, 23, 2, 1, 0).
     repeat,
     write('Choose your class!'), nl,
     write('1. Swordsman'), nl,
@@ -80,7 +74,8 @@ choose_class :-
     write('4. See classes details'), nl,
     write('Choose your class: '), read(ClassType), nl,
     class(ClassID, ClassType,_,_,_,_,_,_),
-    (   ClassID =:= 1 ->
+    (
+        ClassID =:= 1 ->
         write('You have chosen Swordsman'), nl,
         write('You may begin your journey.'), nl;
         (
@@ -122,7 +117,6 @@ start :-
 
 start :-
     \+count(_),
-    first_screen,
     asserta(count(1)),
     choose_class.
 
