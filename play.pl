@@ -8,24 +8,37 @@
 | 13519214      Tanur Rizaldi Rahardjo       |
 ----------------------------------------------
 */
-% Inisialisasi
+
+% Load file yang dibutuhkan
+:- include('facts.pl').
+:- include('config.pl').
+
+% Inisialisasi Dynamic Predicate
 :- dynamic(count/1).
 :- dynamic(player/1).
 
-:- include('facts.pl').
-
+% Inisialisasi program
 :- initialization(shell('clear')).
 :- initialization(first_screen).
+:- initialization(choose_class).
 
-:- initialization(write('Tips : mantap gan\n')). % Disable if not using loading bar
-
-:- initialization(loadingBar(1)). % Disable if not using loading bar
+:- initialization(write('Tips : mantap gan\n')). % Loading Bar
+:- initialization(loadingBar(1)).
 :- initialization(nl).
+:- initialization(gameLoop).
 
-loadingStepDuration(0.001).
-loadingBarSize(100).
-% Half frame loading bar
 
+
+gameLoop :-
+    repeat,
+    write('> '),
+    read(X),
+    catch(call(X), error(_,_) ,errorMessage),
+    fail.
+
+errorMessage :-
+    write('Perintah tidak ditemukan\n').
+% error(existence_error(procedure,asd/0),gameLoop/0)
 
 % Layar pertama ketika dijalankan
 first_screen :-
@@ -46,26 +59,28 @@ first_screen :-
 
 choose_class :-
     write('Hello, adventurer, welcome to our headquarter'), nl,
-    sleep(0.5),
+    % sleep(0.5),
     write('Would you like to tell me your name?'), nl,
-    sleep(0.5),
-    write('Your name: '), read(Name), asserta(player(Name)), nl, nl, 
-    sleep(0.5),
+    % sleep(0.5),
+    write('Your name: '), read(Name), asserta(player(Name)), nl, nl,
+    % sleep(0.5),
     write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
-    sleep(0.5),
+    % sleep(0.5),
     write('Each class has its own unique stats and gameplay'), nl,
-    sleep(0.5),
-    write('<─────────────────────────────────────>'), nl,
-    write('Swordsman Archer Sorcerer'), nl,
-    write('Max HP: '), nl,
-    write('Attack: '), nl,
-    write('Defense: '), nl,
-    write('<─────────────────────────────────────>'), nl,
+    % sleep(0.5),
+    write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
+    write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
+    write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
+    write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
+    write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
+    write('┃                 Atk  25                         Atk  21                        Atk  23                      ┃'), nl,
+    write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
+    write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl,
 
     /* Class(ID_pilihan, class_type, HP, mana, attack, def, level, exp) //parameters could change*/
-    class(1, swordsman, 300, 50, 25, 5, 1, 0).
-    class(2, archer, 280, 60, 21, 3, 1, 0).
-    class(3, sorcerer, 270, 100, 23, 2, 1, 0).
+    % class(1, swordsman, 300, 50, 25, 5, 1, 0).
+    % class(2, archer, 280, 60, 21, 3, 1, 0).
+    % class(3, sorcerer, 270, 100, 23, 2, 1, 0).
     repeat,
     write('Choose your class!'), nl,
     write('1. Swordsman'), nl,
