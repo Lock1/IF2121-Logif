@@ -1,7 +1,5 @@
 width(50).
 height(25).
-setQuest(0).
-setShop(0).
 :- dynamic(position/2).
 :- dynamic(shop/2).
 :- dynamic(quest/2).
@@ -18,9 +16,12 @@ setInitialMap :-
     random(1,5,Absis2),
     random(1,5,Ordinat2),
     asserta(dragon(Absis1, Ordinat1)),
-    asserta(playerLocation(Absis2, Ordinat2)).
+    asserta(playerLocation(Absis2, Ordinat2)),
+    setQuest(3),
+    setMap(3).
 
 setQuest(X) :-
+    X is 0;
     randomize,
     width(W),
     height(H),
@@ -31,6 +32,7 @@ setQuest(X) :-
     setQuest(X2),!.
 
 setShop(X) :-
+    X is 0;
     randomize,
     width(W),
     height(H),
@@ -43,20 +45,21 @@ setShop(X) :-
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
     width(W),
+    (
     X =:= W+1,
     Y =< H+1,
     write('█'), nl,
     Y2 is Y+1,
     setMap(0, Y2),!;
 
-    height(H),  /*Draw Left Border*/
+    /*Draw Left Border*/
     X =:= 0,
     Y =< H+1,
     write('█'),
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Upper Border*/
+    /*Draw Upper Border*/
     X > 0,
     X < W+1,
     Y =:= 0,
@@ -64,8 +67,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Bottom Border*/
-    height(H),
+    /*Draw Bottom Border*/
     X > 0,
     X < W + 1,
     Y =:= H+1,
@@ -73,8 +75,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Dragon*/
-    height(H),
+    /*Draw Dragon*/
     X > 0,
     X < W+1,
     Y > 0,
@@ -84,8 +85,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw quest*/
-    height(H),
+    /*Draw quest*/
     X > 0,
     X < W+1,
     Y > 0,
@@ -95,8 +95,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Player*/
-    height(H),
+    /*Draw Player*/
     X > 0,
     X < W+1,
     Y > 0,
@@ -106,15 +105,15 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Empty*/
-    height(H),
+    /*Draw Empty*/
     X > 0,
     X < W+1,
     Y> 0,
     Y< H+1,
     write('░'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!
+    ).
 
 
 map(X) :-
