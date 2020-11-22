@@ -1,5 +1,5 @@
-width(25).
-height(10).
+width(50).
+height(25).
 :- dynamic(position/2).
 :- dynamic(shop/2).
 :- dynamic(unpassable/2).
@@ -11,12 +11,12 @@ setInitialMap :-
     randomize,
     width(W),
     height(H),
-    random(5,W,Absis1),
-    random(5,H,Ordinat1),
-    random(5,W,Absis2),
-    random(5,H,Ordinat2),
-    random(5,W,Absis3),
-    random(5,H,Ordinat3),
+    random(40,W,Absis1),
+    random(20,H,Ordinat1),
+    random(40,W,Absis2),
+    random(1,10,Ordinat2),
+    random(1,5,Absis3),
+    random(1,5,Ordinat3),
     asserta(dragon(Absis1, Ordinat1)),
     asserta(shop(Absis2, Ordinat2)),
     asserta(playerLocation(Absis3, Ordinat3)).
@@ -40,7 +40,7 @@ setMap(X,Y) :-
     X2 is X+1,
     setMap(X2, Y),!.
 
-/*T*/
+/*U*/
 setMap(X,Y) :-
     width(W),
     X > 0,
@@ -50,7 +50,7 @@ setMap(X,Y) :-
     X2 is X+1,
     setMap(X2, Y),!.
 
-/*B*/
+/*D*/
 setMap(X,Y) :-
     width(W),
     height(H),
@@ -61,6 +61,12 @@ setMap(X,Y) :-
     X2 is X+1,
     setMap(X2, Y),!.
 
+
+
+
+
+
+/* Entity */
 setMap(X,Y) :-
     width(W),
     height(H),
@@ -98,6 +104,6 @@ setMap(X,Y) :-
     setMap(X2, Y),!.
 
 
-
-map :-
-    setMap(0,0), !.
+map(X) :-
+    X is 0, setMap(0,0), !;
+    X is 1, setMap(0,0), !.

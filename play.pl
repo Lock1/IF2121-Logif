@@ -18,48 +18,61 @@
 :- dynamic(count/1).
 :- dynamic(player/1).
 
-
+unicode(0). % Secara default, program ditargetkan untuk mode unicode
 
 % Inisialisasi program
 :- initialization(main).
 
 /* ------------------------- Core Loop -------------------------- */
-% Useful thing : catch(call(X), error(_,_), errorMessage))
 main :-
+    unicode(IsUnicodeMode),
+    IsUnicodeMode is 1,
     shell('clear'),
     randomize,
     random(37,11777,Rseed),
     set_seed(Rseed),
     first_screen,
+    help(IsUnicodeMode),
     setInitialMap,
     printRandomizedTrivia,
     loadingBar(1), nl,
+    gameLoop;
+
+    IsUnicodeMode is 0,
+    randomize,
+    random(37,11777,Rseed),
+    set_seed(Rseed),
+    help(IsUnicodeMode),
+    setInitialMap,
+    printRandomizedTrivia,
     gameLoop.
 
 gameLoop :-
     repeat,
     write('> '),
+    unicode(IsUnicodeMode),
     read(X), (
         X = 'start', call(start);
+        X = 'help', call(help(IsUnicodeMode));
+        X = 'clear', call(clear);
+        X = 'quit', call(quit);
 
         count(_), (
-            X = 'map', call(map);
+            X = 'map', call(map(IsUnicodeMode));
             X = 'status', call(status);
             X = 'w', call(w);
             X = 'a', call(a);
             X = 's', call(s);
             X = 'd', call(d);
-            X = 'move', call(move);
-            X = 'help', call(help);
-            X = 'clear', call(clear)
-
+            X = 'move', call(move)
         )
+
     ),
     fail.
 
-
-errorMessage :-
-    write('Perintah tidak ditemukan\n').
+    % Useful thing : catch(call(X), error(_,_), errorMessage))
+    % errorMessage :-
+    %     write('Perintah tidak ditemukan\n').
 
 /* ------------------------- Commands -------------------------- */
 /* User accessible commands
@@ -99,11 +112,10 @@ overwriteClear :-
 
 quit :-
     \+count(_),
-    write('KAN BELOM DIMULAI PERMAINANNYA!!!!!!!!!!!!!!!!').
+    write('KAN BELOM DIMULAI PERMAINANNYA!!!!!!!!!!!!!!!!'), nl, halt.
 
 quit :-
-    write('Yah masa baru segini quit sih, lemah!!!!').
-    /* masih kurang beberapa argumen */
+    write('Yah masa baru segini quit sih, lemah!!!!'), nl, halt.
 
 /*
 inventory :-
@@ -133,43 +145,38 @@ choose_class :-
     isIDValid(ClassID),!;
     choose_class.
 
-isIDValid(X) :- integer(X),X=<3.
+isIDValid(X) :-
+    integer(X),X=<3.
 
 username_input :-
+    unicode(IsUnicodeMode),
     write('Hello, adventurer, welcome to our headquarter'), nl,
-    sleep(1),
+    sleep(0.8),
     write('Would you like to tell me your name?'), nl,
     sleep(1),
     write('Your name: '), read(Name), asserta(player(Name)), nl, nl,
-    sleep(0.5),
+
     write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
-    sleep(0.5),
+    sleep(0.2),
     write('Each class has its own unique stats and gameplay'), nl,
-    sleep(0.5),
-    write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
-    write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
-    write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
-    write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
-    write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
-    write('┃                 Atk  25                         Atk  21                        Atk  23                      ┃'), nl,
-    write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
-    write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl.
+    sleep(0.2),
+    classScreen(IsUnicodeMode).
 
 /* -------------------------- Movement -------------------------- */
 w :-
     playerLocation(TPX,TPY),
     retract(playerLocation(_,_)),
     Move is TPY-1,
-    asserta(playerLocation(TPX,Move)),
+    asserta(playerLocation(TPX,Move)), % TODO : Collision
     \+map,
-    write('Kamu telah bergerak ke atas'), nl.
+    write('Kamu telah bergerak ke atas '), nl.
 a :-
     playerLocation(TPX,TPY),
     retract(playerLocation(_,_)),
     Move is TPX-1,
     asserta(playerLocation(Move,TPY)),
     \+map,
-    write('Kamu telah bergerak ke kiri'), nl.
+    write('Kamu telah bergerak ke kiri '), nl.
 s :-
     playerLocation(TPX,TPY),
     retract(playerLocation(_,_)),
@@ -224,10 +231,10 @@ first_screen :-
     write('░░░██║░░░██╔══██╗██║░░░██║██║░░██╗██╔═██╗░╚════╝██╔═██╗░██║░░░██║██║╚████║  ╚═╝'), nl,
     write('░░░██║░░░██║░░██║╚██████╔╝╚█████╔╝██║░╚██╗░░░░░░██║░╚██╗╚██████╔╝██║░╚███║  ██╗'), nl,
     write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝'), nl,
-    help,
     flush_output.
 
-help :-
+help(X) :-
+    X is 1,
     write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
     write('│     ┎─────────────────────────────────────────────┒    │ '), nl,
     write('│     ┃ 1. start.  : Memulai petualanganmu          ┃    │ '), nl,
@@ -239,7 +246,44 @@ help :-
     write('│     ┃ 7. clear.  : Membersihkan layar             ┃    │ '), nl,
     write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
     write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
+    write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl;
+
+    X is 0,
+    write('+--------------------------------------------------------+ '), nl,
+    write('|     +---------------------------------------------+    | '), nl,
+    write('|     | 1. start.  : Memulai petualanganmu          |    | '), nl,
+    write('|     | 2. map.    : Menampilkan peta               |    | '), nl,
+    write('|     | 3. status. : Menampilkan kondisi saat ini   |    | '), nl,
+    write('|     | 4. w a s d : Bergerak dengan arah wasd      |    | '), nl,
+    write('|     | 5. move.   : Masuk ke mode movement         |    | '), nl,
+    write('|     | 6. help.   : Menampilkan bantuan            |    | '), nl,
+    write('|     | 7. clear.  : Membersihkan layar             |    | '), nl,
+    write('|     +---------------------------------------------+    | '), nl,
+    write('+--------------------------------------------------------+ '), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
+
+classScreen(X) :-
+    X is 1,
+    write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
+    write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
+    write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
+    write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
+    write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
+    write('┃                 Atk  25                         Atk  21                        Atk  23                      ┃'), nl,
+    write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
+    write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
+
+    X is 0,
+    write('+-----------+-----------+-----------+'), nl,
+    write('| Swordsman |  Archer   |  Sorcerer |'), nl,
+    write('+-----------+-----------+-----------+'), nl,
+    write('|  HP  300  |  HP  280  |  HP  270  |'), nl,
+    write('|  MP   50  |  MP   60  |  MP  100  |'), nl,
+    write('|  Atk  25  |  Atk  21  |  Atk  23  |'), nl,
+    write('|  Def   5  |  Def   3  |  Def   2  |'), nl,
+    write('+-----------+-----------+-----------+'), nl.
+
+
 
 screenWipe(X) :-
     X is 0;
