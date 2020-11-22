@@ -2,7 +2,7 @@ width(50).
 height(25).
 :- dynamic(position/2).
 :- dynamic(shop/2).
-:- dynamic(unpassable/2).
+:- dynamic(quest/2).
 :- dynamic(dragon/2).
 :- dynamic(playerLocation/2).
 
@@ -17,58 +17,48 @@ setInitialMap :-
     random(1,10,Ordinat2),
     random(1,5,Absis3),
     random(1,5,Ordinat3),
+    random(20,30,Absis4),
+    random(20,30,Ordinat4),
     asserta(dragon(Absis1, Ordinat1)),
     asserta(shop(Absis2, Ordinat2)),
-    asserta(playerLocation(Absis3, Ordinat3)).
+    asserta(playerLocation(Absis3, Ordinat3)),
+    asserta(quest(Absis4, Ordinat4)),
+    asserta(quest(Absis3, Ordinat2)).
 
-/*R*/
-setMap(X,Y) :-
+setMap(X,Y) :- /*Draw Right Border*/
     height(H),
     width(W),
     X =:= W+1,
     Y =< H+1,
     write('█'), nl,
     Y2 is Y+1,
-    setMap(0, Y2),!.
+    setMap(0, Y2),!;
 
-/*L*/
-setMap(X,Y) :-
-    height(H),
+    height(H),  /*Draw Left Border*/
     X =:= 0,
     Y =< H+1,
     write('█'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!;
 
-/*U*/
-setMap(X,Y) :-
-    width(W),
+    width(W), /*Draw Upper Border*/
     X > 0,
     X < W+1,
     Y =:= 0,
     write('━'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!;
 
-/*D*/
-setMap(X,Y) :-
-    width(W),
+    width(W), /*Draw Bottom Border*/
     height(H),
     X > 0,
     X < W + 1,
     Y =:= H+1,
     write('━'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!;
 
-
-
-
-
-
-/* Entity */
-setMap(X,Y) :-
-    width(W),
+    width(W), /*Draw Dragon*/
     height(H),
     X > 0,
     X < W+1,
@@ -77,10 +67,20 @@ setMap(X,Y) :-
     dragon(X, Y), !,
     write('D'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!;
 
-setMap(X,Y) :-
-    width(W),
+    width(W), /*Draw quest*/
+    height(H),
+    X > 0,
+    X < W+1,
+    Y > 0,
+    Y < H+1,
+    quest(X, Y), !,
+    write('Q'),
+    X2 is X+1,
+    setMap(X2, Y),!;
+
+    width(W), /*Draw Player*/
     height(H),
     X > 0,
     X < W+1,
@@ -89,11 +89,9 @@ setMap(X,Y) :-
     playerLocation(X, Y), !,
     write('@'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!;
 
-/*empty*/
-setMap(X,Y) :-
-    width(W),
+    width(W), /*Draw Empty*/
     height(H),
     X > 0,
     X < W+1,
