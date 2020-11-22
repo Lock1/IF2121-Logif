@@ -21,19 +21,19 @@
 
 
 % Inisialisasi program
-:- initialization(shell('clear')).
-:- initialization(first_screen).
-% :- initialization(choose_class). % DEBUG
-
-:- initialization(write('Tips : mantap gan\n')). % Loading Bar
-:- initialization(loadingBar(1)).
-:- initialization(nl).
 :- initialization(main).
 
 /* ------------------------- Core Loop -------------------------- */
 % Useful thing : catch(call(X), error(_,_), errorMessage))
 main :-
+    shell('clear'),
+    randomize,
+    random(37,11777,Rseed),
+    set_seed(Rseed),
+    first_screen,
     setInitialMap,
+    printRandomizedTrivia,
+    loadingBar(1), nl,
     gameLoop.
 
 gameLoop :-
@@ -43,8 +43,16 @@ gameLoop :-
         X = 'start', call(start);
 
         count(_), (
+            X = 'map', call(map);
+            X = 'status', call(status);
+            X = 'w', call(w);
+            X = 'a', call(a);
+            X = 's', call(s);
+            X = 'd', call(d);
             X = 'move', call(move);
-            X = 'map', call(map)
+            X = 'help', call(help);
+            X = 'clear', call(clear)
+
         )
     ),
     fail.
@@ -75,6 +83,8 @@ start :-
     asserta(count(1)),
     username_input,
     choose_class.
+
+status. % TODO : add check inventory
 
 clear :-
     shell('clear').
@@ -127,15 +137,15 @@ isIDValid(X) :- integer(X),X=<3.
 
 username_input :-
     write('Hello, adventurer, welcome to our headquarter'), nl,
-    % sleep(0.5),
+    sleep(1),
     write('Would you like to tell me your name?'), nl,
-    % sleep(0.5),
+    sleep(1),
     write('Your name: '), read(Name), asserta(player(Name)), nl, nl,
-    % sleep(0.5),
+    sleep(0.5),
     write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
-    % sleep(0.5),
+    sleep(0.5),
     write('Each class has its own unique stats and gameplay'), nl,
-    % sleep(0.5),
+    sleep(0.5),
     write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
     write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
@@ -318,6 +328,27 @@ horizontalCursorRightMove(X) :-
 horizontalCursorAbsolutePosition(X) :-
     write('\33\[200D'),
     horizontalCursorRightMove(X).
+
+
+
+% Trivia selector
+printRandomizedTrivia :-
+    triviaList(TList),
+    listLength(TList,ListSize),
+    randomize,
+    random(0,10000,RandomResult),
+    Index is mod(RandomResult,ListSize),
+    listSelect(TList,Index,Trivia),
+    write(Trivia), nl.
+
+listLength(L,R) :-
+    L = [], R is 0;
+    L = [_|Y], listLength(Y,Rx), R is Rx + 1.
+
+listSelect(L,I,E) :-
+    L = [X], I is 0, E = X;
+    L = [Y|_], I is 0, E = Y;
+    L = [_|B], Ri is I-1, listSelect(B,Ri,Re), E = Re, !.
 
 
 
