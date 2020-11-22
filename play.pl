@@ -26,35 +26,31 @@ unicode(1). % Secara default, program ditargetkan untuk mode unicode
 /* ------------------------- Core Loop -------------------------- */
 main :-
     unicode(IsUnicodeMode),
-    IsUnicodeMode is 1,
-    shell('clear'),
+    setInitialMap,
     randomize,
     random(37,11777,Rseed),
     set_seed(Rseed),
-    first_screen,
-    help(IsUnicodeMode),
-    setInitialMap,
-    printRandomizedTrivia,
-    loadingBar(1), nl,
-    gameLoop;
+    (
+        IsUnicodeMode is 1,
+        shell('clear'),
+        first_screen,
+        help(IsUnicodeMode),
+        printRandomizedTrivia,
+        loadingBar(1), nl,
+        gameLoop;
 
-    IsUnicodeMode is 0,
-    randomize,
-    random(37,11777,Rseed),
-    set_seed(Rseed),
-    help(IsUnicodeMode),
-    setInitialMap,
-    setQuest(3),
-    setShop(3),
-    printRandomizedTrivia,
-    gameLoop.
+        IsUnicodeMode is 0,
+        help(IsUnicodeMode),
+        printRandomizedTrivia,
+        gameLoop
+    ).
 
 gameLoop :-
     repeat,
     write('> '),
     unicode(IsUnicodeMode),
     % Pembatasan input agar tidak dapat cheat :)
-    read(X), (
+    catch(read(X), error(_,_), errorMessage), (
         X = 'start', call(start);
         X = 'help', call(help(IsUnicodeMode));
         X = 'clear', call(clear);
@@ -69,13 +65,14 @@ gameLoop :-
             X = 'd', call(d);
             X = 'move', call(move)
         )
+        % TODO : Handler message
 
     ),
     fail.
 
     % Useful thing : catch(call(X), error(_,_), errorMessage))
-    % errorMessage :-
-    %     write('Perintah tidak ditemukan\n').
+    errorMessage :-
+        write('Error : Input tidak dipahami\n'), halt.
 
 /* ------------------------- Commands -------------------------- */
 /* User accessible commands
@@ -128,7 +125,7 @@ inventory :-
 /* ----------------------- Decision branch ---------------------- */
 choose_class :-
     write('(Type class name with lowercase)\n'),
-    write('Choose your class: '), read(ClassType), nl,
+    write('Choose your class: '), catch(read(ClassType), error(_,_), errorMessage), nl,
     class(ClassID, ClassType,_,_,_,_,_,_),
     (
         ClassID =:= 1 ->
@@ -157,7 +154,7 @@ username_input :-
     sleep(0.8),
     write('Would you like to tell me your name?'), nl,
     sleep(1),
-    write('Your name: '), read(Name), asserta(player(Name)), nl, nl,
+    write('Your name: '), catch(read(Name), error(_,_), errorMessage), asserta(player(Name)), nl, nl,
 
     write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
     sleep(0.2),
@@ -170,7 +167,7 @@ w :-
     playerLocation(TPX,TPY),
     TPY > 1,
     Move is TPY-1,
-    setLocation(TPX,Move),
+    collisionCheck(TPX,Move),
     \+map,
     write('Kamu telah bergerak ke atas '), nl.
 
@@ -178,7 +175,7 @@ a :-
     playerLocation(TPX,TPY),
     TPX > 1,
     Move is TPX-1,
-    setLocation(Move,TPY),
+    collisionCheck(Move,TPY),
     \+map,
     write('Kamu telah bergerak ke kiri '), nl.
 
@@ -187,22 +184,28 @@ s :-
     height(MaxH),
     TPY < MaxH ,
     Move is TPY+1,
-    setLocation(TPX,Move),
+    collisionCheck(TPX,Move),
     \+map,
-    write('Kamu telah bergerak ke kanan'), nl.
+    write('Kamu telah bergerak ke bawah'), nl.
 
 d :-
     playerLocation(TPX,TPY),
     width(MaxW),
     TPX < MaxW,
     Move is TPX+1,
-    setLocation(Move,TPY),
+    collisionCheck(Move,TPY),
     \+map,
-    write('Kamu telah bergerak ke bawah'), nl.
+    write('Kamu telah bergerak ke kanan'), nl.
 
 setLocation(X,Y) :-
     retract(playerLocation(_,_)),
     asserta(playerLocation(X,Y)).
+
+collisionCheck(X,Y) :-
+    quest(X,Y), write('tambah quest gan'), !;
+    dragon(X,Y), write('battle gan'), !;
+    setLocation(X,Y).
+
 
 
 % Terminal raw mode input, non-blocking mode for more fluid play

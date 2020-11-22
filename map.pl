@@ -1,7 +1,5 @@
 width(50).
 height(25).
-setQuest(0).
-setShop(0).
 :- dynamic(position/2).
 :- dynamic(shop/2).
 :- dynamic(quest/2).
@@ -18,9 +16,12 @@ setInitialMap :-
     random(1,5,Absis2),
     random(1,5,Ordinat2),
     asserta(dragon(Absis1, Ordinat1)),
-    asserta(playerLocation(Absis2, Ordinat2)).
+    asserta(playerLocation(Absis2, Ordinat2)),
+    setQuest(3),
+    setShop(3).
 
 setQuest(X) :-
+    X is 0;
     randomize,
     width(W),
     height(H),
@@ -31,6 +32,7 @@ setQuest(X) :-
     setQuest(X2),!.
 
 setShop(X) :-
+    X is 0;
     randomize,
     width(W),
     height(H),
