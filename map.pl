@@ -45,20 +45,21 @@ setShop(X) :-
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
     width(W),
+    (
     X =:= W+1,
     Y =< H+1,
     write('█'), nl,
     Y2 is Y+1,
     setMap(0, Y2),!;
 
-    height(H),  /*Draw Left Border*/
+    /*Draw Left Border*/
     X =:= 0,
     Y =< H+1,
     write('█'),
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Upper Border*/
+    /*Draw Upper Border*/
     X > 0,
     X < W+1,
     Y =:= 0,
@@ -66,8 +67,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Bottom Border*/
-    height(H),
+    /*Draw Bottom Border*/
     X > 0,
     X < W + 1,
     Y =:= H+1,
@@ -75,8 +75,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Dragon*/
-    height(H),
+    /*Draw Dragon*/
     X > 0,
     X < W+1,
     Y > 0,
@@ -86,8 +85,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw quest*/
-    height(H),
+    /*Draw quest*/
     X > 0,
     X < W+1,
     Y > 0,
@@ -97,8 +95,17 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Player*/
-    height(H),
+    /*Draw shop*/
+    X > 0,
+    X < W+1,
+    Y > 0,
+    Y < H+1,
+    shop(X, Y), !,
+    write('S'),
+    X2 is X+1,
+    setMap(X2, Y),!;
+
+    /*Draw Player*/
     X > 0,
     X < W+1,
     Y > 0,
@@ -108,15 +115,15 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    width(W), /*Draw Empty*/
-    height(H),
+    /*Draw Empty*/
     X > 0,
     X < W+1,
     Y> 0,
     Y< H+1,
-    write('░'),
+    write('□'),
     X2 is X+1,
-    setMap(X2, Y),!.
+    setMap(X2, Y),!
+    ).
 
 
 map :-
