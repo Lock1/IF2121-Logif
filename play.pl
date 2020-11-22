@@ -18,7 +18,7 @@
 :- dynamic(count/1).
 :- dynamic(player/1).
 
-unicode(0). % Secara default, program ditargetkan untuk mode unicode
+unicode(1). % Secara default, program ditargetkan untuk mode unicode
 
 % Inisialisasi program
 :- initialization(main).
@@ -51,6 +51,7 @@ gameLoop :-
     repeat,
     write('> '),
     unicode(IsUnicodeMode),
+    % Pembatasan input agar tidak dapat cheat :)
     read(X), (
         X = 'start', call(start);
         X = 'help', call(help(IsUnicodeMode));
@@ -58,7 +59,7 @@ gameLoop :-
         X = 'quit', call(quit);
 
         count(_), (
-            X = 'map', call(map(IsUnicodeMode));
+            X = 'map', call(map);
             X = 'status', call(status);
             X = 'w', call(w);
             X = 'a', call(a);
@@ -106,7 +107,7 @@ overwriteClear :-
     write('\33\[0,0H'),
     write('\33\[200A'),
     flush_output,
-    screenWipe(20),
+    screenWipe(28),
     write('\33\[200A'),
     flush_output, !.
 
@@ -204,7 +205,7 @@ switchMove(X) :-
 move :-
     clear,
     \+map,
-    write('Tekan e untuk command mode'),
+    write('Tekan e untuk command mode  '), nl,
     toggleRawMode,
     clear,
     write('Telah Kembali ke command mode'), nl.
@@ -212,7 +213,7 @@ move :-
 toggleRawMode :-
     get_key_no_echo(user_input,X),
     overwriteClear,
-    (X is 101, !; switchMove(X), write('Tekan e untuk command mode'), toggleRawMode, !).
+    (X is 101, !; switchMove(X), write('Tekan e untuk command mode '), nl, write('                              '), horizontalCursorAbsolutePosition(1), toggleRawMode, !).
     % Press e to break
 
 /* ----------------------- Draw procedure ----------------------- */

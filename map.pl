@@ -102,6 +102,5 @@ setMap(X,Y) :- /*Draw Right Border*/
     setMap(X2, Y),!.
 
 
-map(X) :-
-    X is 0, setMap(0,0), !;
-    X is 1, setMap(0,0), !.
+map :-
+    setMap(0,0), !.
