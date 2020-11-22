@@ -21,8 +21,7 @@
 :-dynamic(countMonster3/2).
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
-/* Class(ID_pilihan, class_type, HP, mana, attack, def, level, exp) //parameters could change*/
-% statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
+
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 
 % Inisialisasi program
@@ -44,7 +43,6 @@ main :-
         loadingBar(1), nl,
         gameLoop;
 
-        IsUnicodeMode is 0,
         help(IsUnicodeMode),
         printRandomizedTrivia,
         gameLoop
@@ -70,7 +68,7 @@ gameLoop :-
             X = 'd', call(d);
             X = 'move', call(move)
         )
-        % TODO : Handler message
+        % TODO : Extra, Handler message
 
     ),
     fail.
@@ -123,7 +121,7 @@ quit :-
     write('Yah masa baru segini quit sih, lemah!!!!'), nl, halt.
 
 /*
-inventory :- % TODO : integration
+inventory :- % TODO : inventory integration
 */
 
 
@@ -131,7 +129,7 @@ inventory :- % TODO : integration
 choose_class :-
     write('(Type class name with lowercase)\n'),
     write('Choose your class: '), catch(read(ClassType), error(_,_), errorMessage), nl,
-    class(ClassID, ClassType,_,_,_,_,_,_),
+    class(ClassID, ClassType, HP, Mana, Atk, Def),
     (
         ClassID =:= 1 ->
         write('You have chosen Swordsman'), nl,
@@ -147,7 +145,10 @@ choose_class :-
         )
         )
     ),
-    % TODO : Assert player stat
+    player(Name),
+    Lvl is 1, Xp is 0, Gold is 1000, % TODO : Scale with shop cost
+    % statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
+    asserta(statPlayer(ClassID, Name, HP, Mana, Atk, Def, Lvl, Xp, Gold)),
     isIDValid(ClassID),!;
     choose_class.
 
@@ -168,7 +169,7 @@ username_input :-
     sleep(0.2),
     classScreen(IsUnicodeMode).
 
-doQuest(X,Y) :-% TODO : Print at map, using ANSI
+doQuest(X,Y) :-% TODO : Extra, Print at map, using ANSI
     player(Username), randomize, (shell('clear'), !; overwriteClear),
     write('Hello, '), write(Username), write('! It\'s time for some adventure'), nl,
     random(1,500,Rmv1), random(1,500,Rmv2), random(1,500,Rmv3),
@@ -311,7 +312,7 @@ help(X) :-
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
 
 classScreen(X) :-
-    X is 1,
+    X is 1, % TODO : Add some art
     write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
     write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
@@ -333,7 +334,7 @@ classScreen(X) :-
 
 
 
-screenWipe(X) :- % TODO : Selective clear
+screenWipe(X) :- % TODO : Extra, Selective clear
     X is 0;
     flush_output,
     write('                                                                                                           '), nl,
