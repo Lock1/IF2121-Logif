@@ -91,29 +91,29 @@ attackComment :-
 	enemy(_, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
 	write(NamaEnemy), write('telah kalah!'), nl,
-	statPlayer(_,_,_,_,_,_,_,Level,XPPlayer),
+	statPlayer(_,_,_,_,_,_,Level,XPPlayer,_),
 	NewXP is (XPPlayer + XPDrop),
 	retract(enemy(_,_,_,_,_,_)),
 	retract(isRun(_)),
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
-	retract(statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)),
-	asserta(statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, NewXPXP, Gold)),
+	retract(statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, _, Gold)),
+	asserta(statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, NewXP, Gold)),
 	cekNaikLevel(Level, NewXP),
 	!.
 
 /********Belum ketemu musuh*********/
 attack :-
-	not isEnemyAlive(_),
+	\+ isEnemyAlive(_),
 	write('Kamu belum ketemu musuh, mau nyerang siapa?'), nl,
 	!.
 
 /*StatPlayernya belum diimplementasikan*/
-/*Formatnya statPlayer(IDTipe, Nama, Tipe, HP, mana, Atk, Def, Lvl, XP, Gold)*/
+/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/
 /***********Attack biasa********/
 attack :-
 	isEnemyAlive(_),
-	statPlayer(_,_,HPPlayer,Mana,AtkPlayer,DefPlayer,_,_,_,_),
+	statPlayer(_,_,_,_,AtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
 	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
@@ -121,6 +121,8 @@ attack :-
 	write('Kamu menggunakan attack!'), nl,
 	attackComment,
 	!.
+% TODO : Special attack using mana
+% TODO : cekNaikLevel
 
 
 /**********************ATTACK MUSUH***********************/
@@ -142,7 +144,7 @@ enemyAttackComment :-
 
 /*********Serangan dari musuh****************/
 enemyAttack :-
-	enemy(_, NamaEnemy, HPEnemy, AtkEnemy,_, _),
+	enemy(_, NamaEnemy, _, AtkEnemy,_, _),
 	statPlayer(_,_,HPPlayer,_,_,DefPlayer,_,_,_,_),
 	Serangan is (AtkEnemy - DefPlayer),
 	NewHP is (HPPlayer - (AtkEnemy - DefPlayer)),

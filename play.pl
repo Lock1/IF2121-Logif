@@ -13,12 +13,12 @@
 :- include('facts.pl').
 :- include('config.pl').
 :- include('map.pl').
-% :- include('battle.pl').
+:- include('battle.pl').
 
 % Inisialisasi Dynamic Predicate
-:-dynamic(countMonster1/2).
-:-dynamic(countMonster2/2).
-:-dynamic(countMonster3/2).
+:- dynamic(countMonster1/2).
+:- dynamic(countMonster2/2).
+:- dynamic(countMonster3/2).
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
 
@@ -60,7 +60,7 @@ gameLoop :-
         X = 'quit', call(quit);
 
         isGameStarted(_), (
-            X = 'map', call(map);
+            X = 'map', \+map, write('\33\[m'), flush_output;
             X = 'status', call(status);
             X = 'w', call(w);
             X = 'a', call(a);
@@ -100,7 +100,7 @@ start :-
     username_input,
     choose_class.
 
-status. % TODO : add check inventory
+status. % TODO : add check inventory and Extra, print on move mode
 
 clear :-
     shell('clear').
@@ -131,20 +131,18 @@ choose_class :-
     write('Choose your class: '), catch(read(ClassType), error(_,_), errorMessage), nl,
     class(ClassID, ClassType, HP, Mana, Atk, Def),
     (
-        ClassID =:= 1 ->
-        write('You have chosen Swordsman'), nl,
-        write('You may begin your journey.'), nl;
-        (
-        ClassID =:= 2 ->
-        write('You have chosen Archer'), nl,
-        write('You may begin your journey.'), nl;
-        (
-        ClassID =:= 3 ->
-        write('You have chosen Sorcerer'), nl,
-        write('You may begin your journey.'), nl
-        )
-        )
-    ),
+        ClassID =:= 1,
+        write('You have chosen Swordsman'), nl;
+
+        ClassID =:= 2,
+        write('You have chosen Archer'), nl;
+
+        ClassID =:= 3,
+        write('You have chosen Sorcerer'), nl
+
+    ) -> (write('\nYou may begin your journey.\n'),\+map, write('\33\[m'), flush_output,
+    write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
+
     player(Name),
     Lvl is 1, Xp is 0, Gold is 1000, % TODO : Scale with shop cost
     % statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
@@ -169,8 +167,8 @@ username_input :-
     sleep(0.2),
     classScreen(IsUnicodeMode).
 
-doQuest(X,Y) :-% TODO : Extra, Print at map, using ANSI
-    player(Username), randomize, (shell('clear'), !; overwriteClear),
+doQuest(X,Y) :-% TODO : Extra, Print at map using ANSI
+    player(Username), randomize, (shell('clear'), !; overwriteClear, !),
     write('Hello, '), write(Username), write('! It\'s time for some adventure'), nl,
     random(1,500,Rmv1), random(1,500,Rmv2), random(1,500,Rmv3),
     Mnstr1 is mod(Rmv1, 6) + 1, Mnstr2 is mod(Rmv2, 6) + 1, Mnstr3 is mod(Rmv3, 6) + 1,
@@ -185,7 +183,7 @@ doQuest(X,Y) :-% TODO : Extra, Print at map, using ANSI
     retract(quest(X,Y)),
     write('Tekan sembarang tombol untuk melanjutkan'),
     get_key_no_echo(user_input,_),
-    (shell('clear'), !; overwriteClear).
+    (shell('clear'), !; overwriteClear, !). % FIXME : Weird legacy behaviour
 
 
 /* -------------------------- Movement -------------------------- */
@@ -195,7 +193,7 @@ w :-
     Move is TPY-1,
     collisionCheck(TPX,Move),
     \+map,
-    write('Kamu telah bergerak ke atas '), nl.
+    write('Kamu bergerak ke atas '), nl.
 
 a :-
     playerLocation(TPX,TPY),
@@ -203,7 +201,7 @@ a :-
     Move is TPX-1,
     collisionCheck(Move,TPY),
     \+map,
-    write('Kamu telah bergerak ke kiri '), nl.
+    write('Kamu bergerak ke kiri '), nl.
 
 s :-
     playerLocation(TPX,TPY),
@@ -212,7 +210,7 @@ s :-
     Move is TPY+1,
     collisionCheck(TPX,Move),
     \+map,
-    write('Kamu telah bergerak ke bawah'), nl.
+    write('Kamu bergerak ke bawah'), nl.
 
 d :-
     playerLocation(TPX,TPY),
@@ -221,7 +219,7 @@ d :-
     Move is TPX+1,
     collisionCheck(Move,TPY),
     \+map,
-    write('Kamu telah bergerak ke kanan'), nl.
+    write('Kamu bergerak ke kanan'), nl.
 
 setLocation(X,Y) :-
     retract(playerLocation(_,_)),
@@ -229,7 +227,7 @@ setLocation(X,Y) :-
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
-    dragon(X,Y), write('battle gan'), !;
+    dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
     % randomEncounter,  !; % DEBUG encounterEnemy,
     setLocation(X,Y).
@@ -255,6 +253,8 @@ move :-
     \+map,
     write('Tekan e untuk command mode  '), nl,
     toggleRawMode,
+    write('\33\[m'),
+    flush_output,
     clear,
     write('Telah Kembali ke command mode'), nl.
 
@@ -267,6 +267,8 @@ toggleRawMode :-
 /* ----------------------- Draw procedure ----------------------- */
 % Layar pertama ketika dijalankan
 first_screen :-
+    write('\33\[32m\33\[1m'), % ANSI Formatting
+    flush_output,
     write('██╗░░██╗███████╗██╗░░░░░██╗░░░░░░█████╗░░░░'), nl,
     write('██║░░██║██╔════╝██║░░░░░██║░░░░░██╔══██╗░░░'), nl,
     write('███████║█████╗░░██║░░░░░██║░░░░░██║░░██║░░░'), nl,
@@ -279,23 +281,25 @@ first_screen :-
     write('░░░██║░░░██████╔╝██║░░░██║██║░░╚═╝█████═╝░█████╗█████═╝░██║░░░██║██╔██╗██║  ██║'), nl,
     write('░░░██║░░░██╔══██╗██║░░░██║██║░░██╗██╔═██╗░╚════╝██╔═██╗░██║░░░██║██║╚████║  ╚═╝'), nl,
     write('░░░██║░░░██║░░██║╚██████╔╝╚█████╔╝██║░╚██╗░░░░░░██║░╚██╗╚██████╔╝██║░╚███║  ██╗'), nl,
-    write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝'), nl,
+    write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝\33\[m'), nl,
     flush_output.
 
 help(X) :-
     X is 1,
-    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
-    write('│     ┎─────────────────────────────────────────────┒    │ '), nl,
-    write('│     ┃ 1. start.  : Memulai petualanganmu          ┃    │ '), nl,
-    write('│     ┃ 2. map.    : Menampilkan peta               ┃    │ '), nl,
-    write('│     ┃ 3. status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
-    write('│     ┃ 4. w a s d : Bergerak dengan arah wasd      ┃    │ '), nl,
-    write('│     ┃ 5. move.   : Masuk ke mode movement         ┃    │ '), nl,
-    write('│     ┃ 6. help.   : Menampilkan bantuan            ┃    │ '), nl,
-    write('│     ┃ 7. clear.  : Membersihkan layar             ┃    │ '), nl,
-    write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
-    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
-    write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl;
+    write('\33\[37m\33\[1m'), % Help ANSI Formatting
+    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
+    write('│     ┎───────────────────────────────────────────┒    │ '), nl,
+    write('│     ┃  start.  : Memulai petualanganmu          ┃    │ '), nl,
+    write('│     ┃  map.    : Menampilkan peta               ┃    │ '), nl,
+    write('│     ┃  status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
+    write('│     ┃  w a s d : Bergerak dengan arah wasd      ┃    │ '), nl,
+    write('│     ┃  move.   : Masuk ke mode movement         ┃    │ '), nl,
+    write('│     ┃  help.   : Menampilkan bantuan            ┃    │ '), nl,
+    write('│     ┃  clear.  : Membersihkan layar             ┃    │ '), nl,
+    write('│     ┖───────────────────────────────────────────┚    │ '), nl,
+    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
+    write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl,
+    write('\33\[m');
 
     X is 0,
     write('+--------------------------------------------------------+ '), nl,
@@ -363,9 +367,11 @@ loadingBarInner(X) :-
     write('\33\[200D'),
     flush_output,
     write('┃'),
+    write('\33\[33m'), % Loading bar ANSI Formatting
     flush_output,
     loadingProgressDraw(X),
     horizontalCursorAbsolutePosition(Size+3),
+    write('\33\[m'),
     flush_output,
     write('┃'),
     loadingStepDuration(TP),

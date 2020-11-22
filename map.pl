@@ -144,4 +144,6 @@ setMap(X,Y) :- /*Draw Right Border*/
 
 
 map :-
+    write('\33\[37m\33\[1m'),
+    flush_output,
     setMap(0,0), !.
