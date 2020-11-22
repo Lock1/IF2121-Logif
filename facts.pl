@@ -31,6 +31,18 @@ item(10, swordsman, armor, bajuperangdunia, 0, 25).
 item(11, archer, armor, bajuperangdunia2, 0, 21).
 item(12, sorcerer, armor, bajuperangdunia3, 0, 20).
 
+/*Potion(ID, Name, HP+, Mana+)*/
+potion(1, lesserhealingpotion, 10, 0).
+potion(2, smallhealingpotion, 20, 0).
+potion(3, greaterhealingpotion, 30 ,0).
+potion(4, alkohooool, 60, 0).
+
+potion(5, lessermanapotion, 0, 10).
+potion(6, smallmanapotion, 0, 20).
+potion(7, greatermanapotion, 0, 30).
+potion(8, okultisme, 0, 60).
+
+
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
 special_skill(swordsman, matekocokkkkk, 30).
 special_skill(archer, cupid-arrow, 25).
