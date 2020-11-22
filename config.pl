@@ -1,0 +1,15 @@
+/* ----------------- File konfigurasi ----------------- */
+% loadingStepDuration(0.005).
+loadingStepDuration(0.001). % DEBUG
+loadingBarSize(54).
+% Half frame loading bar
+% Change 1/8 or 1/2 on loadingPBar
+
+triviaList(['ayam goreng enak, kalo ditraktir',
+            'tuan krab aku punya ide',
+            'tuan Willy tolong berikan saya gaji',
+            'jika x + 3 = 9, berapakah z?',
+            'fun fact : tubes ini dikerjakan dengan speedrun',
+            'tolong bantu saya, ada pointer dan fungsional disana',
+            'apakah mayonnaise termasuk instrumen?',
+            'mas, pesan es teh panas satu']).

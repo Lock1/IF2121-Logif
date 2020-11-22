@@ -28,3 +28,5 @@ delItem(ItemID) :-
 
 createListInventory(ListItemName, ListCategory) :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_)),
+    findall(Class, inventory(_,Class,_,_,_,_)),
+    findall()
