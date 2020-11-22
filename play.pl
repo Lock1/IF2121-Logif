@@ -31,6 +31,7 @@
 :- initialization(main).
 
 /* ------------------------- Core Loop -------------------------- */
+% Useful thing : catch(call(X), error(_,_), errorMessage))
 main :-
     setInitialMap,
     gameLoop.
@@ -38,11 +39,16 @@ main :-
 gameLoop :-
     repeat,
     write('> '),
-    read(X),
-    % (
-    X = 'move', call(move),
-    % catch(call(X), error(_,_), errorMessage)),
+    read(X), (
+        X = 'start', call(start);
+
+        count(_), (
+            X = 'move', call(move);
+            X = 'map', call(map)
+        )
+    ),
     fail.
+
 
 errorMessage :-
     write('Perintah tidak ditemukan\n').
@@ -62,7 +68,7 @@ w. a. s. d.
 
 start :-
     count(_),
-    write("Gamenya sudah dimulai bambank!").
+    write('Gamenya sudah dimulai bambank!'), nl.
 
 start :-
     \+count(_),
