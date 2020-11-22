@@ -18,6 +18,8 @@
 :- dynamic(count/1).
 :- dynamic(player/1).
 
+
+
 % Inisialisasi program
 :- initialization(shell('clear')).
 :- initialization(first_screen).
@@ -26,27 +28,61 @@
 :- initialization(write('Tips : mantap gan\n')). % Loading Bar
 :- initialization(loadingBar(1)).
 :- initialization(nl).
+:- initialization(setInitialMap).
 :- initialization(gameLoop).
 
-
-
+/* ------------------------- Core Loop -------------------------- */
 gameLoop :-
     repeat,
     write('> '),
     read(X),
-    catch(call(X), error(_,_) ,errorMessage),
+    (X = 'move',\+move;catch(call(X), error(_,_), errorMessage)),
     fail.
 
 errorMessage :-
     write('Perintah tidak ditemukan\n').
-% error(existence_error(procedure,asd/0),gameLoop/0)
 
-% Layar pertama ketika dijalankan
-first_screen :-
-    write('Welcome to your journey!'), nl,
-    help,
-    flush_output.
+/* ------------------------- Commands -------------------------- */
+/* User accessible commands
+start.
+move.
+inventory.
+status.
+map.
+quit.
+clear.
+w. a. s. d.
 
+*/
+
+start :-
+    count(_),
+    write("Gamenya sudah dimulai bambank!").
+
+start :-
+    \+count(_),
+    asserta(count(1)),
+    username_input,
+    choose_class,
+    setInitialMap.
+
+clear :-
+    shell('clear').
+
+quit :-
+    \+count(_),
+    write('KAN BELOM DIMULAI PERMAINANNYA!!!!!!!!!!!!!!!!').
+
+quit :-
+    write('Yah masa baru segini quit sih, lemah!!!!').
+    /* masih kurang beberapa argumen */
+
+/*
+inventory :-
+*/
+
+
+/* ----------------------- Decision branch ---------------------- */
 choose_class :-
     write('(Type class name with lowercase)\n'),
     write('Choose your class: '), read(ClassType), nl,
@@ -91,68 +127,91 @@ username_input :-
     write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl.
 
+/* -------------------------- Movement -------------------------- */
+w :-
+    playerLocation(TPX,TPY),
+    retract(playerLocation(_,_)),
+    Move is TPY-1,
+    asserta(playerLocation(TPX,Move)),
+    \+map,
+    write('Kamu telah bergerak ke atas'), nl.
+a :-
+    playerLocation(TPX,TPY),
+    retract(playerLocation(_,_)),
+    Move is TPX-1,
+    asserta(playerLocation(Move,TPY)),
+    \+map,
+    write('Kamu telah bergerak ke kiri'), nl.
+s :-
+    playerLocation(TPX,TPY),
+    retract(playerLocation(_,_)),
+    Move is TPY+1,
+    asserta(playerLocation(TPX,Move)),
+    \+map,
+    write('Kamu telah bergerak ke kanan'), nl.
+d :-
+    playerLocation(TPX,TPY),
+    retract(playerLocation(_,_)),
+    Move is TPX+1,
+    asserta(playerLocation(Move,TPY)),
+    \+map,
+    write('Kamu telah bergerak ke bawah'), nl.
+
+% Terminal raw mode input, non-blocking mode for more fluid play
+% Press m to back to command mode
+switchMove(X) :-
+    X is 119, w;
+    X is 97, a;
+    X is 115, s;
+    X is 100, d.
+
+move :-
+    shell('clear'),
+    \+map,
+    write('Tekan e untuk command mode'),
+    toggleRawMode,
+    write('Kembali ke command mode'), nl.
+
+toggleRawMode :-
+    get_key_no_echo(user_input,X),
+    shell('clear'),
+    (X is 101, !; switchMove(X), write('Tekan e untuk command mode'), toggleRawMode, !).
+    % Press e to break
+
+/* ----------------------- Draw procedure ----------------------- */
+% Layar pertama ketika dijalankan
+first_screen :-
+    % write('Welcome to your journey!'), nl,
+
+    write('██╗░░██╗███████╗██╗░░░░░██╗░░░░░░█████╗░░░░'), nl,
+    write('██║░░██║██╔════╝██║░░░░░██║░░░░░██╔══██╗░░░'), nl,
+    write('███████║█████╗░░██║░░░░░██║░░░░░██║░░██║░░░'), nl,
+    write('██╔══██║██╔══╝░░██║░░░░░██║░░░░░██║░░██║██╗'), nl,
+    write('██║░░██║███████╗███████╗███████╗╚█████╔╝╚█║'), nl,
+    write('╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝░╚════╝░░╚╝'), nl,
+
+    write('████████╗██████╗░██╗░░░██╗░█████╗░██╗░░██╗░░░░░░██╗░░██╗██╗░░░██╗███╗░░██╗  ██╗'), nl,
+    write('╚══██╔══╝██╔══██╗██║░░░██║██╔══██╗██║░██╔╝░░░░░░██║░██╔╝██║░░░██║████╗░██║  ██║'), nl,
+    write('░░░██║░░░██████╔╝██║░░░██║██║░░╚═╝█████═╝░█████╗█████═╝░██║░░░██║██╔██╗██║  ██║'), nl,
+    write('░░░██║░░░██╔══██╗██║░░░██║██║░░██╗██╔═██╗░╚════╝██╔═██╗░██║░░░██║██║╚████║  ╚═╝'), nl,
+    write('░░░██║░░░██║░░██║╚██████╔╝╚█████╔╝██║░╚██╗░░░░░░██║░╚██╗╚██████╔╝██║░╚███║  ██╗'), nl,
+    write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝'), nl,
+    help,
+    flush_output.
+
 help :-
     write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
     write('│     ┎─────────────────────────────────────────────┒    │ '), nl,
     write('│     ┃ 1. start.  : Memulai petualanganmu          ┃    │ '), nl,
     write('│     ┃ 2. map.    : Menampilkan peta               ┃    │ '), nl,
     write('│     ┃ 3. status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
-    write('│     ┃ 4. w.      : Bergerak ke atas satu langkah  ┃    │ '), nl,
-    write('│     ┃ 5. a.      : Bergerak ke kiri satu langkah  ┃    │ '), nl,
-    write('│     ┃ 6. s.      : Bergerak ke bawah satu langkah ┃    │ '), nl,
-    write('│     ┃ 7. d.      : Bergerak ke kanan satu langkah ┃    │ '), nl,
-    write('│     ┃ 8. help.   : Menampilkan bantuan            ┃    │ '), nl,
+    write('│     ┃ 4. w a s d : Bergerak dengan arah wasd      ┃    │ '), nl,
+    write('│     ┃ 5. move.   : Masuk ke mode movement         ┃    │ '), nl,
+    write('│     ┃ 6. help.   : Menampilkan bantuan            ┃    │ '), nl,
+    write('│     ┃ 7. clear.  : Membersihkan layar             ┃    │ '), nl,
     write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
-    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl, nl, nl.
-
-start :-
-    count(_),
-    write("Gamenya sudah dimulai bambank!").
-
-start :-
-    \+count(_),
-    asserta(count(1)),
-    username_input,
-    choose_class.
-
-
-quit :-
-    \+count(_),
-    write('KAN BELOM DIMULAI PERMAINANNYA!!!!!!!!!!!!!!!!').
-
-quit :-
-    write('Yah masa baru segini quit sih, lemah!!!!').
-    /* masih kurang beberapa argumen */
-
-/*
-inventory :-
-*/
-
-/* Untuk save dan load */
-/*read from file*/
-read_from_file(File) :-
-    open(File, read, Stream),
-
-    /*Get char from data Stream*/
-    get_char(Stream, Char1),
-
-    /*Output all characters until end_of_file*/
-    process_the_stream(Char1, Stream),
-
-    close(Stream).
-
-process_the_stream(end_of_file, _) :- !.
-process_the_stream(Char, Stream) :-
-    write(Char),
-    get_char(Stream, Char2),
-    process_the_stream(Char2, Stream).
-
-/*write to file*/
-write_on_file(File, Text) :-
-    open(File, write, Stream), /*file will get overwritten*/
-    /*open(File, appen, Stream), file will not get overwritten*/
-    write(Stream, Text), nl,
-    close(Stream).
+    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
+    write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
 
 % Loading bar
 loadingBar(X) :-
@@ -235,3 +294,31 @@ horizontalCursorRightMove(X) :-
 horizontalCursorAbsolutePosition(X) :-
     write('\33\[200D'),
     horizontalCursorRightMove(X).
+
+
+/* -------------------- File input / output --------------------- */
+/* Untuk save dan load */
+/*read from file*/
+read_from_file(File) :-
+    open(File, read, Stream),
+
+    /*Get char from data Stream*/
+    get_char(Stream, Char1),
+
+    /*Output all characters until end_of_file*/
+    process_the_stream(Char1, Stream),
+
+    close(Stream).
+
+process_the_stream(end_of_file, _) :- !.
+process_the_stream(Char, Stream) :-
+    write(Char),
+    get_char(Stream, Char2),
+    process_the_stream(Char2, Stream).
+
+/*write to file*/
+write_on_file(File, Text) :-
+    open(File, write, Stream), /*file will get overwritten*/
+    /*open(File, appen, Stream), file will not get overwritten*/
+    write(Stream, Text), nl,
+    close(Stream).
