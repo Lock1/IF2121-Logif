@@ -3,11 +3,14 @@ class(1, swordsman, 300, 50, 25, 5, 1, 0).
 class(2, archer, 280, 60, 21, 3, 1, 0).
 class(3, sorcerer, 270, 100, 23, 2, 1, 0).
 
-/* Monster(name, atk, exp_drop) //parameters could change*/
+/* Monster(ID, name, HP, atk, def, exp_drop) //parameters could change*/
 /* Tipe monster sesuai dengan spek */
-monster(slime, 22, 30).
-monster(goblin, 27, 45).
-monster(wolf, 33, 55).
+monster(1, slime, 60, 22, 2, 30).
+monster(2, goblin, 80, 27, 4, 45).
+monster(3, wolf, 90, 33, 3, 55).
+monster(4, skeleton, 100, 26, 3, 42).
+monster(5, zombie, 65, 20, 2, 32).
+monster(6, bomber, 68, 45, 1, 48).
 
 /* Item(item_id, class_type, category, item_name, attack, def) possibly dont need gold since gacha anyway //parameters could change*/
 /* Item terbagi sesuai dengan jenis class dan category */
@@ -31,4 +34,4 @@ item(12, sorcerer, armor, bajuperangdunia3, 0, 20).
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
 special_skill(swordsman, matekocokkkkk, 30).
 special_skill(archer, cupid-arrow, 25).
-special_skill(sorcerer, santet, 30).
+special_skill(sorcerer, santet, 30). 
