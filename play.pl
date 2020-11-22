@@ -28,15 +28,20 @@
 :- initialization(write('Tips : mantap gan\n')). % Loading Bar
 :- initialization(loadingBar(1)).
 :- initialization(nl).
-:- initialization(setInitialMap).
-:- initialization(gameLoop).
+:- initialization(main).
 
 /* ------------------------- Core Loop -------------------------- */
+main :-
+    setInitialMap,
+    gameLoop.
+
 gameLoop :-
     repeat,
     write('> '),
     read(X),
-    (X = 'move',\+move;catch(call(X), error(_,_), errorMessage)),
+    % (
+    X = 'move', call(move),
+    % catch(call(X), error(_,_), errorMessage)),
     fail.
 
 errorMessage :-
@@ -63,11 +68,18 @@ start :-
     \+count(_),
     asserta(count(1)),
     username_input,
-    choose_class,
-    setInitialMap.
+    choose_class.
 
 clear :-
     shell('clear').
+
+overwriteClear :-
+    write('\33\[0,0H'),
+    write('\33\[200A'),
+    flush_output,
+    screenWipe(20),
+    write('\33\[200A'),
+    flush_output, !.
 
 quit :-
     \+count(_),
@@ -163,26 +175,26 @@ switchMove(X) :-
     X is 119, w;
     X is 97, a;
     X is 115, s;
-    X is 100, d.
+    X is 100, d;
+    X > 0, \+map.
 
 move :-
-    shell('clear'),
+    clear,
     \+map,
     write('Tekan e untuk command mode'),
     toggleRawMode,
-    write('Kembali ke command mode'), nl.
+    clear,
+    write('Telah Kembali ke command mode'), nl.
 
 toggleRawMode :-
     get_key_no_echo(user_input,X),
-    shell('clear'),
+    overwriteClear,
     (X is 101, !; switchMove(X), write('Tekan e untuk command mode'), toggleRawMode, !).
     % Press e to break
 
 /* ----------------------- Draw procedure ----------------------- */
 % Layar pertama ketika dijalankan
 first_screen :-
-    % write('Welcome to your journey!'), nl,
-
     write('██╗░░██╗███████╗██╗░░░░░██╗░░░░░░█████╗░░░░'), nl,
     write('██║░░██║██╔════╝██║░░░░░██║░░░░░██╔══██╗░░░'), nl,
     write('███████║█████╗░░██║░░░░░██║░░░░░██║░░██║░░░'), nl,
@@ -212,6 +224,12 @@ help :-
     write('│     ┖─────────────────────────────────────────────┚    │ '), nl,
     write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
+
+screenWipe(X) :-
+    X is 0;
+    flush_output,
+    write('                                                                  '), nl,
+    Rx is X-1, screenWipe(Rx).
 
 % Loading bar
 loadingBar(X) :-
@@ -249,7 +267,7 @@ loadingPBar(X) :-
     X is 7, write('█'); % █ Full 1/8 step frame
     X is 6, write('█'); % ▉ WSL Terminal doesnt support it
     X is 5, write('█'); % ▊ Only half frame supported
-    X is 4, write('█'); % ▋
+    X is 4, write('█'); % ▋ Windows Terminal support full frame mode
     X is 3, write('▌'); % ▌
     X is 2, write('▌'); % ▍
     X is 1, write('▌'); % ▎
@@ -294,6 +312,7 @@ horizontalCursorRightMove(X) :-
 horizontalCursorAbsolutePosition(X) :-
     write('\33\[200D'),
     horizontalCursorRightMove(X).
+
 
 
 /* -------------------- File input / output --------------------- */
