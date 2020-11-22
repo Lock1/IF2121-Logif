@@ -34,4 +34,4 @@ item(12, sorcerer, armor, bajuperangdunia3, 0, 20).
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
 special_skill(swordsman, matekocokkkkk, 30).
 special_skill(archer, cupid-arrow, 25).
-special_skill(sorcerer, santet, 30). 
+special_skill(sorcerer, santet, 30).

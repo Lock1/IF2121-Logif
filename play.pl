@@ -13,11 +13,16 @@
 :- include('facts.pl').
 :- include('config.pl').
 :- include('map.pl').
+% :- include('battle.pl').
 
 % Inisialisasi Dynamic Predicate
-:- dynamic(count/1).
+:-dynamic(countMonster1/2).
+:-dynamic(countMonster2/2).
+:-dynamic(countMonster3/2).
+:- dynamic(isGameStarted/1).
 :- dynamic(player/1).
-
+/* Class(ID_pilihan, class_type, HP, mana, attack, def, level, exp) //parameters could change*/
+% statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 
 % Inisialisasi program
@@ -56,7 +61,7 @@ gameLoop :-
         X = 'clear', call(clear);
         X = 'quit', call(quit);
 
-        count(_), (
+        isGameStarted(_), (
             X = 'map', call(map);
             X = 'status', call(status);
             X = 'w', call(w);
@@ -70,9 +75,9 @@ gameLoop :-
     ),
     fail.
 
-    % Useful thing : catch(call(X), error(_,_), errorMessage))
-    errorMessage :-
-        write('Error : Input tidak dipahami\n'), halt.
+% Useful thing : catch(call(X), error(_,_), errorMessage))
+errorMessage :-
+    write('Error : Input tidak dipahami\n'), halt.
 
 /* ------------------------- Commands -------------------------- */
 /* User accessible commands
@@ -88,12 +93,12 @@ w. a. s. d.
 */
 
 start :-
-    count(_),
+    isGameStarted(_),
     write('Gamenya sudah dimulai bambank!'), nl.
 
 start :-
-    \+count(_),
-    asserta(count(1)),
+    \+isGameStarted(_),
+    asserta(isGameStarted(1)),
     username_input,
     choose_class.
 
@@ -111,14 +116,14 @@ overwriteClear :-
     flush_output, !.
 
 quit :-
-    \+count(_),
+    \+isGameStarted(_),
     write('KAN BELOM DIMULAI PERMAINANNYA!!!!!!!!!!!!!!!!'), nl, halt.
 
 quit :-
     write('Yah masa baru segini quit sih, lemah!!!!'), nl, halt.
 
 /*
-inventory :-
+inventory :- % TODO : integration
 */
 
 
@@ -142,11 +147,12 @@ choose_class :-
         )
         )
     ),
+    % TODO : Assert player stat
     isIDValid(ClassID),!;
     choose_class.
 
 isIDValid(X) :-
-    integer(X),X=<3.
+    integer(X), X=<3.
 
 username_input :-
     unicode(IsUnicodeMode),
@@ -161,6 +167,25 @@ username_input :-
     write('Each class has its own unique stats and gameplay'), nl,
     sleep(0.2),
     classScreen(IsUnicodeMode).
+
+doQuest(X,Y) :-% TODO : Print at map, using ANSI
+    player(Username), randomize, (shell('clear'), !; overwriteClear),
+    write('Hello, '), write(Username), write('! It\'s time for some adventure'), nl,
+    random(1,500,Rmv1), random(1,500,Rmv2), random(1,500,Rmv3),
+    Mnstr1 is mod(Rmv1, 6) + 1, Mnstr2 is mod(Rmv2, 6) + 1, Mnstr3 is mod(Rmv3, 6) + 1,
+    random(1,1000,Rv1), random(1,1000,Rv2), random(1,1000,Rv3),
+    Cnt1 is mod(Rv1, 6) + 1, Cnt2 is mod(Rv2, 6) + 1, Cnt3 is mod(Rv3, 6) + 1,
+    write('You have to slain '), write(Cnt1), write(' '), monster(Mnstr1,Name1,_,_,_,_), write(Name1), nl,
+    write('You have to slain '), write(Cnt2), write(' '), monster(Mnstr2,Name2,_,_,_,_), write(Name2), nl,
+    write('You have to slain '), write(Cnt3), write(' '), monster(Mnstr3,Name3,_,_,_,_), write(Name3), nl,
+    asserta(countMonster1(Mnstr1,Cnt1)),
+    asserta(countMonster2(Mnstr2,Cnt2)),
+    asserta(countMonster3(Mnstr3,Cnt3)),
+    retract(quest(X,Y)),
+    write('Tekan sembarang tombol untuk melanjutkan'),
+    get_key_no_echo(user_input,_),
+    (shell('clear'), !; overwriteClear).
+
 
 /* -------------------------- Movement -------------------------- */
 w :-
@@ -202,11 +227,18 @@ setLocation(X,Y) :-
     asserta(playerLocation(X,Y)).
 
 collisionCheck(X,Y) :-
-    quest(X,Y), write('tambah quest gan'), !;
+    quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !;
+    shop(X,Y), write('shop gan'), !;
+    % randomEncounter,  !; % DEBUG encounterEnemy,
     setLocation(X,Y).
 
-
+randomEncounter :-
+    randomize, (
+        random(0,10000,RandValue),
+        RandValue < 1500,
+        write('battle lagi gan')
+        ).
 
 % Terminal raw mode input, non-blocking mode for more fluid play
 % Press m to back to command mode
@@ -301,10 +333,10 @@ classScreen(X) :-
 
 
 
-screenWipe(X) :-
+screenWipe(X) :- % TODO : Selective clear
     X is 0;
     flush_output,
-    write('                                                                  '), nl,
+    write('                                                                                                           '), nl,
     Rx is X-1, screenWipe(Rx).
 
 % Loading bar

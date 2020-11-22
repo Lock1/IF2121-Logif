@@ -120,7 +120,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     X < W+1,
     Y> 0,
     Y< H+1,
-    write('□'),
+    % write('□'),
+    write(' '),
     X2 is X+1,
     setMap(X2, Y),!
     ).

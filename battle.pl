@@ -1,4 +1,5 @@
 :- dynamic(enemy/6).
+:- dynamic(statPlayer/9).
 :- dynamic(isEnemyAlive/1).
 :- dynamic(isFighting/1).
 :- dynamic(peluang/1).
@@ -11,24 +12,24 @@ encounterEnemy:-
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('Kamu ketemu '), write(Nama), write('!!'), nl,
 	write('Apa yang akan kamu lakukan?'), nl,
-	write('-fight'), nl,
-	write('-run'),
+	write('- Fight'), nl,
+	write('- Run'),
 	write('Tuliskan perintah diakhiri tanda titik'),
 	random(1, 10, P),
 	asserta(peluang(P)),
 	asserta(isEnemyAlive(1)).
-	
+
 /********Lari*************/
 
 /********Mau Lari tapi belum ketemu musuh******/
 run :-
-	not isEnemyAlive(_),
+	\+ isEnemyAlive(_),
 	write('Kamu belum ketemu musuh lho'),
 	!.
-	
+
 /***********Gagal Lari *********/
 run :-
-	not isRun(_),
+	\+ isRun(_),
 	isEnemyAlive(_),
 	peluang(P),
 	P =< 4,
@@ -37,10 +38,10 @@ run :-
 	asserta(isRun(1)),
 	fight,
 	!.
-	
+
 /************Berhasil Lari************/
 run :-
-	not isRun(_),
+	\+ isRun(_),
 	isEnemyAlive(_),
 	peluang(P),
 	P > 4,
@@ -58,19 +59,19 @@ run :-
 /*******************FIGHT********************/
 /********Belum ketemu musuh*********/
 fight :-
-	not isEnemyAlive(_),
+	\+ isEnemyAlive(_),
 	write('Kamu belum ketemu musuh. Mau nyerang siapa?'), nl,
 	!.
-	
-/********Berhasil Bertarung*********/	
-fight :- 
+
+/********Berhasil Bertarung*********/
+fight :-
 	asserta(isRun(1)),
 	asserta(isFighting(1)),
 	isEnemyAlive(_),
 	!.
-	
+
 /********Sudah ketemu musuh tapi fight lagi*******/
-fight :- 
+fight :-
 	isFighting(_),
 	isEnemyAlive(_),
 	write('Kamu sedang melawan musuh loh'), nl,
@@ -90,14 +91,14 @@ attackComment :-
 	enemy(_, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
 	write(NamaEnemy), write('telah kalah!'), nl,
-	statPlayer(_,_,_,_,_,_,_,_,Level,XPPlayer),
+	statPlayer(_,_,_,_,_,_,_,Level,XPPlayer),
 	NewXP is (XPPlayer + XPDrop),
 	retract(enemy(_,_,_,_,_,_)),
 	retract(isRun(_)),
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
-	retract(statPlayer(IDTipe, Nama, Tipe, HP, mana, Atk, Def, Lvl, XP, Gold)),
-	asserta(statPlayer(IDTipe, Nama, Tipe, HP, mana, Atk, Def, Lvl, NewXPXP, Gold)),
+	retract(statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)),
+	asserta(statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, NewXPXP, Gold)),
 	cekNaikLevel(Level, NewXP),
 	!.
 
@@ -106,7 +107,7 @@ attack :-
 	not isEnemyAlive(_),
 	write('Kamu belum ketemu musuh, mau nyerang siapa?'), nl,
 	!.
-	
+
 /*StatPlayernya belum diimplementasikan*/
 /*Formatnya statPlayer(IDTipe, Nama, Tipe, HP, mana, Atk, Def, Lvl, XP, Gold)*/
 /***********Attack biasa********/
@@ -120,8 +121,8 @@ attack :-
 	write('Kamu menggunakan attack!'), nl,
 	attackComment,
 	!.
-	
-	
+
+
 /**********************ATTACK MUSUH***********************/
 /********Comment kalau pemain masih belum kalah********/
 enemyAttackComment :-
@@ -138,7 +139,7 @@ enemyAttackComment :-
 	write('Kamu mati'), nl,
 	lose,
 	!.
-	
+
 /*********Serangan dari musuh****************/
 enemyAttack :-
 	enemy(_, NamaEnemy, HPEnemy, AtkEnemy,_, _),
@@ -146,12 +147,12 @@ enemyAttack :-
 	Serangan is (AtkEnemy - DefPlayer),
 	NewHP is (HPPlayer - (AtkEnemy - DefPlayer)),
 	write(NamaEnemy), write(' melakukan serangan sebesar '), write(Serangan), nl,
-	retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
-	asserta(statPlayer(IDTipe, Nama, Tipe, NewHP, mana, Atk, DefPlayer, Lvl, XP, Gold)),
+	retract(statPlayer(IDTipe, Nama, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
+	asserta(statPlayer(IDTipe, Nama, NewHP, mana, Atk, DefPlayer, Lvl, XP, Gold)),
 	enemyAttackComment,
 	!.
-	
-	
+
+
 /***********************KALAH********************************/
 lose :-
 	retract(isEnemyAlive(_)),
