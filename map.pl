@@ -1,5 +1,7 @@
 width(50).
 height(25).
+setQuest(0).
+setShop(0).
 :- dynamic(position/2).
 :- dynamic(shop/2).
 :- dynamic(quest/2).
@@ -13,17 +15,30 @@ setInitialMap :-
     height(H),
     random(40,W,Absis1),
     random(20,H,Ordinat1),
-    random(40,W,Absis2),
-    random(1,10,Ordinat2),
-    random(1,5,Absis3),
-    random(1,5,Ordinat3),
-    random(20,30,Absis4),
-    random(20,30,Ordinat4),
+    random(1,5,Absis2),
+    random(1,5,Ordinat2),
     asserta(dragon(Absis1, Ordinat1)),
-    asserta(shop(Absis2, Ordinat2)),
-    asserta(playerLocation(Absis3, Ordinat3)),
-    asserta(quest(Absis4, Ordinat4)),
-    asserta(quest(Absis3, Ordinat2)).
+    asserta(playerLocation(Absis2, Ordinat2)).
+
+setQuest(X) :-
+    randomize,
+    width(W),
+    height(H),
+    random(1, W, Absis),
+    random(1, H, Ordinat),
+    asserta(quest(Absis, Ordinat)),
+    X2 is X-1,
+    setQuest(X2),!.
+
+setShop(X) :-
+    randomize,
+    width(W),
+    height(H),
+    random(1, W, Absis),
+    random(1, H, Ordinat),
+    asserta(shop(Absis, Ordinat)),
+    X2 is X-1,
+    setShop(X2),!.
 
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),

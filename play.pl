@@ -44,6 +44,8 @@ main :-
     set_seed(Rseed),
     help(IsUnicodeMode),
     setInitialMap,
+    setQuest(3),
+    setShop(3),
     printRandomizedTrivia,
     gameLoop.
 
