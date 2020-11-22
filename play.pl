@@ -168,32 +168,42 @@ username_input :-
 /* -------------------------- Movement -------------------------- */
 w :-
     playerLocation(TPX,TPY),
-    retract(playerLocation(_,_)),
+    TPY > 1,
     Move is TPY-1,
-    asserta(playerLocation(TPX,Move)), % TODO : Collision
+    setLocation(TPX,Move),
     \+map,
     write('Kamu telah bergerak ke atas '), nl.
+
 a :-
     playerLocation(TPX,TPY),
-    retract(playerLocation(_,_)),
+    TPX > 1,
     Move is TPX-1,
-    asserta(playerLocation(Move,TPY)),
+    setLocation(Move,TPY),
     \+map,
     write('Kamu telah bergerak ke kiri '), nl.
+
 s :-
     playerLocation(TPX,TPY),
-    retract(playerLocation(_,_)),
+    height(MaxH),
+    TPY < MaxH ,
     Move is TPY+1,
-    asserta(playerLocation(TPX,Move)),
+    setLocation(TPX,Move),
     \+map,
     write('Kamu telah bergerak ke kanan'), nl.
+
 d :-
     playerLocation(TPX,TPY),
-    retract(playerLocation(_,_)),
+    width(MaxW),
+    TPX < MaxW,
     Move is TPX+1,
-    asserta(playerLocation(Move,TPY)),
+    setLocation(Move,TPY),
     \+map,
     write('Kamu telah bergerak ke bawah'), nl.
+
+setLocation(X,Y) :-
+    retract(playerLocation(_,_)),
+    asserta(playerLocation(X,Y)).
+
 
 % Terminal raw mode input, non-blocking mode for more fluid play
 % Press m to back to command mode
