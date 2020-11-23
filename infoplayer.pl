@@ -82,3 +82,17 @@ listPotion :-
 listInventory :-
     listItem,!,
     listPotion,!.
+
+%statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)
+
+checkLevel :-
+    statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold),
+    (
+    CurrentLvl is Lvl,
+    BaseXPReq is 200,
+    NextLvl is CurrentLvl*80+BaseXPReq,
+    NewAtk is Atk*CurrentLvl+20,
+    NewDef is Def*CurrentLvl+10,
+    retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, NewAtk, NewDef, NextLvl, XP, Gold))
+    ).
