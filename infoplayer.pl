@@ -1,5 +1,6 @@
 :- dynamic(inventory/6).
 :- dynamic(inventoryP/4).
+:- include('facts.pl').
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
@@ -26,6 +27,9 @@ addItem(ItemID) :-
 delItem(ItemID) :-
     \+inventory(ItemID,_,_,_,_,_),
     write('There is no specified item to delete'),!,fail;
+
+    \+inventoryP(ItemID,_,_,_),
+    write('There is no specified potion to delete'),!,fail;
 
     ItemID>15,
     retract(inventoryP(ItemID,_,_,_));
