@@ -1,22 +1,19 @@
 :- dynamic(inventory/6).
 
 /*inventory(ItemID, class, category, name, attack, def)*/
-checkLength(Res) :-
-    length(List, Length),
-    length(ListP, LengthP),
-    Res is Length+LengthP.
-
 addItem(ItemID) :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_), List),
-    findall(PotionName, potion(_,PotionName,_,_), ListP),
-    checkLength(Res),
+    findall(PotionName, potion(_,_,_PotionName,_,_), ListP),
+    length(List, Length),
+    length(ListP, LengthP),
+    Res is Length+LengthP,
     (
     Res >= 100,
     write('Inventory Is Full'),
     !,fail;
-
-    potion(PotionID, PotionName, PlusHP, PlusMana),
-    asserta(inventory(PotionID, _, _, PotionName, PlusHP, PlusMana)),!;
+    /*bisa ga ya kira2*/
+    potion(ItemID, _, _, PotionName, PlusHP, PlusMana),
+    asserta(inventory(ItemID, _, _, PotionName, PlusHP, PlusMana)),!;
 
     item(ItemID, ClassType, Category, ItemName, Attack, Def),
     asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!
