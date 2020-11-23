@@ -4,17 +4,14 @@
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
-    (
-    ItemID>15,
-    findall(ItemName, inventory(_,_,_,ItemName,_,_), List);
-    ItemID=<15,
-    findall(PotionName, potion(_,PotionName,_,_), ListP)
-    ),
+    findall(ItemName, inventory(_,_,_,ItemName,_,_), List),
+    findall(PotionName, potion(_,PotionName,_,_), ListP),
     length(List, Length),
     length(ListP, LengthP),
     Res is Length+LengthP,
     (
-    Res >= 100,
+    Res >= 100, 
+    /*for some reason starting res is 9(???)*/
     write('Inventory Is Full'),
     !,fail;
     
