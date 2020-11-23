@@ -4,8 +4,12 @@
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
-    findall(ItemName, inventory(_,_,_,ItemName,_,_), List),
-    findall(PotionName, potion(_,PotionName,_,_), ListP),
+    (
+    ItemID>15,
+    findall(ItemName, inventory(_,_,_,ItemName,_,_), List);
+    ItemID=<15,
+    findall(PotionName, potion(_,PotionName,_,_), ListP)
+    ),
     length(List, Length),
     length(ListP, LengthP),
     Res is Length+LengthP,
