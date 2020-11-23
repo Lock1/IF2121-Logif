@@ -19,9 +19,9 @@ item(1, swordsman, sword, excalibur_kw1, 50, 0).
 item(2, swordsman, sword, samehadawibu, 45, 0).
 item(3, swordsman, sword, pedangzabuza, 42, 0).
 
-item(4, archer, bow, gataudeh, 47, 0).
-item(5, archer, bow, ngarangbebas, 42, 0).
-item(6, archer, bow, tolongkasihnamaya, 39, 0).
+item(4, archer, bow, lightningarrow, 47, 0).
+item(5, archer, bow, archdemon, 42, 0).
+item(6, archer, bow, arrowspike, 39, 0).
 
 item(7, sorcerer, wand, avadacadavra, 46, 0).
 item(8, sorcerer, wand, tolongkasihnama2, 44, 0).
@@ -31,19 +31,24 @@ item(10, swordsman, armor, bajuperangdunia, 0, 25).
 item(11, archer, armor, bajuperangdunia2, 0, 21).
 item(12, sorcerer, armor, bajuperangdunia3, 0, 20).
 
-/*Potion(ID, Name, HP+, Mana+)*/
-potion(1, lesserhealingpotion, 10, 0).
-potion(2, smallhealingpotion, 20, 0).
-potion(3, greaterhealingpotion, 30 ,0).
-potion(4, alkohooool, 60, 0).
+item(13, swordsman, statup, gelangbaja, 10, 5).
+item(14, sorcerer, statup, gelangsihir, 10, 5).
+item(15, archer, statup, gelangkaret, 10, 5).
 
-potion(5, lessermanapotion, 0, 10).
-potion(6, smallmanapotion, 0, 20).
-potion(7, greatermanapotion, 0, 30).
-potion(8, okultisme, 0, 60).
+/*Potion(ID, _, _, Name, HP+, Mana+)*/
+potion(16, 0, 0, lesserhealingpotion, 10, 0).
+potion(17, 0, 0, smallhealingpotion, 20, 0).
+potion(18, 0, 0, greaterhealingpotion, 30 ,0).
+potion(19, 0, 0, alkohooool, 60, 0).
+
+potion(20, 0, 0, lessermanapotion, 0, 10).
+potion(21, 0, 0, smallmanapotion, 0, 20).
+potion(22, 0, 0, greatermanapotion, 0, 30).
+potion(23, 0, 0, okultisme, 0, 60).
+
 
 
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
 special_skill(swordsman, matekocokkkkk, 30).
 special_skill(archer, cupid-arrow, 25).
-special_skill(sorcerer, santet, 30).
+special_skill(sorcerer, santet, 30). 

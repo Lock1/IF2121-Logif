@@ -3,11 +3,17 @@
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_), List),
-    length(List,Length),
+    findall(PotionName, potion(_,_,_PotionName,_,_), ListP),
+    length(List, Length),
+    length(ListP, LengthP),
+    Res is Length+LengthP,
     (
-    Length >= 100,
-    write('Inventory is full'),
+    Res >= 100,
+    write('Inventory Is Full'),
     !,fail;
+    /*bisa ga ya kira2*/
+    potion(ItemID, _, _, PotionName, PlusHP, PlusMana),
+    asserta(inventory(ItemID, _, _, PotionName, PlusHP, PlusMana)),!;
 
     item(ItemID, ClassType, Category, ItemName, Attack, Def),
     asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!
