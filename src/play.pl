@@ -16,9 +16,7 @@
 :- include('battle.pl').
 
 % Inisialisasi Dynamic Predicate
-:- dynamic(countMonster1/2).
-:- dynamic(countMonster2/2).
-:- dynamic(countMonster3/2).
+:- dynamic(questList/2).
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
 
@@ -100,7 +98,7 @@ start :-
     asserta(isGameStarted(1)),
     username_input,
     choose_class.
-
+% TODO : Level up
 status :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'), nl,
@@ -115,8 +113,19 @@ status :-
     write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]), write(' ┃'), nl,
     write('┃ Gold    │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'), nl,
-    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl.
+    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl,
+    questStatus.
+
+questStatus :-
+    questList(ID,Ct),
+    monster(ID,Name,_,_,_,_),
+    write( '┏━━━━━━━━━┯━━━━━━━┓\n'),
+    write( '┃ Monster │ Count ┃\n'),
+    write( '┠─────────┼───────┨\n'),
+    format('┃ \33\[31m\33\[1m%-7s\33\[m │ %5d ┃\n',[Name,Ct]),
+    write( '┗━━━━━━━━━┷━━━━━━━┛\n').
     % TODO : Add check inventory, quest.
+    % TODO : Extra, Filter input 'a,b'
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -213,16 +222,15 @@ username_input :-
 doQuest(X,Y) :-% TODO : Battle interaction
     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
     write('Hello, '), write(Username), write('! It\'s time for some adventure'), nl,
-    random(1,500,Rmv1), random(1,500,Rmv2), random(1,500,Rmv3),
-    Mnstr1 is mod(Rmv1, 6) + 1, Mnstr2 is mod(Rmv2, 6) + 1, Mnstr3 is mod(Rmv3, 6) + 1,
-    random(1,1000,Rv1), random(1,1000,Rv2), random(1,1000,Rv3),
-    Cnt1 is mod(Rv1, 6) + 1, Cnt2 is mod(Rv2, 6) + 1, Cnt3 is mod(Rv3, 6) + 1,
-    write('You have to slain '), write(Cnt1), write(' '), monster(Mnstr1,Name1,_,_,_,_), write(Name1), nl,
-    write('You have to slain '), write(Cnt2), write(' '), monster(Mnstr2,Name2,_,_,_,_), write(Name2), nl,
-    write('You have to slain '), write(Cnt3), write(' '), monster(Mnstr3,Name3,_,_,_,_), write(Name3), nl,
-    asserta(countMonster1(Mnstr1,Cnt1)),
-    asserta(countMonster2(Mnstr2,Cnt2)),
-    asserta(countMonster3(Mnstr3,Cnt3)),
+    random(1,500,Rmv),
+    Mnstr is mod(Rmv, 6) + 1,
+    random(1,1000,Rv),
+    Cnt is mod(Rv, 6) + 1,
+    write('You have to slain '), write(Cnt), write(' '), monster(Mnstr,Name,_,_,_,_), write(Name), nl,
+    (
+        questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
+        asserta(questList(Mnstr,Cnt)), !
+    ),
     retract(quest(X,Y)),
     prompt,
     (shell('clear'), !; overwriteClear, !). % FIXME : Weird legacy behaviour
@@ -236,7 +244,7 @@ w :-
     collisionCheck(TPX,Move),
     flush_output, sideStatus,
     \+map,
-    write('Kamu bergerak ke atas '), nl.
+    write('Kamu bergerak ke atas      '), nl.
 
 a :-
     playerLocation(TPX,TPY),
@@ -245,7 +253,7 @@ a :-
     collisionCheck(Move,TPY),
     flush_output, sideStatus,
     \+map,
-    write('Kamu bergerak ke kiri '), nl.
+    write('Kamu bergerak ke kiri      '), nl.
 
 s :-
     playerLocation(TPX,TPY),
@@ -255,7 +263,7 @@ s :-
     collisionCheck(TPX,Move),
     flush_output, sideStatus,
     \+map,
-    write('Kamu bergerak ke bawah'), nl.
+    write('Kamu bergerak ke bawah     '), nl.
 
 d :-
     playerLocation(TPX,TPY),
@@ -265,7 +273,7 @@ d :-
     collisionCheck(Move,TPY),
     flush_output, sideStatus,
     \+map,
-    write('Kamu bergerak ke kanan'), nl.
+    write('Kamu bergerak ke kanan     '), nl.
 
 setLocation(X,Y) :-
     retract(playerLocation(_,_)),
@@ -274,14 +282,14 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
-    shop(X,Y), shop, !;
-    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
+    shop(X,Y), shop, !; % TODO : Integrate
+    % randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % DEBUG
     setLocation(X,Y).
 
 randomEncounter :-
     randomize, (
         random(0,10000,RandValue),
-        RandValue < 1500
+        RandValue < 800
     ).
 
 clearFightStatus :-

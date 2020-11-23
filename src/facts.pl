@@ -49,6 +49,6 @@ potion(23, okultisme, 0, 60).
 
 
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
-special_skill(swordsman, matekocokkkkk, 30).
+special_skill(swordsman, baliho-fpi, 30).
 special_skill(archer, cupid-arrow, 25).
 special_skill(sorcerer, santet, 30).

@@ -5,11 +5,12 @@
 :- dynamic(peluang/1).
 :- dynamic(isRun/1).
 :- dynamic(isBattleDone/1).
+:- dynamic(battleTick/1).
 
 /********Ketemu Musuh*********/
 % TODO : Extra, gameloop for legacy version
 encounterEnemy(_) :-
-	random(1, 7, ID),
+	random(1, 7, ID), % TODO : Battle tick
 	monster(ID, Nama, HP, Atk, Def, XP),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('\33\[m'), flush_output,
