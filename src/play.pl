@@ -115,8 +115,7 @@ status :-
     write('┃ Gold    │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'), nl,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl.
-    % TODO : add check inventory, quest.
-    % TODO : Extra, print on move mode
+    % TODO : Add check inventory, quest.
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -142,8 +141,7 @@ sideStatus :-
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    write('\33\[100A\33\[1000D'),flush_output. % FIXME : After fight
-
+    write('\33\[100A\33\[1000D'),flush_output.
 
 clear :-
     shell('clear').
@@ -164,7 +162,7 @@ quit :-
     write('Yah masa baru segini quit sih, lemah!!!!'), nl, halt.
 
 /*
-inventory :- % TODO : inventory integration
+inventory :- % TODO : Inventory integration
 */
 
 
@@ -224,8 +222,7 @@ doQuest(X,Y) :-% TODO : Battle interaction
     asserta(countMonster2(Mnstr2,Cnt2)),
     asserta(countMonster3(Mnstr3,Cnt3)),
     retract(quest(X,Y)),
-    write('Tekan sembarang tombol untuk melanjutkan'),
-    get_key_no_echo(user_input,_),
+    prompt,
     (shell('clear'), !; overwriteClear, !). % FIXME : Weird legacy behaviour
 
 
@@ -276,14 +273,23 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
-    randomEncounter, clear, encounterEnemy,  !;
+    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
+    % randomEncounter, encounterEnemy(_), !;
     setLocation(X,Y).
 
 randomEncounter :-
     randomize, (
         random(0,10000,RandValue),
         RandValue < 1500
-        ).
+    ).
+
+clearFightStatus :-
+    retract(isFighting(_));
+    retract(isRun(_));!.
+
+prompt :-
+    write('\33\[37m\33\[1mTekan sembarang tombol untuk melanjutkan\33\[m\n'),
+    get_key_no_echo(user_input,_), !.
 
 % Terminal raw mode input, non-blocking mode for more fluid play
 % Press m to back to command mode

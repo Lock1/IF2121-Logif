@@ -1,7 +1,7 @@
 /* ----------------- File konfigurasi ----------------- */
 loadingStepDuration(0.01).
 % loadingStepDuration(0.001). % DEBUG
-loadingBarSize(54).
+loadingBarSize(4).
 % loadingBarSize(14).
 % Half frame loading bar
 % Change 1/8 or 1/2 on loadingPBar

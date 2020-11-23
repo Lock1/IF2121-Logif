@@ -6,44 +6,40 @@
 :- dynamic(isRun/1).
 :- dynamic(isBattleDone/1).
 
-/********Ketemu Musuh************/
-encounterEnemy:-
+/********Ketemu Musuh*********/
+encounterEnemy(_) :-
 	random(1, 7, ID),
 	monster(ID, Nama, HP, Atk, Def, XP),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('\33\[m'), flush_output,
-	format('Kamu ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
+	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
 	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m%d\33\[m\n',[Nama,HP]),
-	write('Apa yang akan kamu lakukan?'), nl,
-	write('- fight.'), nl,
-	write('- run.'), nl,
-	write('Tuliskan perintah diakhiri tanda titik'), nl,
+	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
+	write('- fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
+	write('- run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
+	write('Tuliskan inisial dari command'), nl,
 	random(1, 10, P),
 	asserta(peluang(P)),
 	asserta(isEnemyAlive(1)),
-	battleLoop.
+	call(battleLoop).
 
-/********Lari*************/
+/********Lari********/
 
 /********Mau Lari tapi belum ketemu musuh******/
 run :-
 	\+ isEnemyAlive(_),
-	write('Kamu belum ketemu musuh lho'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh lho'), nl,
 	!;
-
-/***********Gagal Lari *********/
-
+	/***********Gagal Lari *********/
 	\+ isRun(_),
 	isEnemyAlive(_),
 	peluang(P),
 	P =< 4,
-	write('Kamu gagal run. Semangat bertarung~~ (^///^)'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m \33\[31m\33\[1mgagal\33\[m run. Semangat bertarung~~ (^///^)'), nl,
 	retract(peluang(P)),
 	asserta(isRun(1)),
 	fight;
-
-/************Berhasil Lari************/
-
+	/************Berhasil Lari************/
 	\+ isRun(_),
 	isEnemyAlive(_),
 	peluang(P),
@@ -53,38 +49,32 @@ run :-
 	retract(enemy(_, _, _, _, _, _)),
 	asserta(isBattleDone(1)),
 	flush_output,
-	write('Kamu berhasil kabur'), nl,
-	sleep(1),
-	write('Penakut :('), nl,
+	write('\33\[36m\33\[1mKamu\33\[m \33\[32m\33\[1mberhasil\33\[m kabur'), nl,
+	prompt,
 	!;
-
-/*********Mau Lari tapi udah berhadapan dengan musuh******/
-
+	/*********Mau Lari tapi udah berhadapan dengan musuh******/
 	isRun(_),
-	write('Kamu udah gagal run lho, jangan lari lagi'), nl.
+	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl.
 
 /*******************FIGHT********************/
 /********Belum ketemu musuh*********/
 fight :-
 	\+ isEnemyAlive(_),
-	write('Kamu belum ketemu musuh. Mau nyerang siapa?'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh. Mau nyerang siapa?'), nl,
 	!;
-
-/********Berhasil Bertarung*********/
-
+	/********Berhasil Bertarung*********/
 	\+ isFighting(_),
 	asserta(isRun(1)),
 	asserta(isFighting(1)),
 	isEnemyAlive(_),
 	enemy(_, NamaEnemy, _, _, _, _),
-	format('Kamu mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
-	write('Perintah tersedia :\n- attack.\n'); % TODO : add other information
-
-/********Sudah ketemu musuh tapi fight lagi*******/
-
+	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
+	write('Perintah tersedia :\n- attack (\33\[31m\33\[1ma\33\[m)\n\n');
+	% TODO : Add other information
+	/********Sudah ketemu musuh tapi fight lagi*******/
 	isFighting(_),
 	isEnemyAlive(_),
-	write('Kamu sedang melawan musuh loh'), nl.
+	write('\33\[36m\33\[1mKamu\33\[m sedang melawan musuh loh'), nl.
 
 /******************ATTACK**********************/
 /********Comment kalau musuh masih belum kalah********/
@@ -94,9 +84,7 @@ attackComment :-
 	format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n',[NamaEnemy,HPEnemy]),
 	enemyTurn,
 	!;
-
-/********Comment kalau musuh sudah kalah********/
-
+	/********Comment kalau musuh sudah kalah********/
 	enemy(_, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
@@ -107,24 +95,22 @@ attackComment :-
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
 	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, Gold)),
-	format('Kamu dapat \33\[32m%d XP\33\[m!\n\n',[XPDrop]),
+	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[32m%d XP\33\[m!\n\n',[XPDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, Gold)),
 	sleep(0.5),
-	% write('Tekan sembarang tombol untuk melanjutkan\n'), FIXME : Some problem
-	get_key_no_echo(user_input,_),
-	sleep(2),
-	asserta(isBattleDone(1)), !.
+	asserta(isBattleDone(1)),
+	prompt, !.
 	% cekNaikLevel(Level, NewXP), % TODO : cekNaikLevel
 	% !.
 
 /********Belum ketemu musuh*********/
 attack :-
 	\+ isEnemyAlive(_),
-	write('Kamu belum ketemu musuh, mau nyerang siapa?'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl,
 	!;
 
-/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/
-/***********Attack biasa********/
+	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/
+	/***********Attack biasa********/
 
 	isEnemyAlive(_),
 	statPlayer(_,_,_,_,AtkPlayer,_,_,_,_),
@@ -132,7 +118,7 @@ attack :-
 	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)),
-	write('\nKamu menggunakan attack!'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1mattack\33\[m!'), nl,
 	call(attackComment),
 	!.
 % TODO : Special attack using mana
@@ -143,18 +129,15 @@ attack :-
 enemyAttackComment :-
 	statPlayer(_,_,HPPlayer,Mana,_,_,_,_,_),
 	HPPlayer > 0,
-	format('Darah \33\[31m\33\[1mkamu\33\[m tersisa \33\[31m%d\33\[m dan mana tersisa \33\[34m%d\33\[m\n',[HPPlayer,Mana]), !;
-	% write('Darah kamu tersisa '), write(HPPlayer), write('dan Mana kamu tersisa '), write(Mana), nl,;
-
-/********Comment kalau pemain sudah kalah********/
-
+	format('Darah \33\[36m\33\[1mkamu\33\[m tersisa \33\[31m%d\33\[m dan mana tersisa \33\[34m%d\33\[m\n\n',[HPPlayer,Mana]), !;
+	/********Comment kalau pemain sudah kalah********/
 	statPlayer(_,_,HPPlayer,_,_,_,_,_,_),
 	HPPlayer =< 0,
-	sleep(1),
-	write('Darah kamu sudah habis'), nl,
-	sleep(1),
+	sleep(0.3),
 	write('\33\[31m\33\[1m'),
 	flush_output,
+	write('Darah kamu sudah habis'), nl,
+	sleep(1),
 	write('██╗░░░██╗░█████╗░██╗░░░██╗  ██████╗░██╗███████╗██████╗░░░░'), nl,
 	write('╚██╗░██╔╝██╔══██╗██║░░░██║  ██╔══██╗██║██╔════╝██╔══██╗░░░'), nl,
 	write('░╚████╔╝░██║░░██║██║░░░██║  ██║░░██║██║█████╗░░██║░░██║░░░'), nl,
@@ -182,19 +165,21 @@ enemyTurn :-
 % -------------------- Battle Loop --------------------
 
 battleLoop :-
-	isBattleDone(_), retract(isBattleDone(_)) ->
-	((isRun(_) -> retract(isRun(_))),
-	(isFighting(_) -> retract(isFighting(_)))), clear, !;
-	write('Battle >> '),
-    catch(read(X), error(_,_), errorMessage), (
-        X = 'fight', call(fight);
-        X = 'run', call(run);
-        X = 'quit', call(quit); % TODO : Complete battle sequence
-		isFighting(_), (
-			X = 'attack', call(attack)
-		)
-    ),
-    battleLoop, !. % FIXME : Weird behaviour with random command
+	isBattleDone(_), retract(isBattleDone(_)), !;
+	(
+		write('\33\[32m\33\[1mBattle >> \33\[m'),
+		get_key(X), nl,
+		(
+	    % % catch(read(X), error(_,_), errorMessage), (
+	        X = 102, call(fight), battleLoop, !;
+	        X = 114, call(run), battleLoop, !;
+	        X = 113, call(quit), !; % TODO : Complete battle sequence
+			isFighting(_), (
+				X = 97, call(attack), battleLoop, ! % lowercase 'a' key
+			);
+		 	write('Tombol tidak diketahui\n\n'), battleLoop, !
+	    )
+	). % FIXME : Weird behaviour with random command
 
 
 /***********************KALAH********************************/
