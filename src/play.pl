@@ -66,7 +66,8 @@ gameLoop :-
             X = 'a', call(a);
             X = 's', call(s);
             X = 'd', call(d);
-            X = 'move', call(move)
+            X = 'move', call(move);
+            X = 'hidden', hidden
         )
         % TODO : Extra, Handler message
 
@@ -273,7 +274,7 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
-    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
+    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % TODO : Recheck fight status
     % randomEncounter, encounterEnemy(_), !;
     setLocation(X,Y).
 
