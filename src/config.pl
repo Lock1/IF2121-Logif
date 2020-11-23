@@ -1,5 +1,5 @@
 /* ----------------- File konfigurasi ----------------- */
-loadingStepDuration(0.005).
+loadingStepDuration(0.01).
 % loadingStepDuration(0.001). % DEBUG
 loadingBarSize(54).
 % loadingBarSize(14).
