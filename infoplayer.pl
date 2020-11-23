@@ -1,6 +1,5 @@
 :- dynamic(inventory/6).
 :- dynamic(inventoryP/4).
-:- include('facts.pl').
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
