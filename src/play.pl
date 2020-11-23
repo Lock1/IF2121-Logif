@@ -119,13 +119,16 @@ status :-
 questStatus :-
     questList(ID,Ct),
     monster(ID,Name,_,_,_,_),
-    write( '┏━━━━━━━━━┯━━━━━━━┓\n'),
-    write( '┃ Monster │ Count ┃\n'),
-    write( '┠─────────┼───────┨\n'),
-    format('┃ \33\[31m\33\[1m%-7s\33\[m │ %5d ┃\n',[Name,Ct]),
-    write( '┗━━━━━━━━━┷━━━━━━━┛\n').
-    % TODO : Add check inventory, quest.
+    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
+    write( '┃  Monster  │ Count ┃\n'),
+    write( '┠───────────┼───────┨\n'),
+    format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]),
+    write( '┗━━━━━━━━━━━┷━━━━━━━┛\n').
+    % TODO : Add check inventory,
+    % TODO : Integrate quest.
     % TODO : Extra, Filter input 'a,b'
+
+
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -151,7 +154,39 @@ sideStatus :-
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
+    call(sideStatusQuest),
     write('\33\[100A\33\[1000D'),flush_output.
+
+sideStatusQuest :-
+    findall(A,questList(A,_),L),
+    length(L,Size),
+    Location is Size + 12,
+    questList(ID,Ct),
+    monster(ID,Name,_,_,_,_),
+
+    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Create name list
+    write('\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
+    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
+    write( '┃  Monster  │ Count ┃\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
+    write( '┠───────────┼───────┨\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
+    format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]), % TODO : Fix by print all quest
+    write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
+    write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
+    write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.');
+    % format('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Location]),flush_output,
+
+    write('\33\[100A\33\[1000D\33\[62C\33\[9B'),flush_output,
+    write('Tidak ada quest').
+
+% sideStatusQuestInner(I,Size,Name,Ct) :-
+%     I is Size;
+%     Index is I + 11,
+%     write('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Index]),flush_output,
+%     format('┃ \33\[31m\33\[1m%-7s\33\[m │ %5d ┃\n',[Name,Ct]).
 
 % TODO : Extra, inventory sidebar
 clear :-

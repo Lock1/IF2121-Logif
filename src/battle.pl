@@ -196,6 +196,7 @@ battleLoop :-
 	).
 
 
+
 /***********************KALAH********************************/
 lose :-
 	retract(isEnemyAlive(_)),
