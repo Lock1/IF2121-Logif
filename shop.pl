@@ -1,12 +1,12 @@
 :- dynamic(inventory/6).
 :- dynamic(statPlayer/9).
 
-/harga potion berapa? anggap 10 gold/
-/harga gacha berapa? anggap 50 gold/
+/*harga potion berapa? anggap 10 gold*/
+/*harga gacha berapa? anggap 50 gold*/
 
 
 shop:-
-    /deket shop/
+    /*deket shop*/
     write("Perintah , harga(gold)"),nl,
     write("-beliPotion, 10"),nl,
     write("-gacha, 50"),nl,
@@ -14,14 +14,14 @@ shop:-
     write('Tuliskan perintah diakhiri tanda titik'), nl,!.
 
 
-/beli potion gagal, duid ga cukup/
+/*beli potion gagal, duid ga cukup*/
 beliPotion:-
     statPlayer(_,_,_,_,_,_,_,_,_,Gold),
     Gold < 10,
     write("Uang kamu tidak cukup, silahkan farming dulu"),!.
 
 
-/beli potion berhasil, duid cukup/
+/*beli potion berhasil, duid cukup*/
 beliPotion:-
     statPlayer(_,_,_,_,_,_,_,_,_,Gold),
     Gold > 10,
@@ -29,18 +29,18 @@ beliPotion:-
     retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)),
     random(1,9,P),
-    /add potion, addItem(P),/
+    /*add potion, addItem(P),*/
     write('Kamu berhasil membeli potion'),
-    /Cara Nambahin Potion ke inventory gimana? formatnya berbeda gitu/
+    /*Cara Nambahin Potion ke inventory gimana? formatnya berbeda gitu*/
     shop, !.
 
-/Gacha Gagal, duid ga cukup/
+/*Gacha Gagal, duid ga cukup*/
 gacha:-
     statPlayer(_,_,_,_,_,_,_,_,_,Gold),
     Gold < 50,
     write("Uang kamu tidak cukup, silahkan farming dulu"),!.
 
-/Gacha Berhasil(uang cukup)/
+/*Gacha Berhasil(uang cukup)*/
 gacha:-
     statPlayer(_,_,Tipe,_,_,_,_,_,_,Gold),
     Gold >= 50,
@@ -90,8 +90,7 @@ keluar:-
     .
 
 
-/gagal, shop ga pada tempatnya/
-/
+/*gagal, shop ga pada tempatnya*/
 shop:-
     not deketshop(_)
     write('gabisa beli disini woy, gaada yang jualan. Pergi ketempat shop sono!'),!.
