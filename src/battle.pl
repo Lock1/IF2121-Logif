@@ -93,7 +93,8 @@ attackComment :-
 	statPlayer(_,_,_,_,_,_,Level,XPPlayer,GoldPlayer),
 	MaxGoldDrop is 25+XPDrop//2,
 	random(5,MaxGoldDrop,GoldDrop),
-	NewXP is (XPPlayer + XPDrop),
+	random(-5,5,XPSpread),
+	NewXP is (XPPlayer + XPDrop + XPSpread),
 	NewGold is (GoldPlayer + GoldDrop),
 	retract(enemy(_,_,_,_,_,_)),
 	retract(isRun(_)),
@@ -119,12 +120,15 @@ attack :-
 	/***********Attack biasa********/
 
 	isEnemyAlive(_),
-	statPlayer(_,_,_,_,AtkPlayer,_,_,_,_),
+	statPlayer(_,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
+	random(-7,5,AtkSpread),
+	AtkPlayer is BaseAtkPlayer + AtkSpread,
 	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	write('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1mattack\33\[m!'), nl,
+	format('Serangan dengan \33\[31m%d\33\[m damage!',[AtkPlayer]), nl,
 	call(attackComment),
 	!.
 % TODO : Special attack using mana
@@ -159,7 +163,8 @@ enemyAttackComment :-
 enemyTurn :-
 	enemy(_, NamaEnemy, _, AtkEnemy,_, _),
 	statPlayer(_,_,HPPlayer,_,_,DefPlayer,_,_,_),
-	Serangan is (AtkEnemy - DefPlayer),
+	random(-3,4,AtkSpread),
+	Serangan is (AtkEnemy - DefPlayer + AtkSpread),
 	(
 		NewHP is (HPPlayer - (AtkEnemy - DefPlayer)), NewHP =< HPPlayer, !;
 		NewHP is HPPlayer, !
