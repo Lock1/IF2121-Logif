@@ -36,9 +36,9 @@ item(14, sorcerer, statup, gelangsihir, 10, 5).
 item(15, archer, statup, gelangkaret, 10, 5).
 
 /*Potion(ID, _, _,Name, HP+, Mana+)*/
-potion(16, lesserhealingpotion, 10, 0).
-potion(17, smallhealingpotion, 20, 0).
-potion(18, greaterhealingpotion, 30 ,0).
+potion(16, lesser_healing_potion, 10, 0).
+potion(17, small_healing_potion, 20, 0).
+potion(18, greater_healing_potion, 30 ,0).
 potion(19, alkohooool, 60, 0).
 
 potion(20, lessermanapotion, 0, 10).

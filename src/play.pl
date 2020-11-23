@@ -67,7 +67,8 @@ gameLoop :-
             X = 's', call(s);
             X = 'd', call(d);
             X = 'move', call(move);
-            X = 'list', call(listInventory);
+            X = 'inventory', call(listInventory);
+            X = 'y', call(addItem(17)); % DEBUG
             X = 'hidden', hidden
         )
         % TODO : Extra, Handler message
@@ -127,7 +128,6 @@ questStatus :-
     write( '┠───────────┼───────┨\n'),
     format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]),
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\n').
-    % TODO : Add check inventory,
     % TODO : Integrate quest.
     % TODO : Extra, Filter input 'a,b'
 
@@ -163,11 +163,11 @@ sideStatus :-
 sideStatusQuest :-
     findall(A,questList(A,_),L),
     length(L,Size),
-    Location is Size + 12,
+    % Location is Size + 12,
     questList(ID,Ct),
     monster(ID,Name,_,_,_,_),
 
-    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Create name list
+    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Extra, Create name list
     write('\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
@@ -175,7 +175,7 @@ sideStatusQuest :-
     write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
     write( '┠───────────┼───────┨\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
-    format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]), % TODO : Fix by print all quest
+    format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
@@ -315,13 +315,13 @@ d :-
 
 setLocation(X,Y) :-
     retract(playerLocation(_,_)),
-    asserta(playerLocation(X,Y)).
+    asserta(playerLocation(X,Y)). % TODO : Quest -> Level -> Shop
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
-    shop(X,Y), shop, !; % TODO : Integrate
-    % randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % DEBUG
+    shop(X,Y), clear, call(shop), clear, !; % TODO : collision check
+    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % DEBUG
     setLocation(X,Y).
 
 randomEncounter :-
@@ -390,30 +390,32 @@ help(X) :-
     X is 1,
     write('\33\[37m\33\[1m'), % Help ANSI Formatting
     write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
-    write('│     ┎───────────────────────────────────────────┒    │ '), nl,
-    write('│     ┃  start.  : Memulai petualanganmu          ┃    │ '), nl,
-    write('│     ┃  map.    : Menampilkan peta               ┃    │ '), nl,
-    write('│     ┃  status. : Menampilkan kondisi saat ini   ┃    │ '), nl,
-    write('│     ┃  w a s d : Bergerak dengan arah wasd      ┃    │ '), nl,
-    write('│     ┃  move.   : Masuk ke mode movement         ┃    │ '), nl,
-    write('│     ┃  help.   : Menampilkan bantuan            ┃    │ '), nl,
-    write('│     ┃  clear.  : Membersihkan layar             ┃    │ '), nl,
-    write('│     ┖───────────────────────────────────────────┚    │ '), nl,
+    write('│   ┎─────────────────────────────────────────────┒    │ '), nl,
+    write('│   ┃  start.     : Memulai petualanganmu         ┃    │ '), nl,
+    write('│   ┃  map.       : Menampilkan peta              ┃    │ '), nl,
+    write('│   ┃  status.    : Menampilkan kondisi saat ini  ┃    │ '), nl,
+    write('│   ┃  inventory. : Menampilkan barang            ┃    │ '), nl,
+    write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
+    write('│   ┃  move.      : Masuk ke mode movement        ┃    │ '), nl,
+    write('│   ┃  help.      : Menampilkan bantuan           ┃    │ '), nl,
+    write('│   ┃  clear.     : Membersihkan layar            ┃    │ '), nl,
+    write('│   ┖─────────────────────────────────────────────┚    │ '), nl,
     write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl,
     write('\33\[m');
 
     X is 0,
     write('+--------------------------------------------------------+ '), nl,
-    write('|     +---------------------------------------------+    | '), nl,
-    write('|     | 1. start.  : Memulai petualanganmu          |    | '), nl,
-    write('|     | 2. map.    : Menampilkan peta               |    | '), nl,
-    write('|     | 3. status. : Menampilkan kondisi saat ini   |    | '), nl,
-    write('|     | 4. w a s d : Bergerak dengan arah wasd      |    | '), nl,
-    write('|     | 5. move.   : Masuk ke mode movement         |    | '), nl,
-    write('|     | 6. help.   : Menampilkan bantuan            |    | '), nl,
-    write('|     | 7. clear.  : Membersihkan layar             |    | '), nl,
-    write('|     +---------------------------------------------+    | '), nl,
+    write('|   +----------------------------------------------+     | '), nl,
+    write('|   | 1. start.     : Memulai petualanganmu        |     | '), nl,
+    write('|   | 2. map.       : Menampilkan peta             |     | '), nl,
+    write('|   | 3. status.    : Menampilkan kondisi saat ini |     | '), nl,
+    write('|   | 3. inventory. : Menampilkan kondisi saat ini |     | '), nl,
+    write('|   | 4. w a s d    : Bergerak dengan arah wasd    |     | '), nl,
+    write('|   | 5. move.      : Masuk ke mode movement       |     | '), nl,
+    write('|   | 6. help.      : Menampilkan bantuan          |     | '), nl,
+    write('|   | 7. clear.     : Membersihkan layar           |     | '), nl,
+    write('|   +----------------------------------------------+     | '), nl,
     write('+--------------------------------------------------------+ '), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
 

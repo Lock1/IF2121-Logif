@@ -106,7 +106,7 @@ attackComment :-
 	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	sleep(0.5),
-	asserta(isBattleDone(1)),
+	asserta(isBattleDone(1)), checkLevelUp,
 	prompt, !.
 	% cekNaikLevel(Level, NewXP), % TODO : cekNaikLevel
 	% !.

@@ -1,6 +1,6 @@
 :- dynamic(inventory/6).
 :- dynamic(inventoryP/4).
-:- include('facts.pl'). %DEBUGGING
+% :- include('facts.pl'). %DEBUGGING
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
@@ -13,7 +13,7 @@ addItem(ItemID) :-
     Res >= 100,
     write('Inventory Is Full'),
     !,fail;
-    
+
     /*bisa ga ya kira2*/
     ItemID>15,
     potion(ItemID, PotionName, PlusHP, PlusMana),
@@ -40,11 +40,11 @@ delItem(ItemID) :-
 listing([],[],[]).
 listing(List1, List2, List3) :-
     [W1|W2]=List1,
-    format('┃Name    | %24s  ┃',[W1]), nl,
+    format('┃ Name   │ %24s  ┃',[W1]), nl,
     [X1|X2]=List2,
-    format('┃Attack  | %24d  ┃',[X1]), nl,
+    format('┃ Attack │ %24d  ┃',[X1]), nl, % TODO : Rescale
     [Y1|Y2]=List3,
-    format('┃Def     | %24d  ┃',[Y1]), nl,
+    format('┃ Def    │ %24d  ┃',[Y1]), nl,
     write('┃                                    ┃'),nl,
     listing(W2, X2, Y2).
 
@@ -54,18 +54,18 @@ listItem :-
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
     write('┃               Weapon               ┃'), nl,
-    write('┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃'), nl,
+    write('┠────────────────────────────────────┨'), nl,
     listing(Names, Attacks, Defs),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
 listingPotion([],[],[]).
 listingPotion(List1, List2, List3):-
     [A1|A2]=List1,
-    format('┃Name           | %19s  ┃',[A1]), nl,
+    format('┃ Name          │ %19s  ┃',[A1]), nl,
     [B1|B2]=List2,
-    format('┃HP Restored    | %19d  ┃',[B1]), nl,
+    format('┃ HP Restored   │ %19d  ┃',[B1]), nl,
     [C1|C2]=List3,
-    format('┃Mana Restored  | %19d  ┃',[C1]), nl,
+    format('┃ Mana Restored │ %19d  ┃',[C1]), nl,
     write('┃                                      ┃'),nl,
     listingPotion(A2, B2, C2).
 
@@ -80,19 +80,20 @@ listPotion :-
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
 listInventory :-
-    listItem,!,
-    listPotion,!.
+    listItem,
+    listPotion.
 
-%statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)
+%statPlayer(IDTipe, Nama, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)
 
-checkLevel :-
-    statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold),
-    (
-    CurrentLvl is Lvl,
-    BaseXPReq is 200,
-    NextLvl is CurrentLvl*80+BaseXPReq,
-    NewAtk is Atk*CurrentLvl+20,
-    NewDef is Def*CurrentLvl+10,
-    retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, NewAtk, NewDef, NextLvl, XP, Gold))
-    ).
+checkLevelUp :-
+    statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, XP, Gold),
+    XPNextToLvl is CurrentLvl*80 + 120,
+    XPNextToLvl =< XP,
+    NewHP is CurrentHP + CurrentLvl*5 + 120,
+    NewMana is CurrentMana + CurrentLvl*3 + 30,
+    NewAtk is CurrentAtk + CurrentLvl//2 + 1,
+    NewDef is CurrentDef + CurrentLvl//3,
+    NewXP is 0, LvlUp is CurrentLvl + 1,
+    retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
+    write('\33\[33m\33\[1mSelamat kamu naik level!\33\[m\n'), !; !.
