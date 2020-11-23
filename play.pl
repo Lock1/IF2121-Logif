@@ -298,7 +298,7 @@ move :-
     clear,
     sideStatus,
     \+map,
-    write('Tekan e untuk command mode  '), nl,
+    write('Tekan e untuk command mode                  '), nl,
 
     toggleRawMode,
     write('\33\[m'),
@@ -309,7 +309,7 @@ move :-
 toggleRawMode :-
     get_key_no_echo(user_input,X),
     overwriteClear,
-    (X is 101, !;  switchMove(X), write('Tekan e untuk command mode '), nl, horizontalCursorAbsolutePosition(1), toggleRawMode, !).
+    (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl, horizontalCursorAbsolutePosition(1), toggleRawMode, !).
     % Press e to break
 
 /* ----------------------- Draw procedure ----------------------- */

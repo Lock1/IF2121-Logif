@@ -55,7 +55,7 @@ run :-
 	flush_output,
 	write('Kamu berhasil kabur'), nl,
 	sleep(1),
-	write('Penakut :('),
+	write('Penakut :('), nl,
 	!;
 
 /*********Mau Lari tapi udah berhadapan dengan musuh******/
@@ -109,11 +109,13 @@ attackComment :-
 	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, Gold)),
 	format('Kamu dapat \33\[32m%d XP\33\[m!\n\n',[XPDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, Gold)),
-	write('Tekan sembarang tombol untuk melanjutkan\n'), sleep(2),
+	sleep(0.5),
+	% write('Tekan sembarang tombol untuk melanjutkan\n'), FIXME : Some problem
 	get_key_no_echo(user_input,_),
-	asserta(isBattleDone(1)),
+	sleep(2),
+	asserta(isBattleDone(1)), !.
 	% cekNaikLevel(Level, NewXP), % TODO : cekNaikLevel
-	!.
+	% !.
 
 /********Belum ketemu musuh*********/
 attack :-
@@ -131,10 +133,9 @@ attack :-
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	write('\nKamu menggunakan attack!'), nl,
-	attackComment,
+	call(attackComment),
 	!.
 % TODO : Special attack using mana
-% TODO : cekNaikLevel
 
 
 /**********************ATTACK MUSUH***********************/
@@ -152,7 +153,16 @@ enemyAttackComment :-
 	sleep(1),
 	write('Darah kamu sudah habis'), nl,
 	sleep(1),
-	write('Kamu mati'), nl,
+	write('\33\[31m\33\[1m'),
+	flush_output,
+	write('██╗░░░██╗░█████╗░██╗░░░██╗  ██████╗░██╗███████╗██████╗░░░░'), nl,
+	write('╚██╗░██╔╝██╔══██╗██║░░░██║  ██╔══██╗██║██╔════╝██╔══██╗░░░'), nl,
+	write('░╚████╔╝░██║░░██║██║░░░██║  ██║░░██║██║█████╗░░██║░░██║░░░'), nl,
+	write('░░╚██╔╝░░██║░░██║██║░░░██║  ██║░░██║██║██╔══╝░░██║░░██║░░░'), nl,
+	write('░░░██║░░░╚█████╔╝╚██████╔╝  ██████╔╝██║███████╗██████╔╝██╗'), nl,
+	write('░░░╚═╝░░░░╚════╝░░╚═════╝░  ╚═════╝░╚═╝╚══════╝╚═════╝░╚═╝'), nl,
+	write('\33\[m'),
+	flush_output,
 	sleep(1),
 	lose, !.
 
@@ -172,7 +182,9 @@ enemyTurn :-
 % -------------------- Battle Loop --------------------
 
 battleLoop :-
-	isBattleDone(_), retract(isBattleDone(_)), clear, !;
+	isBattleDone(_), retract(isBattleDone(_)) ->
+	((isRun(_) -> retract(isRun(_))),
+	(isFighting(_) -> retract(isFighting(_)))), clear, !;
 	write('Battle >> '),
     catch(read(X), error(_,_), errorMessage), (
         X = 'fight', call(fight);
@@ -190,4 +202,4 @@ lose :-
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
 	retract(isRun(_)),
-	quit.
+	halt.
