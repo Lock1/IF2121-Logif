@@ -265,7 +265,7 @@ d :-
     Move is TPX+1,
     collisionCheck(Move,TPY),
     flush_output, sideStatus,
-    \+map, 
+    \+map,
     write('Kamu bergerak ke kanan'), nl.
 
 setLocation(X,Y) :-
@@ -292,13 +292,14 @@ switchMove(X) :-
     X is 97, a;
     X is 115, s;
     X is 100, d;
-    X > 0, \+map, sideStatus.
+    X > 0, sideStatus, \+map.
 
 move :-
     clear,
-    \+map,
     sideStatus,
+    \+map,
     write('Tekan e untuk command mode  '), nl,
+
     toggleRawMode,
     write('\33\[m'),
     flush_output,
@@ -308,7 +309,7 @@ move :-
 toggleRawMode :-
     get_key_no_echo(user_input,X),
     overwriteClear,
-    (X is 101, !; switchMove(X), write('Tekan e untuk command mode '), nl, write('                              '), horizontalCursorAbsolutePosition(1), toggleRawMode, !).
+    (X is 101, !;  switchMove(X), write('Tekan e untuk command mode '), nl, horizontalCursorAbsolutePosition(1), toggleRawMode, !).
     % Press e to break
 
 /* ----------------------- Draw procedure ----------------------- */
@@ -388,7 +389,7 @@ classScreen(X) :-
 screenWipe(X) :- % TODO : Extra, Selective clear
     X is 0;
     flush_output,
-    write('                                                            '), nl,
+    write('                                                       '), nl,
     Rx is X-1, screenWipe(Rx).
 
 % Loading bar
