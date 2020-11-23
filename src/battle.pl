@@ -7,6 +7,7 @@
 :- dynamic(isBattleDone/1).
 
 /********Ketemu Musuh*********/
+% TODO : Extra, gameloop for legacy version
 encounterEnemy(_) :-
 	random(1, 7, ID),
 	monster(ID, Nama, HP, Atk, Def, XP),

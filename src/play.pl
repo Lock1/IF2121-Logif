@@ -144,6 +144,7 @@ sideStatus :-
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
     write('\33\[100A\33\[1000D'),flush_output.
 
+% TODO : Extra, inventory sidebar
 clear :-
     shell('clear').
 
@@ -274,8 +275,7 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
-    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % TODO : Recheck fight status
-    % randomEncounter, encounterEnemy(_), !;
+    % randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
 randomEncounter :-
@@ -315,7 +315,8 @@ move :-
 
 toggleRawMode :-
     get_key_no_echo(user_input,X),
-    overwriteClear,
+    % overwriteClear,
+    lineWipeAtPlayer,
     (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl, horizontalCursorAbsolutePosition(1), toggleRawMode, !).
     % Press e to break
 
@@ -371,8 +372,46 @@ help(X) :-
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
 
 classScreen(X) :-
-    X is 1, % TODO : Add some art
+    X is 1,
     write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
+    write('┃                            ███                                                                              '), nl,
+    write('┃                           ░▓█░                                                                              '), nl,
+    write('┃                          ████                                                                               '), nl,
+    write('┃                          ███▒                                                                               '), nl,
+    write('┃                         ▒██                                                                                 '), nl,
+    write('┃                         ██                                                                                  '), nl,
+    write('┃                        ▓█                                                                                   '), nl,
+    write('┃                       ▒█▒                                                                                   '), nl,
+    write('┃                       █▓                                                                                    '), nl,
+    write('┃                      ██                                                                                     '), nl,
+    write('┃                     ▓█░                                                                                     '), nl,
+    write('┃                    ▒█▓                                                                                      '), nl,
+    write('┃     ▒▓██▒         ░██                                                                                       '), nl,
+    write('┃        ▒▓▓▓▓▒▓▓▓▒▓██▒                                                                                       '), nl,
+    write('┃          ░███████▓▓▓▓▓▒                                                                                     '), nl,
+    write('┃          ▒▓████▓▓▓███████▓░                                                                                 '), nl,
+    write('┃           ▓████▓▓█████████▓███▓▒                                                                            '), nl,
+    write('┃          ▒███▓▓▓████████▓    ░▒▓                                                                            '), nl,
+    write('┃          ▓▓▓▓▓▒▓██████▒                                                                                     '), nl,
+    write('┃         ▒▓▓▓▓▒▓██▓▓██▒                                                                                      '), nl,
+    write('┃        ░▓▒▓▓▒▒▓█▓▓██▒                                                                                       '), nl,
+    write('┃        ▓▓▓▒▓▒▓█▓▓▓█▓                                                                                        '), nl,
+    write('┃       ▒▓▓▒▒▒▓██▓▓█▓                                                                                         '), nl,
+    write('┃      ░▓▓▓▒▒▓██▓▓█▓           ░▒▓▒░                                                                          '), nl,
+    write('┃      ▓▓▓▓▒▓▓█▓▓██░         ▒██▓▓░                                                                           '), nl,
+    write('┃     ▒▓▓▓▒▒▓▓▓▓▓█░       ░▒▓▓░                                                                               '), nl,
+    write('┃    ░▓▓▓▓▒▒▓▓▓▓▓░      ▒▓▒░                                                                                  '), nl,
+    write('┃    ▓▒▓▒▒▒▓▓▓▓▓▒▒▒▒▒▒▓██▒                                                                                    '), nl,
+    write('┃   ▒▓▓▒▒▒▓▓▓▓▓▒▓▓▓▓███████▓▓▒░░▒▒▒░                                                                          '), nl,
+    write('┃  ░▓▓▓▒▒▓▓▓▓▓▒▒▓▓▓▓▓█▓▓▒                                                                                     '), nl,
+    write('┃  ▓▓▓▒▒▓▓▓▓▓▓▒▓▓▓█▓▓░                                                                                        '), nl,
+    write('┃ ▒█▓▓▓▓▓▓▓▓▓▒▓█▓▓░                                                                                           '), nl,
+    write('┃▒██▓▓▓▓████▓▓▓░                                                                                              '), nl,
+    write('┃▒▓▓▓▓▓▓▓▓▓▒                                                                                                  '), nl,
+
+    % TODO : Move art
+
+
     write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
     write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
@@ -393,11 +432,18 @@ classScreen(X) :-
 
 
 
-screenWipe(X) :- % TODO : Extra, Selective clear
+screenWipe(X) :-
     X is 0;
     flush_output,
     write('                                                       '), nl,
     Rx is X-1, screenWipe(Rx).
+
+lineWipeAtPlayer :-
+    playerLocation(_,Y), NegY is Y * (-1),
+    format('\33\[u\33\[100A\33\[100C\33\[%dB',[NegY]), flush_output,
+    write('                                          '),
+    write('\33\[s').
+
 
 % Loading bar
 loadingBar(X) :-
