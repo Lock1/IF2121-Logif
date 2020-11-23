@@ -88,7 +88,7 @@ attackComment :-
 	enemyTurn,
 	!;
 	/********Comment kalau musuh sudah kalah********/
-	enemy(_, NamaEnemy, HPEnemy, _, _, XPDrop),
+	enemy(ID, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
 	statPlayer(_,_,_,_,_,_,Level,XPPlayer,GoldPlayer),
@@ -107,6 +107,7 @@ attackComment :-
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	sleep(0.5),
 	asserta(isBattleDone(1)),
+	isQuestDone(ID),
 	prompt, !.
 	% cekNaikLevel(Level, NewXP), % TODO : cekNaikLevel
 	% !.
@@ -203,3 +204,14 @@ lose :-
 	retract(isFighting(_)),
 	retract(isRun(_)),
 	halt.
+
+isQuestDone(X) :-
+	questList(ID,Cnt),
+	(
+	Cnt =:= 1,
+	retract(questList(ID, Cnt));
+
+	NewCnt is Cnt-1,
+	retract(questList(ID, Cnt)),
+	asserta(questList(ID, NewCnt))
+	).
