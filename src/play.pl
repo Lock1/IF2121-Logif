@@ -112,7 +112,7 @@ status :-
     format('\33\[34m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'), nl,
     write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'), nl,
     write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'), nl,
-    write('┃ Lv / XP │    '), format('%2d / %2d',[Lvl,XP]), write(' ┃'), nl,
+    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]), write(' ┃'), nl,
     write('┃ Gold    │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'), nl,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl.
@@ -136,7 +136,7 @@ sideStatus :-
     write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
     write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
-    write('┃ Lv / XP │    '), format('%2d / %2d',[Lvl,XP]), write(' ┃'),
+    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]), write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
     write('┃ Gold    │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'),

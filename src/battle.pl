@@ -71,6 +71,7 @@ fight :-
 	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
 	write('Perintah tersedia :\n- attack (\33\[31m\33\[1ma\33\[m)\n\n');
 	% TODO : Add other information
+	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
 	isFighting(_),
 	isEnemyAlive(_),
@@ -88,15 +89,19 @@ attackComment :-
 	enemy(_, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
-	statPlayer(_,_,_,_,_,_,Level,XPPlayer,_),
-	NewXP is (XPPlayer + XPDrop), % TODO : Random gold drop
+	statPlayer(_,_,_,_,_,_,Level,XPPlayer,GoldPlayer),
+	MaxGoldDrop is 25+XPDrop//2,
+	random(5,MaxGoldDrop,GoldDrop),
+	NewXP is (XPPlayer + XPDrop),
+	NewGold is (GoldPlayer + GoldDrop),
 	retract(enemy(_,_,_,_,_,_)),
 	retract(isRun(_)),
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
-	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, Gold)),
-	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[32m%d XP\33\[m!\n\n',[XPDrop]),
-	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, Gold)),
+	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, _)),
+	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[XPDrop]),
+	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
+	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	sleep(0.5),
 	asserta(isBattleDone(1)),
 	prompt, !.
@@ -154,7 +159,10 @@ enemyTurn :-
 	enemy(_, NamaEnemy, _, AtkEnemy,_, _),
 	statPlayer(_,_,HPPlayer,_,_,DefPlayer,_,_,_),
 	Serangan is (AtkEnemy - DefPlayer),
-	NewHP is (HPPlayer - (AtkEnemy - DefPlayer)),
+	(
+		NewHP is (HPPlayer - (AtkEnemy - DefPlayer)), NewHP =< HPPlayer, !;
+		NewHP is HPPlayer, !
+	),
 	format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m%d\33\[m\n',[NamaEnemy,Serangan]),
 	retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
 	asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
@@ -176,10 +184,9 @@ battleLoop :-
 	        X = 113, call(quit), !; % TODO : Complete battle sequence
 			isFighting(_), (
 				X = 97, call(attack), battleLoop, ! % lowercase 'a' key
-			);
-		 	write('Tombol tidak diketahui\n\n'), battleLoop, !
+			); write('Tombol tidak diketahui\n\n'), battleLoop, !
 	    )
-	). % FIXME : Weird behaviour with random command
+	).
 
 
 /***********************KALAH********************************/
