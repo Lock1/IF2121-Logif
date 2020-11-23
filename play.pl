@@ -275,7 +275,7 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
-    shop(X,Y), write('shop gan'), !;
+    shop(X,Y), shop, !;
     randomEncounter, clear, encounterEnemy,  !;
     setLocation(X,Y).
 
