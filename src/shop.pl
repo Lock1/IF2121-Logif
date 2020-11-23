@@ -25,11 +25,13 @@ shop:-
 beliPotion:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold < 10,
-    write("Uang kamu tidak cukup, silahkan farming dulu"),!;
+    write('Uang kamu tidak cukup, silahkan farming dulu'), nl,
+    write('Pencet sembarang tombol!'), nl,
+    get_key_no_echo(X),!;
 
 
 /*beli potion berhasil, duid cukup*/
-    statPlayer(_,_,_,_,_,_,_,_,_,Gold),
+    statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold > 10,
     NewGold is Gold-10,
     retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
@@ -46,12 +48,15 @@ gacha:-
     Gold < 50,
     write('Uang kamu tidak cukup, silahkan farming dulu'), nl,
     write('Pencet sembarang tombol!'), nl,
-    get_key_no_echo(X),!.
+    get_key_no_echo(X),!,
 
 /*Gacha Berhasil(uang cukup)*/
-    /*statPlayer(_,Tipe,_,_,_,_,_,_,Gold),
+    %for some reason balik ke mode move
+    ramdomize,
+    statPlayer(_,Tipe,_,_,_,_,_,_,Gold),
+    item(_,Tipe,_,_,_,_),
     Gold >= 50,
-    findall(X, item(_,Tipe,_,X,_,_), L), % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus 
+    findall(X, item(_,_,_,X,_,_), L), % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus 
     random(0, 100, Peluang),
     (
         Peluang =< 10,
@@ -87,8 +92,7 @@ gacha:-
     ),
     NewGold is Gold-50,
     retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)),
-    shop.*/
+    asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)), get_key_no_echo(X).
 
 /*keluar:-
     .

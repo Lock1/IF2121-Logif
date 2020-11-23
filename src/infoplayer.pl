@@ -1,5 +1,6 @@
 :- dynamic(inventory/6).
 :- dynamic(inventoryP/4).
+:- include('facts.pl'). %DEBUGGING
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
@@ -39,44 +40,44 @@ delItem(ItemID) :-
 listing([],[],[]).
 listing(List1, List2, List3) :-
     [W1|W2]=List1,
-    write('Name: '),
-    write(W1), nl,
+    format('┃Name    | %24s  ┃',[W1]), nl,
     [X1|X2]=List2,
-    write('Attack: '),
-    write(X1), nl,
+    format('┃Attack  | %24d  ┃',[X1]), nl,
     [Y1|Y2]=List3,
-    write('Def: '),
-    write(Y1), nl,
+    format('┃Def     | %24d  ┃',[Y1]), nl,
+    write('┃                                    ┃'),nl,
     listing(W2, X2, Y2).
 
 listItem :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_), Names),
     findall(Attack, inventory(_,_,_,_,Attack,_), Attacks),
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
-    write('----------------'), nl,
-    write('Weapon:'), nl,
-    listing(Names, Attacks, Defs).
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃               Weapon               ┃'), nl,
+    write('┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃'), nl,
+    listing(Names, Attacks, Defs),
+    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
 listingPotion([],[],[]).
 listingPotion(List1, List2, List3):-
-    [W1|W2]=List1,
-    write('Name: '),
-    write(W1), nl,
-    [X1|X2]=List2,
-    write('HP Restored: '),
-    write(X1), nl,
-    [Y1|Y2]=List3,
-    write('Mana Restored: '),
-    write(Y1), nl,
-    listing(W2, X2, Y2).
+    [A1|A2]=List1,
+    format('┃Name           | %19s  ┃',[A1]), nl,
+    [B1|B2]=List2,
+    format('┃HP Restored    | %19d  ┃',[B1]), nl,
+    [C1|C2]=List3,
+    format('┃Mana Restored  | %19d  ┃',[C1]), nl,
+    write('┃                                      ┃'),nl,
+    listingPotion(A2, B2, C2).
 
 listPotion :-
     findall(PotionName, inventoryP(_,PotionName,_,_), PNames),
     findall(PlusHP, inventoryP(_,_,PlusHP,_), HPs),
     findall(PlusMana, inventoryP(_,_,_,PlusMana), ManaS),
-    write('----------------'), nl,
-    write('Potion:'), nl,
-    listingPotion(PNames, HPs, ManaS).
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃                Potion                ┃'), nl,
+    write('┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃'), nl,
+    listingPotion(PNames, HPs, ManaS),
+    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
 listInventory :-
     listItem,!,

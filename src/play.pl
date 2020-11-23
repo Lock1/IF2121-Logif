@@ -69,6 +69,7 @@ gameLoop :-
             X = 's', call(s);
             X = 'd', call(d);
             X = 'move', call(move);
+            X = 'list', call(listInventory);
             X = 'hidden', hidden
         )
         % TODO : Extra, Handler message
