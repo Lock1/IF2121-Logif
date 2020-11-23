@@ -75,7 +75,7 @@ listPotion :-
     findall(PlusMana, inventoryP(_,_,_,PlusMana), ManaS),
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
     write('┃                Potion                ┃'), nl,
-    write('┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃'), nl,
+    write('┠──────────────────────────────────────┨'), nl,
     listingPotion(PNames, HPs, ManaS),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
@@ -86,14 +86,14 @@ listInventory :-
 %statPlayer(IDTipe, Nama, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)
 
 checkLevelUp :-
-    statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, XP, Gold),
-    XPNextToLvl is CurrentLvl*80 + 120,
-    XPNextToLvl =< XP,
+    statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold),
+    XPToLvlUp is CurrentLvl*80 + 100,
+    XPToLvlUp =< CurrentXP,
     NewHP is CurrentHP + CurrentLvl*5 + 120,
     NewMana is CurrentMana + CurrentLvl*3 + 30,
     NewAtk is CurrentAtk + CurrentLvl//2 + 1,
     NewDef is CurrentDef + CurrentLvl//3,
-    NewXP is 0, LvlUp is CurrentLvl + 1,
-    retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, XP, Gold)),
+    NewXP is CurrentXP - XPToLvlUp, LvlUp is CurrentLvl + 1,
+    retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
-    write('\33\[33m\33\[1mSelamat kamu naik level!\33\[m\n'), !; !.
+    format('\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]), checkLevelUp; !.

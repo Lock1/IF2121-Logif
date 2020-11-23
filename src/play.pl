@@ -68,6 +68,9 @@ gameLoop :-
             X = 'd', call(d);
             X = 'move', call(move);
             X = 'inventory', call(listInventory);
+            X = 'greedisgood', call(greedisgood);
+            X = 'whosyourdaddy', call(whosyourdaddy);
+            X = 'hesoyam', call(hesoyam);
             X = 'y', call(addItem(17)); % DEBUG
             X = 'hidden', hidden
         )
@@ -234,7 +237,7 @@ choose_class :-
     write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
 
     player(Name),
-    Lvl is 1, Xp is 0, Gold is 0, % TODO : Scale with shop cost
+    Lvl is 1, Xp is 0, Gold is 0,
     % statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
     asserta(statPlayer(ClassType, Name, HP, Mana, Atk, Def, Lvl, Xp, Gold)),
     isIDValid(ClassID),!;
@@ -259,12 +262,12 @@ username_input :-
 
 doQuest(X,Y) :-% TODO : Battle interaction
     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
-    write('Hello, '), write(Username), write('! It\'s time for some adventure'), nl,
+    format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
     random(1,500,Rmv),
     Mnstr is mod(Rmv, 6) + 1,
     random(1,1000,Rv),
-    Cnt is mod(Rv, 6) + 1,
-    write('You have to slain '), write(Cnt), write(' '), monster(Mnstr,Name,_,_,_,_), write(Name), nl,
+    Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
+    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
     (
         questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
         asserta(questList(Mnstr,Cnt)), !
@@ -272,6 +275,34 @@ doQuest(X,Y) :-% TODO : Battle interaction
     retract(quest(X,Y)),
     prompt,
     (shell('clear'), !; overwriteClear, !). % FIXME : Weird legacy behaviour
+
+greedisgood :-
+    write('\33\[33m\33\[1mResource granted\33\[m\n'),
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewXP is XP + 1000,
+    NewGold is Gold + 1000,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
+    checkLevelUp, !.
+
+whosyourdaddy :-
+    write('\33\[33m\33\[1mGod mode granted\33\[m\n'),
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewAtk is 100000,
+    NewDef is 100000,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+    checkLevelUp, !.
+
+hesoyam :-
+    write('\33\[37m\33\[1mCheat activated\33\[m\n'),
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewDef is 999,
+    NewHP is 999,
+    NewGold is Gold + 1000,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, NewDef, Lvl, XP, NewGold)),
+    checkLevelUp, !.
 
 
 /* -------------------------- Movement -------------------------- */
@@ -315,13 +346,13 @@ d :-
 
 setLocation(X,Y) :-
     retract(playerLocation(_,_)),
-    asserta(playerLocation(X,Y)). % TODO : Quest -> Level -> Shop
+    asserta(playerLocation(X,Y)). % TODO : Shop
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), clear, call(shop), clear, !; % TODO : collision check
-    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % DEBUG
+    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
 randomEncounter :-

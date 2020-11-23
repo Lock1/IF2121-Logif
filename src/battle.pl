@@ -88,10 +88,10 @@ attackComment :-
 	enemyTurn,
 	!;
 	/********Comment kalau musuh sudah kalah********/
-	enemy(ID, NamaEnemy, HPEnemy, _, _, XPDrop),
+	enemy(EnemyID, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
-	statPlayer(_,_,_,_,_,_,Level,XPPlayer,GoldPlayer),
+	statPlayer(_,_,_,_,_,_,_,XPPlayer,GoldPlayer),
 	MaxGoldDrop is 25+XPDrop//2,
 	random(5,MaxGoldDrop,GoldDrop),
 	random(-5,5,XPSpread),
@@ -106,11 +106,10 @@ attackComment :-
 	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	sleep(0.5),
-	asserta(isBattleDone(1)), checkLevelUp,
-	isQuestDone(ID),
+	asserta(isBattleDone(1)),
+	isQuestDone(EnemyID),
+	checkLevelUp, % TODO : Cek multiple lvl up
 	prompt, !.
-	% cekNaikLevel(Level, NewXP), % TODO : cekNaikLevel
-	% !.
 
 /********Belum ketemu musuh*********/
 attack :-
@@ -205,13 +204,20 @@ lose :-
 	retract(isRun(_)),
 	halt.
 
-isQuestDone(X) :-
-	questList(ID,Cnt),
+isQuestDone(EnemyID) :-
+	questList(EnemyID,Cnt),
 	(
-	Cnt =:= 1,
-	retract(questList(ID, Cnt));
+	Cnt is 1,
+	retract(questList(EnemyID, Cnt)),
+	statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold),
+	random(-10,30,XPSpread), random(-25,40,GoldSpread),
+	NewXP is CurrentXP + XPSpread + Cnt*10, NewGold is CurrentGold + GoldSpread + 25 + Cnt*30,
+	retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
+	asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
+	monster(EnemyID, EnemyName, _, _, _, _),
+	format('\33\[33m\33\[1mQuest %s sudah selesai!\33\[m\n',[EnemyName]);
 
 	NewCnt is Cnt-1,
-	retract(questList(ID, Cnt)),
-	asserta(questList(ID, NewCnt))
-	).
+	retract(questList(EnemyID, Cnt)),
+	asserta(questList(EnemyID, NewCnt))
+	); !.
