@@ -142,7 +142,7 @@ sideStatus :-
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    write('\33\[100A\33\[1000D'),flush_output.
+    write('\33\[100A\33\[1000D'),flush_output. % FIXME : After fight
 
 
 clear :-
@@ -210,7 +210,7 @@ username_input :-
     sleep(0.2),
     classScreen(IsUnicodeMode).
 
-doQuest(X,Y) :-% TODO : Extra, Print at map using ANSI
+doQuest(X,Y) :-% TODO : Battle interaction
     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
     write('Hello, '), write(Username), write('! It\'s time for some adventure'), nl,
     random(1,500,Rmv1), random(1,500,Rmv2), random(1,500,Rmv3),
@@ -235,7 +235,7 @@ w :-
     TPY > 1,
     Move is TPY-1,
     collisionCheck(TPX,Move),
-    flush_output,
+    flush_output, sideStatus,
     \+map,
     write('Kamu bergerak ke atas '), nl.
 
@@ -244,7 +244,7 @@ a :-
     TPX > 1,
     Move is TPX-1,
     collisionCheck(Move,TPY),
-    flush_output,
+    flush_output, sideStatus,
     \+map,
     write('Kamu bergerak ke kiri '), nl.
 
@@ -254,7 +254,7 @@ s :-
     TPY < MaxH ,
     Move is TPY+1,
     collisionCheck(TPX,Move),
-    flush_output,
+    flush_output, sideStatus,
     \+map,
     write('Kamu bergerak ke bawah'), nl.
 
@@ -264,8 +264,8 @@ d :-
     TPX < MaxW,
     Move is TPX+1,
     collisionCheck(Move,TPY),
-    flush_output,
-    \+map,
+    flush_output, sideStatus,
+    \+map, 
     write('Kamu bergerak ke kanan'), nl.
 
 setLocation(X,Y) :-
@@ -276,14 +276,13 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
-    % randomEncounter, clear, encounterEnemy,  !; % DEBUG
+    randomEncounter, clear, encounterEnemy,  !;
     setLocation(X,Y).
 
 randomEncounter :-
     randomize, (
         random(0,10000,RandValue),
-        RandValue < 1500,
-        write('battle lagi gan')
+        RandValue < 1500
         ).
 
 % Terminal raw mode input, non-blocking mode for more fluid play
@@ -293,7 +292,7 @@ switchMove(X) :-
     X is 97, a;
     X is 115, s;
     X is 100, d;
-    X > 0, \+map.
+    X > 0, \+map, sideStatus.
 
 move :-
     clear,
