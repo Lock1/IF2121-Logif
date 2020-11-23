@@ -14,6 +14,8 @@
 :- include('config.pl').
 :- include('map.pl').
 :- include('battle.pl').
+:- include('shop.pl').
+:- include('infoplayer.pl').
 
 % Inisialisasi Dynamic Predicate
 :- dynamic(questList/2).
@@ -65,6 +67,7 @@ gameLoop :-
             X = 's', call(s);
             X = 'd', call(d);
             X = 'move', call(move);
+            X = 'list', call(listInventory);
             X = 'hidden', hidden
         )
         % TODO : Extra, Handler message
@@ -231,7 +234,7 @@ choose_class :-
     write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
 
     player(Name),
-    Lvl is 1, Xp is 0, Gold is 1000, % TODO : Scale with shop cost
+    Lvl is 1, Xp is 0, Gold is 0, % TODO : Scale with shop cost
     % statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
     asserta(statPlayer(ClassType, Name, HP, Mana, Atk, Def, Lvl, Xp, Gold)),
     isIDValid(ClassID),!;
