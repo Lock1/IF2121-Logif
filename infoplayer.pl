@@ -1,10 +1,11 @@
 :- dynamic(inventory/6).
+:- dynamic(inventoryP/4).
 :- include('facts.pl').
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_), List),
-    findall(PotionName, potion(_,_,_,PotionName,_,_), ListP),
+    findall(PotionName, potion(_,PotionName,_,_), ListP),
     length(List, Length),
     length(ListP, LengthP),
     Res is Length+LengthP,
@@ -12,63 +13,69 @@ addItem(ItemID) :-
     Res >= 100,
     write('Inventory Is Full'),
     !,fail;
+    
     /*bisa ga ya kira2*/
     ItemID>15,
-    potion(ItemID, _, _, PotionName, PlusHP, PlusMana),
-    asserta(inventory(ItemID, _, _, PotionName, PlusHP, PlusMana)),!;
+    potion(ItemID, PotionName, PlusHP, PlusMana),
+    asserta(inventoryP(ItemID, PotionName, PlusHP, PlusMana)),!;
 
-    item(ItemID, _, Category, ItemName, Attack, Def),
-    asserta(inventory(ItemID, _, Category, ItemName, Attack, Def)),!
+    ItemID=<15,
+    item(ItemID, Class, Category, ItemName, Attack, Def),
+    asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!
     ).
 
 delItem(ItemID) :-
     \+inventory(ItemID,_,_,_,_,_),
     write('There is no specified item to delete'),!,fail;
 
+    ItemID>15,
+    retract(inventoryP(ItemID,_,_,_));
+
+    ItemID=<15,
     retract(inventory(ItemID,_,_,_,_,_)), !.
 
-listingPotion(List1, List2, List3, List4):-
-    [],[],[],[],[],[];
+listing([],[],[]).
+listing(List1, List2, List3) :-
     [W1|W2]=List1,
+    write('Name: '),
     write(W1), nl,
     [X1|X2]=List2,
+    write('Attack: '),
     write(X1), nl,
     [Y1|Y2]=List3,
+    write('Def: '),
     write(Y1), nl,
-    [Z1|Z2]=List4,
-    write(Z1), nl,
-    listing(W2, X2, Y2, Z2).
+    listing(W2, X2, Y2).
 
-listing([W1|W2], [X1|X2], [Y1|Y2], [Z1|Z2]):-
-    [],[],[],[];
-    write(W1), nl,
-    write(X1), nl,
-    write(Y1), nl,
-    write(Z1), nl,
-    listing(W2, X2, Y2, Z2).
-
-listItem:-
+listItem :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_), Names),
-    findall(ItemID, inventory(ItemID,_,_,_,_,_), IDs),
     findall(Attack, inventory(_,_,_,_,Attack,_), Attacks),
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
     write('----------------'), nl,
     write('Weapon:'), nl,
-    listing(Names, IDs, Attacks, Defs).
+    listing(Names, Attacks, Defs).
 
-listPotion:-
-    findall(PotionName, inventory(_,_,_,PotionName,_,_), PNames),
-    findall(ItemID, inventory(ItemID,_,_,_,_,_), IDs),
-    findall(PlusHP, inventory(_,_,_,_,PlusHP,_), HPs),
-    findall(PlusMana, inventory(_,_,_,_,_,_,PlusMana), ManaS),
+listingPotion([],[],[]).
+listingPotion(List1, List2, List3):-
+    [W1|W2]=List1,
+    write('Name: '),
+    write(W1), nl,
+    [X1|X2]=List2,
+    write('HP Restored: '),
+    write(X1), nl,
+    [Y1|Y2]=List3,
+    write('Mana Restored: '),
+    write(Y1), nl,
+    listing(W2, X2, Y2).
+
+listPotion :-
+    findall(PotionName, inventoryP(_,PotionName,_,_), PNames),
+    findall(PlusHP, inventoryP(_,_,PlusHP,_), HPs),
+    findall(PlusMana, inventoryP(_,_,_,PlusMana), ManaS),
     write('----------------'), nl,
     write('Potion:'), nl,
-    listingP(PNames, IDs, HPs, ManaS).
+    listingPotion(PNames, HPs, ManaS).
 
-listInventory:-
+listInventory :-
     listItem,
     listPotion.
-
-
-
-
