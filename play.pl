@@ -100,7 +100,23 @@ start :-
     username_input,
     choose_class.
 
-status. % TODO : add check inventory and Extra, print on move mode
+status :-
+    statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'), nl,
+    write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'), nl,
+    write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'), nl,
+    write('┃ HP / MP │  '),
+    format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
+    write(' / '),
+    format('\33\[34m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'), nl,
+    write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'), nl,
+    write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'), nl,
+    write('┃ Lv / XP │    '), format('%2d / %2d',[Lvl,XP]), write(' ┃'), nl,
+    write('┃ Gold    │ '),
+    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'), nl,
+    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl.
+    % TODO : add check inventory, quest.
+    % TODO : Extra, print on move mode
 
 clear :-
     shell('clear').
@@ -146,7 +162,7 @@ choose_class :-
     player(Name),
     Lvl is 1, Xp is 0, Gold is 1000, % TODO : Scale with shop cost
     % statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)
-    asserta(statPlayer(ClassID, Name, HP, Mana, Atk, Def, Lvl, Xp, Gold)),
+    asserta(statPlayer(ClassType, Name, HP, Mana, Atk, Def, Lvl, Xp, Gold)),
     isIDValid(ClassID),!;
     choose_class.
 
@@ -192,6 +208,7 @@ w :-
     TPY > 1,
     Move is TPY-1,
     collisionCheck(TPX,Move),
+    flush_output,
     \+map,
     write('Kamu bergerak ke atas '), nl.
 
@@ -200,6 +217,7 @@ a :-
     TPX > 1,
     Move is TPX-1,
     collisionCheck(Move,TPY),
+    flush_output,
     \+map,
     write('Kamu bergerak ke kiri '), nl.
 
@@ -209,6 +227,7 @@ s :-
     TPY < MaxH ,
     Move is TPY+1,
     collisionCheck(TPX,Move),
+    flush_output,
     \+map,
     write('Kamu bergerak ke bawah'), nl.
 
@@ -218,6 +237,7 @@ d :-
     TPX < MaxW,
     Move is TPX+1,
     collisionCheck(Move,TPY),
+    flush_output,
     \+map,
     write('Kamu bergerak ke kanan'), nl.
 
@@ -229,7 +249,7 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
-    % randomEncounter,  !; % DEBUG encounterEnemy,
+    randomEncounter, clear, encounterEnemy,  !;
     setLocation(X,Y).
 
 randomEncounter :-

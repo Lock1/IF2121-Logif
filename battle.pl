@@ -10,14 +10,16 @@ encounterEnemy:-
 	random(1, 7, ID),
 	monster(ID, Nama, HP, Atk, Def, XP),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
-	write('Kamu ketemu '), write(Nama), write('!!'), nl,
+	write('\33\[m'), flush_output,
+	write('Kamu ketemu '), write(Nama), write(' !!'), nl,
 	write('Apa yang akan kamu lakukan?'), nl,
 	write('- Fight'), nl,
-	write('- Run'),
-	write('Tuliskan perintah diakhiri tanda titik'),
+	write('- Run'), nl,
+	write('Tuliskan perintah diakhiri tanda titik'), nl,
 	random(1, 10, P),
 	asserta(peluang(P)),
-	asserta(isEnemyAlive(1)).
+	asserta(isEnemyAlive(1)),
+	battleLoop.
 
 /********Lari*************/
 
@@ -153,6 +155,21 @@ enemyAttack :-
 	asserta(statPlayer(IDTipe, Nama, NewHP, mana, Atk, DefPlayer, Lvl, XP, Gold)),
 	enemyAttackComment,
 	!.
+
+
+
+% -------------------- Battle Loop --------------------
+
+battleLoop :-
+    repeat,
+    write('> '),
+    catch(read(X), error(_,_), errorMessage), (
+        X = 'attack', call(attack);
+        X = 'fight', call(fight);
+        X = 'run', call(run);
+        X = 'quit', call(quit)
+    ),
+    fail.
 
 
 /***********************KALAH********************************/

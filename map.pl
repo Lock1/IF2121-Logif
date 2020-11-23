@@ -45,9 +45,12 @@ setShop(X) :-
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
     width(W),
+    flush_output,
     (
     X =:= W+1,
     Y =< H+1,
+    write('\33\[37m\33\[1m'),
+    flush_output,
     (Y is 0,write('╗'),nl,!;
     Y is H+1,write('╝'),nl,!;
     mod(Y,2) =:= 0,write('┨'),nl,!;
@@ -59,6 +62,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     /*Draw Left Border*/
     X =:= 0,
     Y =< H+1,
+    write('\33\[37m\33\[1m'),
+    flush_output,
     (Y is 0,write('╔'),!;
     Y is H+1,write('╚'),!;
     mod(Y,2) =:= 0,write('┠'),!;
@@ -71,6 +76,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     X > 0,
     X < W+1,
     Y =:= 0,
+    write('\33\[37m\33\[1m'),
+    flush_output,
     (mod(X,4) =:= 0,write('╤'),!;
     write('═')),
     X2 is X+1,
@@ -80,6 +87,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     X > 0,
     X < W + 1,
     Y =:= H+1,
+    write('\33\[37m\33\[1m'),
+    flush_output,
     (mod(X,4) =:= 0,write('╧'),!;
     write('═')),
     X2 is X+1,
@@ -91,7 +100,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     Y > 0,
     Y < H+1,
     dragon(X, Y), !,
-    write('D'),
+    write('\33\[31m\33\[1mD\33\[m'),
+    flush_output,
     X2 is X+1,
     setMap(X2, Y),!;
 
@@ -101,7 +111,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     Y > 0,
     Y < H+1,
     quest(X, Y), !,
-    write('Q'),
+    write('\33\[33m\33\[1mQ\33\[m'),
+    flush_output,
     X2 is X+1,
     setMap(X2, Y),!;
 
@@ -111,7 +122,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     Y > 0,
     Y < H+1,
     shop(X, Y), !,
-    write('S'),
+    write('\33\[36m\33\[1mS\33\[m'),
+    flush_output,
     X2 is X+1,
     setMap(X2, Y),!;
 
@@ -121,7 +133,8 @@ setMap(X,Y) :- /*Draw Right Border*/
     Y > 0,
     Y < H+1,
     playerLocation(X, Y), !,
-    write('@'),
+    write('\33\[32m\33\[1m@\33\[m'),
+    flush_output,
     X2 is X+1,
     setMap(X2, Y),!;
 
