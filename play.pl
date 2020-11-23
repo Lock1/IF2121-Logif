@@ -118,6 +118,33 @@ status :-
     % TODO : add check inventory, quest.
     % TODO : Extra, print on move mode
 
+sideStatus :-
+    statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
+    write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[1B'),flush_output,
+    write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[2B'),flush_output,
+    write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[3B'),flush_output,
+    write('┃ HP / MP │  '),
+    format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
+    write(' / '),
+    format('\33\[34m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
+    write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
+    write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
+    write('┃ Lv / XP │    '), format('%2d / %2d',[Lvl,XP]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
+    write('┃ Gold    │ '),
+    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
+    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
+    write('\33\[100A\33\[1000D'),flush_output.
+
+
 clear :-
     shell('clear').
 
@@ -249,7 +276,7 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
     shop(X,Y), write('shop gan'), !;
-    randomEncounter, clear, encounterEnemy,  !;
+    % randomEncounter, clear, encounterEnemy,  !; % DEBUG
     setLocation(X,Y).
 
 randomEncounter :-
@@ -271,6 +298,7 @@ switchMove(X) :-
 move :-
     clear,
     \+map,
+    sideStatus,
     write('Tekan e untuk command mode  '), nl,
     toggleRawMode,
     write('\33\[m'),
@@ -361,7 +389,7 @@ classScreen(X) :-
 screenWipe(X) :- % TODO : Extra, Selective clear
     X is 0;
     flush_output,
-    write('                                                                                                           '), nl,
+    write('                                                            '), nl,
     Rx is X-1, screenWipe(Rx).
 
 % Loading bar

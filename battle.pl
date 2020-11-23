@@ -55,7 +55,7 @@ run :-
 /*********Mau Lari tapi udah berhadapan dengan musuh******/
 run :-
 	isRun(_),
-	write('Kamu udah gagal run lho, jangan lari lagi'),
+	write('Kamu udah gagal run lho, jangan lari lagi'), nl,
 	!.
 
 /*******************FIGHT********************/
