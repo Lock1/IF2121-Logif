@@ -113,4 +113,5 @@ usePotion(PID) :-
     NewHP is HP+PlusHP,
     NewMana is Mana+PlusMana,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)).
+    asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
+    retract(inventoryP(ID, Name, PlusHP, PlusMana)).
