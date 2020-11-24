@@ -124,27 +124,39 @@ equip(ItemID) :-
     (
     \+currentWeapon(_),
     ItemID =< 9, ItemID > 0,
-    inventory(IDWeapon,Tipe,_,Name,WAtk,_),
-    asserta(currentWeapon(IDWeapon)),
     statPlayer(Tipe, _, _, _, Atk, _, _, _, _),
+    inventory(IDWeapon,Tipe,_,Name,WAtk,_),
+    (
+    asserta(currentWeapon(IDWeapon));
+    write("Tidak sesuai kelas")
+    ),
+
     NewAtk is WAtk+Atk,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, Def, Lvl, XP, Gold));
 
     \+currentArmor(_),
     ItemID > 9, ItemID <13,
-    inventory(IDArmor, Tipe, _, Name, _,ADef),
-    asserta(currentArmor(IDArmor)),
     statPlayer(Tipe, _, _, _, _, Def, _, _, _),
+    inventory(IDArmor, Tipe, _, Name, _,ADef),
+    (
+    asserta(currentArmor(IDWeapon));
+    write("Tidak sesuai kelas")
+    ),
+    
     NewDef is ADef+Def,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(Tipe, Nama, HP, Mana, Atk, NewDef, Lvl, XP, Gold));
 
     \+currentMisc(_),
     ItemID > 12, ItemID =< 15,
-    inventory(IDMisc, Tipe, _, Name, WAtk, ADef),
-    asserta(currentMisc(IDMisc)),
     statPlayer(Tipe, _, _, _, Atk, Def, _, _, _),
+    inventory(IDMisc, Tipe, _, Name, WAtk, ADef),
+    (
+    asserta(currentWeapon(IDWeapon));
+    write("Tidak sesuai kelas")
+    ),
+    
     NewAtk is WAtk+Atk,
     NewDef is ADef+Def,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
