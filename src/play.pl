@@ -21,6 +21,7 @@
 :- dynamic(questList/2).
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
+:- dynamic(isQuest/1).
 
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 % Support untuk terminal gprolog diwindows telah didrop dikarenakan deadline
@@ -297,6 +298,33 @@ doQuest(X,Y) :- % TODO : add quest
     prompt,
     (shell('clear'), !; overwriteClear, !).
 
+doQuest2(X,Y) :- % TODO : add quest
+    player(Username), randomize, (shell('clear'), !; overwriteClear, !),
+    format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
+    random(1,500,Rmv),
+    random(1,500,Rmv2),
+    random(1,500,Rmv3),
+    Mnstr is mod(Rmv, 6) + 1,
+    Mnstr2 is mod(Rmv2, 6) + 1,
+    Mnstr3 is mod(Rmv3, 6) + 1,
+    random(1,1000,Rv),
+    random(1,1000,Rv2),
+    random(1,1000,Rv3),
+    Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
+    Cnt2 is mod(Rv2, 6) + 1, monster(Mnstr2,Name2,_,_,_,_),
+    Cnt3 is mod(Rv3, 6) + 1, monster(Mnstr3,Name3,_,_,_,_),
+    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
+    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt2, Name2]),
+    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt3, Name3]),
+    (
+        questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
+        asserta(questList(Mnstr,Cnt)), !
+    ),
+    isQuest(1),
+    retract(quest(X,Y)),
+    prompt,
+    (shell('clear'), !; overwriteClear, !).
+
 greedisgood :-
     write('\33\[33m\33\[1mResource granted\33\[m\n'),
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -432,7 +460,7 @@ setLocation(X,Y) :-
     asserta(playerLocation(X,Y)).
 
 collisionCheck(X,Y) :-
-    quest(X,Y), doQuest(X,Y), !;
+    quest(X,Y), doQuest2(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
     teleporter(X,Y), randomize, width(W), height(H), random(1, W, Absis), random(1, H, Ordinat), retract(player(X,Y)), asserta(player(Absis, Ordinat)), !;
     shop(X,Y), clear, call(shop), clear, !; % TODO : Choice
