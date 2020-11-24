@@ -22,13 +22,14 @@
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
 :- dynamic(isQuest/1).
+:- dynamic(critChance/1).
 
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 % Support untuk terminal gprolog diwindows telah didrop dikarenakan deadline
 
 % Inisialisasi program
 :- initialization(main).
-
+% TODO : Non essential, balancing
 /* ------------------------- Core Loop -------------------------- */
 main :-
     unicode(IsUnicodeMode),
@@ -72,7 +73,7 @@ gameLoop :-
             X = 'drink', call(drinkPot);
             X = 'delete', call(deleteItemInventory);
             X = 'shop', call(shopError);
-            % X = 'w', call(w); % TODO : Extra, legacy support
+            % X = 'w', call(w); % TODO : Non essential, legacy support
             % X = 'a', call(a);
             % X = 's', call(s);
             % X = 'd', call(d);
@@ -81,17 +82,10 @@ gameLoop :-
             X = 'mp', \+map, write('\33\[m'), flush_output;
             X = 's', call(status);
             X = 'm', call(move);
+            X = 'e', call(equipItem);
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(18)); % DEBUG
-            X = 'y', call(addItem(2)); % DEBUG
-            X = 'y', call(addItem(11)); % DEBUG
-            X = 'y', call(addItem(6)); % DEBUG
-            X = 'y', call(addItem(4)); % DEBUG
-            X = 'y', call(addItem(5)); % DEBUG
-            X = 'y', call(addItem(15)); % DEBUG
-            X = 'e', call(equipItem);
 
 
             % Super-obscure-feature
@@ -100,7 +94,7 @@ gameLoop :-
             X = 'hesoyam', call(hesoyam);
             X = 'hidden', hidden
         )
-        % TODO : Extra, Handler message
+        % TODO : Non essential, Handler message
 
     ),
     fail.
@@ -163,7 +157,7 @@ questStatus :- % TODO : Extra, check quest print
     format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
     write('\33\[37m\33\[1m'),flush_output,
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
-    % TODO : Extra, Filter input 'a,b'
+    % TODO : Non essential, Filter input 'a,b'
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -256,13 +250,16 @@ choose_class :-
     class(ClassID, ClassType, HP, Mana, Atk, Def),
     (
         ClassID =:= 1,
-        write('You have chosen \33\[31m\33\[1mSwordsman\33\[m'), nl;
+        write('You have chosen \33\[31m\33\[1mSwordsman\33\[m'), nl,
+        asserta(critChance(5));
 
         ClassID =:= 2,
-        write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl;
+        write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl
+        asserta(critChance(16));
 
         ClassID =:= 3,
-        write('You have chosen \33\[36m\33\[1mSorcerer\33\[m'), nl
+        write('You have chosen \33\[36m\33\[1mSorcerer\33\[m'), nl,
+        asserta(critChance(8))
 
     ) -> (write('\nYou may begin your journey.\n'),\+map, write('\33\[m'), flush_output,
     % write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
@@ -290,7 +287,7 @@ username_input :-
     sleep(1),
     classScreen(IsUnicodeMode).
 
-% doQuest(X,Y) :-
+% doQuest(X,Y) :- % Single quest add
 %     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
 %     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
 %     random(1,500,Rmv),
@@ -353,6 +350,7 @@ greedisgood :-
     NewGold is Gold + 1000,
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
+    get_key_no_echo(_),
     checkLevelUp, !.
 
 whosyourdaddy :-
@@ -438,7 +436,7 @@ deleteItemInventory :-
         length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
         format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
 
-        currentMish(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        currentMisc(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
         length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
         format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
 

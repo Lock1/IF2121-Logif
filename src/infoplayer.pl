@@ -3,7 +3,7 @@
 :- dynamic(currentWeapon/1).
 :- dynamic(currentArmor/1).
 :- dynamic(currentMisc/1).
-% :- include('facts.pl'). %DEBUGGING
+% :- include('facts.pl').
 
 /*inventory(ItemID, class, category, name, attack, def)*/
 addItem(ItemID) :-
@@ -127,16 +127,52 @@ listInventory :-
 
 checkLevelUp :-
     statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold),
-    XPToLvlUp is CurrentLvl*80 + 100,
+    XPToLvlUp is CurrentLvl*20 + 80,
     XPToLvlUp =< CurrentXP,
-    NewHP is CurrentHP + CurrentLvl*5 + 120,
-    NewMana is CurrentMana + CurrentLvl*3 + 30,
-    NewAtk is CurrentAtk + CurrentLvl//2 + 1,
-    NewDef is CurrentDef + CurrentLvl//3 + 1,
     NewXP is CurrentXP - XPToLvlUp, LvlUp is CurrentLvl + 1,
+    (
+        IDTipe = 'swordsman',
+        HPGain is CurrentLvl*5 + 40,
+        ManaGain is CurrentLvl*3 + 45,
+        AtkGain is CurrentLvl//2 + 1,
+        DefGain is CurrentLvl//3 + 2;
+
+        IDTipe = 'archer',
+        HPGain is CurrentLvl*5 + 20,
+        ManaGain is CurrentLvl*2 + 10,
+        AtkGain is CurrentLvl//2 + 2,
+        DefGain is CurrentLvl//3 + 1;
+
+        IDTipe = 'sorcerer',
+        HPGain is CurrentLvl*5 + 40,
+        ManaGain is CurrentLvl*4 + 60,
+        AtkGain is CurrentLvl//2 + 1,
+        DefGain is CurrentLvl//3 + 1
+    ),
+    NewHP is CurrentHP + HPGain,
+    NewMana is CurrentMana + ManaGain,
+    NewAtk is CurrentAtk + AtkGain,
+    NewDef is CurrentDef + DefGain,
+
     retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
-    format('\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]), checkLevelUp; !.
+    format('\n\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]),
+    write('\33\[1m\33\[37m'), flush_output,
+    write('┏━━━━━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
+    format('┃ HP    \33\[31m%4d \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentHP , NewHP , HPGain]),
+    format('┃ Mana  \33\[36m%4d \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentMana , NewMana , ManaGain]),
+    format('┃ Atk   \33\[m\33\[33m\33\[2m\33\[2m%4d\33\[1m \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentAtk , NewAtk , AtkGain]),
+    format('┃ Def   \33\[35m%4d \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentDef , NewDef , DefGain]),
+    write('┗━━━━━━━━━━━━━━━━━━┷━━━━━━━┛\n'),
+
+    prompt,
+    checkLevelUp; !.
+
+
+% rawAtk(X) :-
+%     currentWeapon(X), inventory(X,_,_,_,WAtk,_),
+% rawDef(X)
+
 
 drinkPot :-
     inventoryP(_,_,_,_),

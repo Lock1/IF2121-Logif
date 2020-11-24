@@ -54,7 +54,7 @@ setTeleporter(X) :-
     asserta(teleporter(Absis, Ordinat)),
     X2 is X-1,
     setTeleporter(X2),!.
-
+% TODO : Non essential, double buffer
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
     width(W),

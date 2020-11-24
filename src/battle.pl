@@ -7,7 +7,7 @@
 :- dynamic(isBattleDone/1).
 
 /********Ketemu Musuh*********/
-% TODO : Extra, gameloop for legacy version
+% TODO : Non essential, gameloop for legacy version
 encounterEnemy(_) :-
 	random(1, 7, ID),
 	monster(ID, Nama, HP, Atk, Def, XP),
@@ -62,7 +62,7 @@ encounterDragon(_) :-
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
 	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
 	write('• status (\33\[36m\33\[1mx\33\[m)'), flush_output, nl,
-	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl, % TODO : Special UI
+	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl, % TODO : Non essential, Special UI
 	write('Tuliskan inisial dari command'), nl,
 	random(1, 10, P1),
 	asserta(peluangLari(P1)),
@@ -109,7 +109,7 @@ fight :-
 	!;
 	/********Berhasil Bertarung*********/
 	\+ isFighting(_),
-	% asserta(isRun(1)), % DEBUG
+	% asserta(isRun(1)),
 	asserta(isFighting(1)),
 	isEnemyAlive(_),
 	enemy(_, NamaEnemy, _, _, _, _),
@@ -323,7 +323,7 @@ isAllQuestComplete :-
 specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
-	enemy(_,EnemyN,HPEnemy,_,DefEnemy,_),
+	enemy(_,EnemyN,_,_,_,_),
 	special_skill(Class, SName, SMana),
 	NewMana is Mana - SMana,
 	(

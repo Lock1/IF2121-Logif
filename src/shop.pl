@@ -84,7 +84,7 @@ beliPotion :-
     %     Peluang =< 10000, Peluang > 9750, nth(7, L, Nama1), !
     % ),
     % random(1,7,Rx),
-    random(0,9,Rx), % TODO : Extra, dunno
+    random(0,9,Rx), % TODO : Non essential, non uniform random distribution
     nth(Rx, L, Nama1),
 
     potion(PotionID,Nama1,_,_),
