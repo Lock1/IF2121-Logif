@@ -37,7 +37,7 @@ main :-
     set_seed(Rseed),
     (
         IsUnicodeMode is 1,
-        % shell('clear'),
+        shell('clear'),
         first_screen,
         help(IsUnicodeMode),
         printRandomizedTrivia,

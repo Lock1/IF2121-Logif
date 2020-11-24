@@ -6,11 +6,12 @@ shop:-
     /*deket shop*/
     write('\33\[37m\33\[1mSelamat datang pada tempat pembakaran\33\[m \33\[33m\33\[1muang\33\[m\33\[37m\33\[1m!'), nl,
     write('Ini adalah barang yang dapat dibeli \33\[m'),nl,
-    write('• \33\[35m\33\[1mpotion\33\[m \33\[33m\33\[1m10 gold\33\[m'), nl,
-    write('• \33\[35m\33\[1mgacha\33\[m  \33\[33m\33\[1m40\33\[m \33\[37m\33\[1mhingga\33\[m \33\[33m\33\[1m70 gold\33\[m'), nl,
+    write('• \33\[35m\33\[1mpotion\33\[m \33\[33m\33\[1m40 gold\33\[m \33\[37m\33\[1mhingga\33\[m \33\[33m\33\[1m150 gold\33\[m (\33\[36m\33\[1mb\33\[m)'), nl,
+    write('• \33\[35m\33\[1mgacha potion\33\[m \33\[33m\33\[1m10 gold\33\[m (\33\[36m\33\[1mp\33\[m)'), nl,
+    write('• \33\[35m\33\[1mgacha\33\[m  \33\[33m\33\[1m40\33\[m \33\[37m\33\[1mhingga\33\[m \33\[33m\33\[1m70 gold\33\[m (\33\[36m\33\[1mg\33\[m)'), nl,
     write('Tekan sembarang tombol untuk quit shop'), nl,
     write('Tuliskan inisial untuk membeli barang'), nl,
-    write('> '),
+    write('\33\[32m\33\[1mShop >> \33\[m'),
     get_key(X), nl, nl,
     (
         X = 103,
@@ -19,7 +20,7 @@ shop:-
         X = 112,
         beliPotion, prompt, !;
 
-        X = 115,
+        X = 98,
         beliPotionID, prompt, !;
 
         !
@@ -27,34 +28,36 @@ shop:-
     !.
 
 beliPotionID :-
-    write('List Healing Potion berdasarkan ID: '), nl,
-    write('1. Lesser Healing Potion'), nl,
-    write('2. Healing Potion'), nl,
-    write('3. Greater Healing Potion'), nl,
-    write('4. Alkohol'), nl,
+    write('\33\[37m\33\[1mList Potion\33\[m'), nl,
+    write('┏━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━┓'), nl,
+    write('┃ 1 │ \33\[31m\33\[1mLesser Healing Potion\33\[m   │ \33\[33m\33\[1m 40 gold\33\[m ┃'), nl,
+    write('┃ 2 │ \33\[31m\33\[1mHealing Potion\33\[m          │ \33\[33m\33\[1m 70 gold\33\[m ┃'), nl,
+    write('┃ 3 │ \33\[31m\33\[1mGreater Healing Potion\33\[m  │ \33\[33m\33\[1m100 gold\33\[m ┃'), nl,
+    write('┃ 4 │ \33\[31m\33\[1mAlkohol\33\[m                 │ \33\[33m\33\[1m150 gold\33\[m ┃'), nl,
+    write('┃ 5 │ \33\[36m\33\[1mLesser Mana Potion\33\[m      │ \33\[33m\33\[1m 40 gold\33\[m ┃'), nl,
+    write('┃ 6 │ \33\[36m\33\[1mMana Potion\33\[m             │ \33\[33m\33\[1m 70 gold\33\[m ┃'), nl,
+    write('┃ 7 │ \33\[36m\33\[1mGreater Mana Potion\33\[m     │ \33\[33m\33\[1m100 gold\33\[m ┃'), nl,
+    write('┃ 8 │ \33\[36m\33\[1mOkultisme\33\[m               │ \33\[33m\33\[1m150 gold\33\[m ┃'), nl,
+    write('┗━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━━━┛'), nl,
 
-    write('List Mana Potion berdasarkan ID: '), nl,
-    write('5. Lesser Mana Potion'), nl,
-    write('6. Mana Potion'), nl,
-    write('7. Greater Mana Potion'), nl,
-    write('8. okultisme'), nl,
-
-    write('Tulis ID'), nl,
-    write('> '), get_key(X),
+    write('Tulis angka untuk membeli potion'), nl,
+    write('\33\[32m\33\[1mShop >> \33\[m'), get_key(X), nl,
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     (
-        X = 1, Gold >= 20, NewGold is Gold-20, addItem(16), !;
-        X = 2, Gold >= 30, NewGold is Gold-30, addItem(17), !;
-        X = 3, Gold >= 40, NewGold is Gold-40, addItem(18), !;
-        X = 4, Gold >= 60, NewGold is Gold-60, addItem(19), !;
-        X = 5, Gold >= 20, NewGold is Gold-20, addItem(20), !;
-        X = 6, Gold >= 30, NewGold is Gold-30, addItem(21), !;
-        X = 7, Gold >= 40, NewGold is Gold-40, addItem(22), !;
-        X = 8, Gold >= 60, NewGold is Gold-60, addItem(23), !
+        X = 49, Gold >= 40, NewGold is Gold-40, addItem(16), write('\33\[33m\33\[1mLesser Healing Potion\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 50, Gold >= 70, NewGold is Gold-70, addItem(17), write('\33\[33m\33\[1mHealing Potion\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 51, Gold >= 100, NewGold is Gold-100, addItem(18), write('\33\[33m\33\[1mGreater Healing Potion\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 52, Gold >= 150, NewGold is Gold-150, addItem(19), write('\33\[33m\33\[1mAlkohol\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 53, Gold >= 40, NewGold is Gold-40, addItem(20), write('\33\[33m\33\[1mLesser Mana Potion\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 54, Gold >= 70, NewGold is Gold-70, addItem(21), write('\33\[33m\33\[1mMana Potion\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 55, Gold >= 100, NewGold is Gold-100, addItem(22), write('\33\[33m\33\[1mGreater Mana Potion\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        X = 56, Gold >= 150, NewGold is Gold-150, addItem(23), write('\33\[33m\33\[1mOkultisme\33\[m \33\[37m\33\[1mtelah dibeli!\33\[m\n'), !;
+        NewGold is Gold, write('Silahkan farming dulu :)\n')
     ),
-    
+
     retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)), !.
+    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)),
+    !.
 
 /*beli potion gagal, duid ga cukup*/
 beliPotion :-
