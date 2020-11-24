@@ -176,20 +176,21 @@ attack :-
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
 	random(-5,3,AtkSpread),
+	critChance(CritChance),
 	% Critical Roll
 	(
 		ClassType = 'swordsman',
-		random(1,100,CritRoll), CritRoll < 6,
+		random(1,100,CritRoll), CritRoll =< CritChance,
 		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
 		AtkPlayer is BaseAtkPlayer*4//3 + AtkSpread; % 1,3~ x multiplier
 
 		ClassType = 'archer',
-		random(1,100,CritRoll), CritRoll < 17,
+		random(1,100,CritRoll), CritRoll =< CritChance,
 		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
 		AtkPlayer is BaseAtkPlayer*5 + AtkSpread;	% 4 x multiplier
 
 		ClassType = 'sorcerer',
-		random(1,100,CritRoll), CritRoll < 9,
+		random(1,100,CritRoll), CritRoll =< CritChance,
 		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
 		AtkPlayer is BaseAtkPlayer*3//2 + AtkSpread; % 1,5 x multiplier
 

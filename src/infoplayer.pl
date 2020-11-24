@@ -127,6 +127,7 @@ listInventory :-
 
 checkLevelUp :-
     statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold),
+    critChance(CritChance), % Intentionally obscure stat
     XPToLvlUp is CurrentLvl*20 + 80,
     XPToLvlUp =< CurrentXP,
     NewXP is CurrentXP - XPToLvlUp, LvlUp is CurrentLvl + 1,
@@ -135,35 +136,43 @@ checkLevelUp :-
         HPGain is CurrentLvl*5 + 40,
         ManaGain is CurrentLvl*3 + 45,
         AtkGain is CurrentLvl//2 + 1,
-        DefGain is CurrentLvl//3 + 2;
+        DefGain is CurrentLvl//3 + 2,
+        CritGain is CurrentLvl//4;
 
         IDTipe = 'archer',
         HPGain is CurrentLvl*5 + 20,
         ManaGain is CurrentLvl*2 + 10,
         AtkGain is CurrentLvl//2 + 2,
-        DefGain is CurrentLvl//3 + 1;
+        DefGain is CurrentLvl//3 + 1,
+        CritGain is CurrentLvl//2;
 
         IDTipe = 'sorcerer',
         HPGain is CurrentLvl*5 + 40,
         ManaGain is CurrentLvl*4 + 60,
         AtkGain is CurrentLvl//2 + 1,
-        DefGain is CurrentLvl//3 + 1
+        DefGain is CurrentLvl//3 + 1,
+        CritGain is CurrentLvl//3
     ),
     NewHP is CurrentHP + HPGain,
     NewMana is CurrentMana + ManaGain,
     NewAtk is CurrentAtk + AtkGain,
     NewDef is CurrentDef + DefGain,
+    NewCrit is CritChance + CritGain,
+
+    retract(critChance(CritChance)),
+    asserta(critChance(NewCrit)),
 
     retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
     format('\n\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]),
     write('\33\[1m\33\[37m'), flush_output,
-    write('┏━━━━━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
-    format('┃ HP    \33\[31m%4d \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentHP , NewHP , HPGain]),
-    format('┃ Mana  \33\[36m%4d \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentMana , NewMana , ManaGain]),
-    format('┃ Atk   \33\[m\33\[33m\33\[2m\33\[2m%4d\33\[1m \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentAtk , NewAtk , AtkGain]),
-    format('┃ Def   \33\[35m%4d \33\[32m→ \33\[33m%3d \33\[37m│ \33\[32m↑ \33\[37m%3d ┃\n',[CurrentDef , NewDef , DefGain]),
-    write('┗━━━━━━━━━━━━━━━━━━┷━━━━━━━┛\n'),
+    write('┏━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━┓\n'),
+    format('┃ HP    \33\[31m%4d \33\[32m→ \33\[33m%5d \33\[37m│ \33\[32m↑ \33\[37m%4d ┃\n',[CurrentHP , NewHP , HPGain]),
+    format('┃ Mana  \33\[36m%4d \33\[32m→ \33\[33m%5d \33\[37m│ \33\[32m↑ \33\[37m%4d ┃\n',[CurrentMana , NewMana , ManaGain]),
+    format('┃ Atk   \33\[m\33\[33m\33\[2m\33\[2m%4d\33\[1m \33\[32m→ \33\[33m%5d \33\[37m│ \33\[32m↑ \33\[37m%4d ┃\n',[CurrentAtk , NewAtk , AtkGain]),
+    format('┃ Def   \33\[35m%4d \33\[32m→ \33\[33m%5d \33\[37m│ \33\[32m↑ \33\[37m%4d ┃\n',[CurrentDef , NewDef , DefGain]),
+    format('┃ Crit  \33\[m\33\[37m\33\[2m\33\[2m%3d%s\33\[m\33\[1m \33\[32m→  \33\[33m%3d%s \33\[37m│ \33\[32m↑  \33\[37m%2d%s ┃\n',[CritChance, '%', NewCrit, '%', CritGain, '%']),
+    write('┗━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━┛\n'),
 
     prompt,
     checkLevelUp; !.

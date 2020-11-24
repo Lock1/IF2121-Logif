@@ -254,7 +254,7 @@ choose_class :-
         asserta(critChance(5));
 
         ClassID =:= 2,
-        write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl
+        write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl,
         asserta(critChance(16));
 
         ClassID =:= 3,
