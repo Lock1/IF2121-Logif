@@ -15,25 +15,25 @@ monster(6, bomber, 25, 45, 1, 48).
 /* Item(item_id, class_type, category, item_name, attack, def) possibly dont need gold since gacha anyway //parameters could change*/
 /* Item terbagi sesuai dengan jenis class dan category */
 
-item(1, swordsman, sword, excalibur_kw1, 50, 0).
-item(2, swordsman, sword, samehadawibu, 45, 0).
-item(3, swordsman, sword, pedang_zabuza, 42, 0).
+item(1, swordsman, sword, 'excalibur kw1', 50, 0).
+item(2, swordsman, sword, 'samehadawibu', 45, 0).
+item(3, swordsman, sword, 'pedang zabuza', 42, 0).
 
-item(4, archer, bow, lightningarrow, 47, 0).
-item(5, archer, bow, archdemon, 42, 0).
-item(6, archer, bow, arrowspike, 39, 0).
+item(4, archer, bow, 'lightning arrow', 47, 0).
+item(5, archer, bow, 'arch demon', 42, 0).
+item(6, archer, bow, 'arrow spike', 39, 0).
 
-item(7, sorcerer, wand, avadacadavra, 46, 0).
-item(8, sorcerer, wand, tolongkasihnama2, 44, 0).
-item(9, sorcerer, wand, gataudeh2, 41, 0).
+item(7, sorcerer, wand, 'avadacadavra', 46, 0).
+item(8, sorcerer, wand, 'tolong kasih nama2', 44, 0).
+item(9, sorcerer, wand, 'gataudeh2', 41, 0).
 
-item(10, swordsman, armor, bajuperangdunia, 0, 25).
-item(11, archer, armor, bajuperangdunia2, 0, 21).
-item(12, sorcerer, armor, bajuperangdunia3, 0, 20).
+item(10, swordsman, armor, 'baju perang dunia', 0, 25).
+item(11, archer, armor, 'baju orang miskin', 0, 21).
+item(12, sorcerer, armor, 'baju orang big brain', 0, 20).
 
-item(13, swordsman, statup, gelangbaja, 10, 5).
-item(14, sorcerer, statup, gelangsihir, 10, 5).
-item(15, archer, statup, gelangkaret, 10, 5).
+item(13, swordsman, statup, 'gelang baja', 10, 5).
+item(14, sorcerer, statup, 'gelang sihir', 10, 5).
+item(15, archer, statup, 'gelang karet', 10, 5).
 
 /*Potion(ID, _, _,Name, HP+, Mana+)*/
 potion(16, lesser_healing_potion, 10, 0).

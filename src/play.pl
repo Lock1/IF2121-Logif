@@ -68,6 +68,7 @@ gameLoop :-
             X = 'd', call(d);
             X = 'move', call(move);
             X = 'inventory', call(listInventory);
+            X = 'shop', call(shop);
             X = 'greedisgood', call(greedisgood);
             X = 'whosyourdaddy', call(whosyourdaddy);
             X = 'hesoyam', call(hesoyam);

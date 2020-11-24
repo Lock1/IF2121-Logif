@@ -6,7 +6,7 @@ shop:-
     /*deket shop*/
     write('Perintah / gold'),nl,
     write('- potion / 10'), nl,
-    write('- gacha / 50'), nl,
+    write('- gacha / (40 - 70)'), nl,
     write('- quit'), nl,
     write('Tuliskan g untuk gacha dan p untuk potion!'), nl,
     write('> '),
@@ -58,46 +58,50 @@ gacha:-
     randomize,
     statPlayer(Tipe,_,_,_,_,_,_,_,Gold),
     item(_,Tipe,_,_,_,_),
-    Gold >= 50,
+    random(-10,20,CostSpread),
+    GachaCost is 50 + CostSpread,
+    Gold >= GachaCost,
+    format('You spent \33\[33m%d\33\[m gold.\n', [GachaCost]),
     findall(Y, item(_,_,_,Y,_,_), L),
     % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus
-    random(1, 100, Peluang),
+    random(1, 10000, Peluang),
     (
-        Peluang =< 10, Peluang > 1,
+        Peluang =< 1000, Peluang > 1,
         nth(0, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(X), nl;
+        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
 
-        Peluang =< 30, Peluang > 10,
+        Peluang =< 3000, Peluang > 1000,
         nth(1, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(X), nl;
+        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
 
-        Peluang =< 55, Peluang > 30,
+        Peluang =< 5500, Peluang > 3000,
         nth(2, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(X), nl;
+        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
 
-        Peluang =< 70, Peluang > 55,
+        Peluang =< 7000, Peluang > 5500,
         nth(3, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(X), nl;
+        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
 
-        Peluang < 100, Peluang > 70,
+        Peluang < 10000, Peluang > 7000,
         nth(4, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(X), nl;
+        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
 
-        Peluang = 1,
-        write('\33\[31\33\[1mMaaf kamu tidak beruntung, mohon untuk menghubungi truck-kun lagi :)\33\[m\n'),
+        Peluang = 1, % 0.01% chance to quit
+        flush_output,
+        write('\33\[31m\33\[1mMaaf kamu tidak beruntung, mohon untuk menghubungi truck-kun lagi :)\33\[m\n'),
         halt
     ),
-    NewGold is Gold-50,
+    NewGold is Gold - GachaCost,
     retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)).
 
@@ -107,5 +111,4 @@ gacha:-
 
 /*gagal, shop ga pada tempatnya*/
 shop:-
-    \+deketshop(_),
     write('gabisa beli disini woy, gaada yang jualan. Pergi ketempat shop sono!'),!.
