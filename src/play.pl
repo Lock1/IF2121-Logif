@@ -22,7 +22,8 @@
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
 :- dynamic(isQuest/1).
-:- dynamic(critChance/1).
+:- dynamic(critChance/1). % TODO : Extra, add crit chance status data
+% TODO : Extra, add dodge stat
 
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 % Support untuk terminal gprolog diwindows telah didrop dikarenakan deadline

@@ -28,7 +28,9 @@ encounterEnemy(_) :-
 
 
 encounterDragon(_) :-
-	asserta(enemy(99, tubesDuragon, 999, 99, 99, 1000)),
+	% asserta(enemy(99, tubesDuragon, 999, 99, 99, 1000)),
+	monster(99, Name, HP, Atk, Def, XPGain),
+	asserta(enemy(99, Name, HP, Atk, Def, XPGain)),
 	write('\33\[31m\33\[1m'),
 	write(' ░░       ░░░▒▒▒▒░░                                                     '),nl,
 	write('░░▒▒▒▒▒▒░      ░▒▒▒▒▒▒░                                                 '),nl,
@@ -155,7 +157,7 @@ attackComment :-
 	isQuestDone(EnemyID),
 	isAllQuestComplete,
 	checkLevelUp,
-	prompt, !.
+	write('\33\[37m\33\[2mTekan sembarang tombol mengakhiri battle\33\[m\n'), get_key_no_echo(_), !.
 % TODO : Extra, auto fight for qol
 /********Belum ketemu musuh*********/
 normalAttack :-

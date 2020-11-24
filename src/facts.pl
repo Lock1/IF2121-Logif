@@ -47,7 +47,7 @@ potion(21, 'Mana Potion', 0, 20).
 potion(22, 'Greater Mana Potion', 0, 30).
 potion(23, 'okultisme', 0, 60).
 
-
+% TODO : Extra, boost potion
 
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
 special_skill(swordsman, 'baliho yang dicopot', 15).

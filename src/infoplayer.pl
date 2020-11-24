@@ -174,7 +174,7 @@ checkLevelUp :-
     format('┃ Crit  \33\[m\33\[37m\33\[2m\33\[2m%3d%s\33\[m\33\[1m \33\[32m→  \33\[33m%3d%s \33\[37m│ \33\[32m↑  \33\[37m%2d%s ┃\n',[CritChance, '%', NewCrit, '%', CritGain, '%']),
     write('┗━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━┛\n'),
 
-    prompt,
+    write('\33\[33mTekan sembarang tombol untuk melanjutkan level up.\33\[m\n'), get_key_no_echo(_),
     checkLevelUp; !.
 
 
