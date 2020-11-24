@@ -11,6 +11,7 @@ monster(3, wolf, 90, 12, 3, 55).
 monster(4, skeleton, 100, 15, 3, 42).
 monster(5, zombie, 65, 20, 2, 32).
 monster(6, bomber, 25, 45, 1, 48).
+moster(99, 'tubes Duragon', 999, 99, 99, 1000).
 
 /* Item(item_id, class_type, category, item_name, attack, def) possibly dont need gold since gacha anyway //parameters could change*/
 /* Item terbagi sesuai dengan jenis class dan category */
@@ -52,5 +53,3 @@ potion(23, okultisme, 0, 60).
 special_skill(swordsman, baliho-fpi, 30).
 special_skill(archer, cupid-arrow, 25).
 special_skill(sorcerer, santet, 30).
-
-boss(duragonnnn, 999, 100, 30).
