@@ -104,7 +104,7 @@ gacha:-
 
 
     item(Item_id, _,_, X, _, _),
-    addItem(Item_id),
+    addItem(Item_id), % TODO : Random
     format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]),
 
     NewGold is Gold - GachaCost,

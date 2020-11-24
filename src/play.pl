@@ -202,7 +202,7 @@ sideStatusQuest :-
     write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
     write( '┠───────────┼───────┨\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
-    format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
+    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
     write('\33\[37m\33\[1m'),flush_output,
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
@@ -281,7 +281,7 @@ username_input :-
     sleep(1),
     classScreen(IsUnicodeMode).
 
-doQuest(X,Y) :-
+doQuest(X,Y) :- % TODO : add quest
     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
     random(1,500,Rmv),
@@ -434,10 +434,10 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !; % TODO : Boss battle
-    shop(X,Y), clear, call(shop), clear, !;
-    (
+    shop(X,Y), clear, call(shop), clear, !; % TODO : Choice
+    (   % TODO : Teleport
     \+shop(X,Y);
-    \+dragon(X,Y) 
+    \+dragon(X,Y)
     ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 

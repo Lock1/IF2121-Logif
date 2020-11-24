@@ -30,29 +30,29 @@ encounterEnemy(_) :-
 encounterDragon(_) :-
 	asserta(enemy(99, tubesDuragon, 999, 99, 99, 1000)),
 	write('\33\[31m\33\[1m'),
-	write(' ░░       ░░░▒▒▒▒░░                                                     '),nl,    
-	write('░░▒▒▒▒▒▒░      ░▒▒▒▒▒▒░                                                 '),nl,   
-	write('      ░▒▒▒▓▓▒░      ░▒▒▓▓▒▒░                                            '),nl,   
-	write('            ░░▒▒▒▒░░    ░▒▓▓▓▒▒░                                        '),nl,   
-	write('                 ░░▒▒▒▒░    ▒▓▓▓▓▒░  ▒▒▒                                '),nl,   
-	write('                      ▒▒▓▒░   ▒▓▓▓██▓▒▒▒▓▓▒                             '),nl,   
-	write('                ░░       ░▓██▒     ███   ░▓▒                            '),nl,   
-	write('                ░░    ░░░   ██      ▒▓▓▓░  ░▓▒░                         '),nl,   
-	write('             ░░░░░░░      ░  ▓█░             ▒▒▒░                       '),nl,   
-	write('             ▒▒   ░░▒▒▒▒▒░    █▓    ▒▒   ░░░   ░▒▓▒                     '),nl,   
-	write('             ▒░         ░▒▓▓▒  ▓▒░░▒░░▒▒░         ▒░▒▒                  '),nl,   
-	write('          ░▓▓  ░▒▒▒▒▒▒▒░    ▒▓▒▓█▓▒▒▓░  ▒▓▒░     ░ ▓    ▒░              '),nl,   
-	write('            ░▓       ░▒▒▒▓▓▒  ▓█░▒▒▒ ▒▓▓▒▒▒▒▓▓▓▓▓▒░█  ▒▓▓░              '),nl,   
-	write('             ▒▒            ██░        ▒▓ ░░▒████░   ░ ▒▓▒░              '),nl,   
-	write('            ░▒  ░░░▒▒▒▒▒▒▒▒▓      ▒        ░░░░░▒▒▒▒░    ░▒░            '),nl,   
-	write('             ░▒           █▓      ▒█░              ▒▓▓▒    ░░░░░░       '),nl,   
-	write('               ▒   ░▒▒▒▒▒▒▓█     ▓▓  ░░▒▓▒░██▓▒▒        ▒▒ ░░▒▒ ░▒▒     '),nl,   
-	write('              ░▓▒▒▓▒▒▒▒▒▒▒▒██   ▓▓  ▓ ░▓░ ░▓░░█░▒▓▒░      ▓░░░░▒░ ░▒▒░░ '),nl,   
-	write('              ░░            ▓█▒ ▓  ░█▒ ▒▒  ▓  ▓▒ ▓▓█▓▒    ▓░░▒▒ ▒▒    ▒▒'),nl,   
-	write('                              ▒▒░   ▓█  █  ▓▒ ░░ ░░░▓██▓▒     ░▒ ░░▒  ▓ '),nl,   
-	write('                                  ░  ░░▒▒▒▒▒▒▒▒▓▒▒░░   ▓█▒         ░ ▓░ '),nl,   
-	write('                                   ░░░░░░░░       ░░▒░░  ▒▒▒▒         ▒ '),nl,   
-	write('                                                       ░    ░▒▒▒▒░░░▒▒▒▒'),nl,   
+	write(' ░░       ░░░▒▒▒▒░░                                                     '),nl,
+	write('░░▒▒▒▒▒▒░      ░▒▒▒▒▒▒░                                                 '),nl,
+	write('      ░▒▒▒▓▓▒░      ░▒▒▓▓▒▒░                                            '),nl,
+	write('            ░░▒▒▒▒░░    ░▒▓▓▓▒▒░                                        '),nl,
+	write('                 ░░▒▒▒▒░    ▒▓▓▓▓▒░  ▒▒▒                                '),nl,
+	write('                      ▒▒▓▒░   ▒▓▓▓██▓▒▒▒▓▓▒                             '),nl,
+	write('                ░░       ░▓██▒     ███   ░▓▒                            '),nl,
+	write('                ░░    ░░░   ██      ▒▓▓▓░  ░▓▒░                         '),nl,
+	write('             ░░░░░░░      ░  ▓█░             ▒▒▒░                       '),nl,
+	write('             ▒▒   ░░▒▒▒▒▒░    █▓    ▒▒   ░░░   ░▒▓▒                     '),nl,
+	write('             ▒░         ░▒▓▓▒  ▓▒░░▒░░▒▒░         ▒░▒▒                  '),nl,
+	write('          ░▓▓  ░▒▒▒▒▒▒▒░    ▒▓▒▓█▓▒▒▓░  ▒▓▒░     ░ ▓    ▒░              '),nl,
+	write('            ░▓       ░▒▒▒▓▓▒  ▓█░▒▒▒ ▒▓▓▒▒▒▒▓▓▓▓▓▒░█  ▒▓▓░              '),nl,
+	write('             ▒▒            ██░        ▒▓ ░░▒████░   ░ ▒▓▒░              '),nl,
+	write('            ░▒  ░░░▒▒▒▒▒▒▒▒▓      ▒        ░░░░░▒▒▒▒░    ░▒░            '),nl,
+	write('             ░▒           █▓      ▒█░              ▒▓▓▒    ░░░░░░       '),nl,
+	write('               ▒   ░▒▒▒▒▒▒▓█     ▓▓  ░░▒▓▒░██▓▒▒        ▒▒ ░░▒▒ ░▒▒     '),nl,
+	write('              ░▓▒▒▓▒▒▒▒▒▒▒▒██   ▓▓  ▓ ░▓░ ░▓░░█░▒▓▒░      ▓░░░░▒░ ░▒▒░░ '),nl,
+	write('              ░░            ▓█▒ ▓  ░█▒ ▒▒  ▓  ▓▒ ▓▓█▓▒    ▓░░▒▒ ▒▒    ▒▒'),nl,
+	write('                              ▒▒░   ▓█  █  ▓▒ ░░ ░░░▓██▓▒     ░▒ ░░▒  ▓ '),nl,
+	write('                                  ░  ░░▒▒▒▒▒▒▒▒▓▒▒░░   ▓█▒         ░ ▓░ '),nl,
+	write('                                   ░░░░░░░░       ░░▒░░  ▒▒▒▒         ▒ '),nl,
+	write('                                                       ░    ░▒▒▒▒░░░▒▒▒▒'),nl,
 	write('                                                              ░▒▓▓▓▓▓▒░ '),nl,
 	write('        █████████████████████████████████████████▀███████████'),nl,
 	write('        █▄─▄████▀▄─██─▄▄▄▄█─▄─▄─███▄─▄▄─█▄─▄█─▄▄▄▄█─█─█─▄─▄─█'),nl,
@@ -194,8 +194,15 @@ attack :-
 
 		AtkPlayer is BaseAtkPlayer + AtkSpread, !
 	),
-	format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[AtkPlayer]), nl,
-	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
+	TotalDamage is AtkPlayer - DefEnemy,
+	(
+		TotalDamage > 0,
+		format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[TotalDamage]), nl,
+		NewHPEnemy is (HPEnemy - TotalDamage), !;
+
+		format('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
+		NewHPEnemy is HPEnemy, !
+	),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)).
 
@@ -233,7 +240,7 @@ enemyTurn :-
 	random(-3,4,AtkSpread),
 	Serangan is (AtkEnemy - DefPlayer + AtkSpread),
 	(
-		NewHP is (HPPlayer - (AtkEnemy - DefPlayer)), NewHP =< HPPlayer, !;
+		NewHP is (HPPlayer - Serangan), NewHP =< HPPlayer, !;
 		NewHP is HPPlayer, !
 	),
 	format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m%d\33\[m\n',[NamaEnemy,Serangan]),
@@ -317,6 +324,7 @@ specialAttack :-
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
+			format('Tersisa \33\[36m\33\[1m%d\33\[m mana\n',[NewMana]),
 			attack, !, attack, !,
 			(
 				enemy(_,_,NewEHP,_,_,_),
