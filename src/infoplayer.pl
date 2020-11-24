@@ -1,5 +1,8 @@
 :- dynamic(inventory/6).
 :- dynamic(inventoryP/4).
+:- dynamic(currentWeapon/1).
+:- dynamic(currentArmor/1).
+:- dynamic(currentMisc/1).
 % :- include('facts.pl'). %DEBUGGING
 
 /*inventory(ItemID, class, category, name, attack, def)*/
@@ -137,65 +140,118 @@ checkLevelUp :-
 drinkPot :-
     inventoryP(_,_,_,_),
     listPotion,
-    write('Masukkan ID Potion \n>> '),
+    write('Masukkan ID Potion \n\33\[32m\33\[1mDrink >> \33\[m'),
     catch(read(X), error(_,_), errorMessage), get_key_no_echo(_),
     usePotion(X), !;
     write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n\n'), !.
 
-:- dynamic(currentWapon/1).
-:- dynamic(currentArmor/1).
-:- dynamic(currentMisc/1).
-kuontol :-
+
+equipItem :-
     listItem,
-    write('Masukkan ID Item \n> '),
+    write('Masukkan ID item yang akan diequip, \n\33\[34m\33\[1mEquip >> \33\[m'),
     catch(read(X), error(_,_), errorMessage),
     equip(X).
 
 % Weapon, Armor, Misc
-equip(ItemID) :-
-    (
-    \+currentWeapon(_),
+equip(ItemID) :- % TODO : Extra, Inv sidebar
+    currentWeapon(A),
     ItemID =< 9, ItemID > 0,
-    statPlayer(Tipe, _, _, _, Atk, _, _, _, _),
-    inventory(IDWeapon,Tipe,_,Name,WAtk,_),
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    inventory(ItemID,Tipe,_,Name,WAtk,_),
+    inventory(A,_,_,OldName,OldAtk,_),
     (
-    asserta(currentWeapon(IDWeapon)),
-    NewAtk is WAtk+Atk,
-    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, Def, Lvl, XP, Gold));
+        retract(currentWeapon(A)),
+        asserta(currentWeapon(ItemID)),
+        NewAtk is Atk - OldAtk + WAtk,
+        retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+        asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, Def, Lvl, XP, Gold)),
+        format('\33\[33m\33\[1m%s\33\[m dilepas,\n',[OldName]),
+        format('\33\[33m\33\[1m%s\33\[m telah berhasil diequip!\n\n',[Name]),!;
 
-    write("Tidak sesuai kelas"),!
+        !
     );
 
-    \+currentArmor(_),
-    ItemID > 9, ItemID <13,
-    statPlayer(Tipe, _, _, _, _, Def, _, _, _),
-    inventory(IDArmor, Tipe, _, Name, _,ADef),
+    currentArmor(B),
+    ItemID > 9, ItemID < 13,
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    inventory(ItemID, Tipe, _, Name, _,ADef),
+    inventory(B,_,_,OldName,_,OldDef),
     (
-    asserta(currentArmor(IDWeapon)),
-    NewDef is ADef+Def,
-    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(Tipe, Nama, HP, Mana, Atk, NewDef, Lvl, XP, Gold));
+        retract(currentArmor(B)),
+        asserta(currentArmor(ItemID)),
+        NewDef is Def - OldDef + ADef,
+        retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+        asserta(statPlayer(Tipe, Nama, HP, Mana, Atk, NewDef, Lvl, XP, Gold)),
+        format('\33\[33m\33\[1m%s\33\[m dilepas,\n',[OldName]),
+        format('\33\[33m\33\[1m%s\33\[m telah berhasil diequip!\n\n',[Name]),!;
 
-    write("Tidak sesuai kelas"),!
+        !
     );
 
-    \+currentMisc(_),
+    currentMisc(C),
     ItemID > 12, ItemID =< 15,
-    statPlayer(Tipe, _, _, _, Atk, Def, _, _, _),
-    inventory(IDMisc, Tipe, _, Name, WAtk, ADef),
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    inventory(ItemID, Tipe, _, Name, WAtk, ADef),
+    inventory(C,_,_,OldName,OldAtk,OldDef),
     (
-    asserta(currentWeapon(IDWeapon)),
-    NewAtk is WAtk+Atk,
-    NewDef is ADef+Def,
-    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold));
+        retract(currentMisc(C)),
+        asserta(currentMisc(ItemID)),
+        NewAtk is Atk - OldAtk + WAtk,
+        NewDef is Def - OldDef + ADef,
+        retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+        asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+        format('\33\[33m\33\[1m%s\33\[m dilepas,\n',[OldName]),
+        format('\33\[33m\33\[1m%s\33\[m telah berhasil diequip!\n\n',[Name]), !;
 
-    write("Tidak sesuai kelas"),!
+        !
     );
 
-    write('sudah nge equip barang kok mau equip lagi')
-    ).
+
+
+
+    % Equip new item
+    ItemID =< 9, ItemID > 0,
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    inventory(ItemID,Tipe,_,Name,WAtk,_),
+    (
+        asserta(currentWeapon(ItemID)),
+        NewAtk is WAtk + Atk,
+        retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+        asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, Def, Lvl, XP, Gold)),
+        format('\33\[33m\33\[1m%s\33\[m telah berhasil diequip!\n\n',[Name]),!;
+
+        !
+    );
+
+    ItemID > 9, ItemID <13,
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    inventory(ItemID, Tipe, _, Name, _,ADef),
+    (
+        asserta(currentArmor(ItemID)),
+        NewDef is ADef+Def,
+        retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+        asserta(statPlayer(Tipe, Nama, HP, Mana, Atk, NewDef, Lvl, XP, Gold)),
+        format('\33\[33m\33\[1m%s\33\[m telah berhasil diequip!\n\n',[Name]),!;
+
+        !
+    );
+
+    ItemID > 12, ItemID =< 15,
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    inventory(ItemID, Tipe, _, Name, WAtk, ADef),
+    (
+        asserta(currentMisc(ItemID)),
+        NewAtk is WAtk+Atk,
+        NewDef is ADef+Def,
+        retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+        asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+        format('\33\[33m\33\[1m%s\33\[m telah berhasil diequip!\n\n',[Name]), !;
+
+        !
+    );
+
+    write('Tidak sesuai kelas.\n\n').
+% TODO : Delete current equipment
 
 usePotion(PID) :-
     inventoryP(PID, Name, PlusHP, PlusMana),

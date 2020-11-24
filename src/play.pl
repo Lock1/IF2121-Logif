@@ -34,6 +34,8 @@ main :-
     unicode(IsUnicodeMode),
     setInitialMap,
     randomize,
+    addItem(16), addItem(16), addItem(16), addItem(16), addItem(16),
+    addItem(20), addItem(20),
     random(37,11777,Rseed),
     set_seed(Rseed),
     (
@@ -65,8 +67,10 @@ gameLoop :-
             X = 'map', \+map, write('\33\[m'), flush_output;
             X = 'status', call(status);
             X = 'move', call(move);
+            X = 'equip', call(equipItem);
             X = 'inventory', call(listInventory);
             X = 'drink', call(drinkPot);
+            X = 'delete', call(deleteItemInventory);
             X = 'shop', call(shopError);
             % X = 'w', call(w); % TODO : Extra, legacy support
             % X = 'a', call(a);
@@ -79,11 +83,16 @@ gameLoop :-
             X = 'm', call(move);
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
-            X = 'x', call(deleteItemInventory),
+            X = 'x', call(deleteItemInventory);
             X = 'y', call(addItem(18)); % DEBUG
             X = 'y', call(addItem(2)); % DEBUG
             X = 'y', call(addItem(11)); % DEBUG
-            X = 'y', call(addItem(22)); % DEBUG
+            X = 'y', call(addItem(6)); % DEBUG
+            X = 'y', call(addItem(4)); % DEBUG
+            X = 'y', call(addItem(5)); % DEBUG
+            X = 'y', call(addItem(15)); % DEBUG
+            X = 'e', call(equipItem);
+
 
             % Super-obscure-feature
             X = 'greedisgood', call(greedisgood);
@@ -144,14 +153,14 @@ status :-
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl,
     questStatus.
 
-questStatus :-
-    questList(ID,Ct),
+questStatus :- % TODO : Extra, check quest print
+    questList(ID,Ct), % FIXME : Extra, status battle
     monster(ID,Name,_,_,_,_),
     write('\33\[37m\33\[1m'),flush_output,
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
     write( '┃  Monster  │ Count ┃\n'),
     write( '┠───────────┼───────┨\n'),
-    format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]),
+    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
     write('\33\[37m\33\[1m'),flush_output,
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
     % TODO : Extra, Filter input 'a,b'
@@ -283,31 +292,31 @@ username_input :-
     sleep(1),
     classScreen(IsUnicodeMode).
 
-doQuest(X,Y) :- % TODO : add quest
-    player(Username), randomize, (shell('clear'), !; overwriteClear, !),
-    format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
-    random(1,500,Rmv),
-    Mnstr is mod(Rmv, 6) + 1,
-    random(1,1000,Rv),
-    Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
-    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
-    (
-        questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
-        asserta(questList(Mnstr,Cnt)), !
-    ),
-    retract(quest(X,Y)),
-    prompt,
-    (shell('clear'), !; overwriteClear, !).
+% doQuest(X,Y) :- % TODO : add quest
+%     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
+%     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
+%     random(1,500,Rmv),
+%     Mnstr is mod(Rmv, 6) + 1,
+%     random(1,1000,Rv),
+%     Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
+%     format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
+%     (
+%         questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
+%         asserta(questList(Mnstr,Cnt)), !
+%     ),
+%     retract(quest(X,Y)),
+%     prompt,
+%     (shell('clear'), !; overwriteClear, !).
 
-doQuest2(X,Y) :- % TODO : add quest
-    player(Username), randomize, (shell('clear'), !; overwriteClear, !),
+doQuest2(X,Y) :-
+    \+ isQuest(_),
+    player(Username), randomize, clear,
     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
-    random(1,500,Rmv),
-    random(1,500,Rmv2),
-    random(1,500,Rmv3),
-    Mnstr is mod(Rmv, 6) + 1,
-    Mnstr2 is mod(Rmv2, 6) + 1,
-    Mnstr3 is mod(Rmv3, 6) + 1,
+    generateRandomTriplet(P),
+    P = [A,B,C],
+    Mnstr is A,
+    Mnstr2 is B,
+    Mnstr3 is C,
     random(1,1000,Rv),
     random(1,1000,Rv2),
     random(1,1000,Rv3),
@@ -317,14 +326,27 @@ doQuest2(X,Y) :- % TODO : add quest
     format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
     format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt2, Name2]),
     format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt3, Name3]),
-    (
-        questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
-        asserta(questList(Mnstr,Cnt)), !
-    ),
-    isQuest(1),
+    asserta(questList(Mnstr,Cnt)),
+    asserta(questList(Mnstr2,Cnt2)),
+    asserta(questList(Mnstr3,Cnt3)),
+    asserta(isQuest(1)),
     retract(quest(X,Y)),
     prompt,
-    (shell('clear'), !; overwriteClear, !).
+    clear;
+
+    clear,
+    write('\33\[31m\33\[1mTidak\33\[m dapat mengambil quest, selesaikan quest berikut terlebih dahulu.\n'),
+    questStatus, prompt, clear, !.
+
+generateRandomTriplet(L) :-
+    randomize,
+    random(1,4,Rmv),
+    R2 is Rmv + 1,
+    random(R2,5,Rmv2),
+    R3 is Rmv2 + 1,
+    random(R3,6,Rmv3),
+    L = [Rmv,Rmv2,Rmv3].
+
 
 greedisgood :-
     write('\33\[33m\33\[1mResource granted\33\[m\n'),
@@ -559,6 +581,8 @@ help(X) :-
     write('│   ┃  map.       : Menampilkan peta              ┃    │ '), nl,
     write('│   ┃  status.    : Menampilkan kondisi saat ini  ┃    │ '), nl,
     write('│   ┃  inventory. : Menampilkan barang            ┃    │ '), nl,
+    write('│   ┃  equip.     : Menggunakan item              ┃    │ '), nl,
+    write('│   ┃  delete.    : Menghapus barang              ┃    │ '), nl,
     % write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
     write('│   ┃  move.      : Masuk ke mode movement        ┃    │ '), nl,
     write('│   ┃  help.      : Menampilkan bantuan           ┃    │ '), nl,

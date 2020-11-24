@@ -200,7 +200,7 @@ attack :-
 		format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[TotalDamage]), nl,
 		NewHPEnemy is (HPEnemy - TotalDamage), !;
 
-		format('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
+		write('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
 		NewHPEnemy is HPEnemy, !
 	),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
@@ -285,25 +285,40 @@ lose :-
 isQuestDone(EnemyID) :-
 	questList(EnemyID,Cnt),
 	(
-	Cnt is 1,
-	retract(questList(EnemyID, Cnt)),
-	statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold),
-	random(-10,30,XPSpread), random(-25,40,GoldSpread),
-	NewXP is CurrentXP + XPSpread + Cnt*10, NewGold is CurrentGold + GoldSpread + 25 + Cnt*30,
-	retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
-	asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
-	monster(EnemyID, EnemyName, _, _, _, _),
-	format('\33\[33m\33\[1mQuest %s sudah selesai!\33\[m\n',[EnemyName]),isQuest(0);
+		Cnt is 1,
+		retract(questList(EnemyID, Cnt)),
+		statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold),
+		random(-10,30,XPSpread), random(-25,40,GoldSpread),
+		XPBounty is XPSpread + Cnt*10, GoldBounty is GoldSpread + 15 + Cnt*20,
+		NewXP is CurrentXP + XPBounty, NewGold is CurrentGold + GoldBounty,
+		retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
+		asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
+		monster(EnemyID, EnemyName, _, _, _, _),
+		format('\33\[33mBagian quest %s sudah selesai!\33\[m\n',[EnemyName]),
+		format('Kamu mendapatkan \33\[32m\33\[1m%d XP\33\[m dan \33\[33m\33\[1m%d gold\33\[m!\n',[XPBounty,GoldBounty]);
 
-	NewCnt is Cnt-1,
-	retract(questList(EnemyID, Cnt)),
-	asserta(questList(EnemyID, NewCnt))
-	); !.
+		NewCnt is Cnt-1,
+		retract(questList(EnemyID, Cnt)),
+		asserta(questList(EnemyID, NewCnt))
+	), !;
+	\+questList(_,_),
+	(
+		retract(isQuest(_)),
+		statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold),
+		random(0,70,XPSpread), random(-15,60,GoldSpread),
+		XPBounty is XPSpread + 150, GoldBounty is GoldSpread + 250,
+		NewXP is CurrentXP + XPBounty, NewGold is CurrentGold + GoldBounty,
+		retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
+		asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
+		write('\n\33\[33m\33\[1mQuest sudah selesai!\33\[m\n'),
+		format('Kamu mendapatkan \33\[32m\33\[1m%d XP\33\[m dan \33\[33m\33\[1m%d gold\33\[m!\n',[XPBounty,GoldBounty])
+	), !;
+	!.
 
 specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
-	enemy(_,EnemyN,_,_,_,_),
+	enemy(_,EnemyN,HPEnemy,_,DefEnemy,_),
 	special_skill(Class, SName, SMana),
 	NewMana is Mana - SMana,
 	(
