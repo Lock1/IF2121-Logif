@@ -78,7 +78,8 @@ gameLoop :-
             X = 'm', call(move);
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
-            X = 'y', call(addItem(4)); % DEBUG
+            X = 'y', call(addItem(17)); % DEBUG
+            X = 'y', call(addItem(23)); % DEBUG
             X = 'e', call(kuontol); % DEBUG
 
             % Super-obscure-feature
@@ -146,7 +147,7 @@ questStatus :-
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\n').
     % TODO : Extra, Filter input 'a,b'
 
-% TODO : Integrate usepot and equip
+% TODO : Integrate equip
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),

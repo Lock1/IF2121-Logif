@@ -98,7 +98,7 @@ checkLevelUp :-
     NewHP is CurrentHP + CurrentLvl*5 + 120,
     NewMana is CurrentMana + CurrentLvl*3 + 30,
     NewAtk is CurrentAtk + CurrentLvl//2 + 1,
-    NewDef is CurrentDef + CurrentLvl//3,
+    NewDef is CurrentDef + CurrentLvl//3 + 1,
     NewXP is CurrentXP - XPToLvlUp, LvlUp is CurrentLvl + 1,
     retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),

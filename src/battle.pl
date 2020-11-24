@@ -2,10 +2,9 @@
 :- dynamic(statPlayer/9).
 :- dynamic(isEnemyAlive/1).
 :- dynamic(isFighting/1).
-:- dynamic(peluang/1).
+:- dynamic(peluangLari/1).
 :- dynamic(isRun/1).
 :- dynamic(isBattleDone/1).
-:- dynamic(battleTick/1).
 
 /********Ketemu Musuh*********/
 % TODO : Extra, gameloop for legacy version
@@ -13,15 +12,17 @@ encounterEnemy(_) :-
 	random(1, 7, ID),
 	monster(ID, Nama, HP, Atk, Def, XP),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
-	write('\33\[m'), flush_output,
+	write('\33\[m'), sideStatus, write('\33\[1000A\33\[1000D'), flush_output,
 	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
 	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m%d\33\[m\n',[Nama,HP]),
+	sleep(0.2),
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
 	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
+	write('• status (\33\[36m\33\[1ms\33\[m)'), flush_output, nl,
 	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
 	write('Tuliskan inisial dari command'), nl,
 	random(1, 10, P),
-	asserta(peluang(P)),
+	asserta(peluangLari(P)),
 	asserta(isEnemyAlive(1)),
 	call(battleLoop).
 
@@ -35,18 +36,18 @@ run :-
 	/***********Gagal Lari *********/
 	\+ isRun(_),
 	isEnemyAlive(_),
-	peluang(P),
+	peluangLari(P),
 	P =< 4,
 	write('\33\[36m\33\[1mKamu\33\[m \33\[31m\33\[1mgagal\33\[m run. Semangat bertarung~~ (^///^)'), nl,
-	retract(peluang(P)),
+	retract(peluangLari(P)),
 	asserta(isRun(1)),
 	fight;
 	/************Berhasil Lari************/
 	\+ isRun(_),
 	isEnemyAlive(_),
-	peluang(P),
+	peluangLari(P),
 	P > 4,
-	retract(peluang(P)),
+	retract(peluangLari(P)),
 	retract(isEnemyAlive(_)),
 	retract(enemy(_, _, _, _, _, _)),
 	asserta(isBattleDone(1)),
@@ -64,7 +65,7 @@ fight :-
 	\+ isEnemyAlive(_),
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh. Mau nyerang siapa?'), nl, nl,
 	!;
-	/********Berhasil Bertarung*********/
+	/********Berhasil Bertarung*********/ % TODO : Player crit
 	\+ isFighting(_),
 	% asserta(isRun(1)), % DEBUG
 	asserta(isFighting(1)),
@@ -73,6 +74,7 @@ fight :-
 	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
 	write('Perintah tersedia :\n'),
 	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
+	write('• status (\33\[36m\33\[1ms\33\[m)'), nl,
 	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
 	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
@@ -117,7 +119,7 @@ attack :-
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl, nl,
 	!;
 
-	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/ % TODO : Add usepot
+	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/
 	/***********Attack biasa********/
 
 	isEnemyAlive(_),
@@ -188,10 +190,14 @@ battleLoop :-
 	    % % catch(read(X), error(_,_), errorMessage), (
 	        X = 102, call(fight), battleLoop, !;
 	        X = 114, call(run), battleLoop, !;
+	        X = 115, \+status, battleLoop, !;
+	        X = 100, call(drinkPot), get_key_no_echo(_), battleLoop, !; % FIXME : Read get interaction
 	        X = 113, call(quit), !;
 			isFighting(_), (
-				X = 97, call(attack), battleLoop, ! % lowercase 'a' key
-			); write('Tombol tidak diketahui\n\n'), battleLoop, !
+				% X = 97, call(attack), battleLoop, !, % lowercase 'a' key
+				X = 97, call(specialAttack), battleLoop, ! % lowercase 'a' key
+			);
+			write('Tombol tidak diketahui\n\n'), battleLoop, !
 	    )
 	).
 
@@ -224,35 +230,41 @@ isQuestDone(EnemyID) :-
 
 specialAttack :-
 	isEnemyAlive(_),
-	statPlayer(Class,_,_,Mana,Atk,Def,_,_,_),
+	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
 	enemy(_,_,HPEnemy,_,DefEnemy,_),
-	special_skill(Class,SName, SMana),
+	special_skill(Class, SName, SMana),
+	NewMana is Mana - SMana,
 	(
-	Class = 'swordsman',
-	NewDef is Def+999,
-	NewMana is Mana-SMana,
-	retract(statPlayer(_,_,_,Mana,_,Def,_,_,_)),
-	asserta(statPlayer(IDTipe, Nama, HP,NewMana, Atk,NewDef, Lvl, XP, Gold)),
-	enemyTurn,
-	enemyAttackComment,
-	OldDef is NewDef-999,
-	retract(statPlayer(IDTipe, Nama, HP,NewMana, Atk,NewDef, Lvl, XP, Gold)),
-	asserta(statPlayer(IDTipe, Nama, HP,NewMana, Atk,OldDef, Lvl, XP, Gold));
+		NewMana >= 0,
+		(
+			Class = 'swordsman',
+			NewDef is Def+999,
 
-	Class = 'archer',
-	attack,
-	attackComment,
-	attack,
-	attackComment;
+			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
+			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
+			enemyAttackComment,
+			retract(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold));
 
-	Class = 'sorcerer'
-	SantetAtk is Atk+150,
-	NewMana is Mana-SMana,
-	retract(statPlayer(_,_,_,Mana,Atk,_,_,_,_)),
-	asserta(statPlayer(IDTipe, Nama, HP,NewMana, SantetAtk, Def, Lvl, XP, Gold)),
-	enemyTurn,
-	enemyAttackComment,
-	OldAtk is SantetAtk-150,
-	retract(statPlayer(IDTipe, Nama, HP,NewMana, SantetAtk, Def, Lvl, XP, Gold)),
-	asserta(statPlayer(IDTipe, Nama, HP,NewMana, OldAtk, Def, Lvl, XP, Gold));
+			Class = 'archer',
+			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
+			% attack, % TODO : Attack split
+			attack;
+
+			Class = 'sorcerer',
+			SantetAtk is Atk+150,
+			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
+			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
+			\+attack,
+			retract(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold))
+		), !;
+		ManaNeeded is (-1)*NewMana,
+		format('Kurang \33\[36m\33\[1m%d mana\33\[m untuk \33\[33m\33\[1m%s\33\[m\n', [ManaNeeded,SName]),
+		enemyTurn, !
 	).
+	% NewMana is Mana - SMana,
+
+	%

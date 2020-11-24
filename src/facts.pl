@@ -36,19 +36,19 @@ item(14, sorcerer, statup, 'Gelang Sihir', 10, 5).
 item(15, archer, statup, 'Gelang Karet', 10, 5).
 
 /*Potion(ID, _, _,Name, HP+, Mana+)*/
-potion(16, lesser_healing_potion, 10, 0).
-potion(17, small_healing_potion, 20, 0).
-potion(18, greater_healing_potion, 30 ,0).
-potion(19, alkohooool, 60, 0).
+potion(16, '\33\[31m\33\[1mLesser Healing Potion\33\[m', 10, 0).
+potion(17, '\33\[31m\33\[1mHealing Potion\33\[m', 20, 0).
+potion(18, '\33\[31m\33\[1mGreater Healing Potion\33\[m', 30 ,0).
+potion(19, '\33\[33m\33\[1malkohooool\33\[m', 60, 0).
 
-potion(20, lessermanapotion, 0, 10).
-potion(21, smallmanapotion, 0, 20).
-potion(22, greatermanapotion, 0, 30).
-potion(23, okultisme, 0, 60).
+potion(20, '\33\[36m\33\[1mLesser Mana Potion\33\[m', 0, 10).
+potion(21, '\33\[36m\33\[1mMana Potion\33\[m', 0, 20).
+potion(22, '\33\[36m\33\[1mGreater Mana Potion\33\[m', 0, 30).
+potion(23, '\33\[33m\33\[1mokultisme\33\[m', 0, 60).
 
 
 
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
-special_skill(swordsman, baliho-fpi, 30).
-special_skill(archer, cupid-arrow, 25).
-special_skill(sorcerer, santet, 30).
+special_skill(swordsman, 'baliho fpi', 15).
+special_skill(archer, 'cupid arrow', 10).
+special_skill(sorcerer, 'santet', 20).
