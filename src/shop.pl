@@ -35,16 +35,52 @@ beliPotion:-
 
 
 /*beli potion berhasil, duid cukup*/
+    randomize,
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold > 10,
+    potion(_,Nama,_,_),
+    findall(Nama, potion(_,Nama,_,_), L),
+    random(1,100,Peluang),
+
+    (
+        Peluang =< 10, Peluang > 1,
+        nth(0, L, Nama1),
+        potion(PotionID,Nama1,_,_),
+        addItem(PotionID),
+        write('You get '), write(Nama1), nl;
+
+        Peluang =< 30, Peluang > 10,
+        nth(1, L, Nama1),
+        potion(PotionID,Nama1,_,_),
+        addItem(PotionID),
+        write('You get '), write(Nama1), nl;
+
+        Peluang =< 55, Peluang > 30,
+        nth(2, L, Nama1),
+        potion(PotionID,Nama1,_,_),
+        addItem(PotionID),
+        write('You get '), write(Nama1), nl;
+
+        Peluang =< 70, Peluang > 55,
+        nth(3, L, Nama1),
+        potion(PotionID,Nama1,_,_),
+        addItem(PotionID),
+        write('You get '), write(Nama1), nl;
+
+        Peluang < 100, Peluang > 70,
+        nth(4, L, Nama1),
+        potion(PotionID,Nama1,_,_),
+        addItem(PotionID),
+        write('You get '), write(Nama1), nl;
+
+        Peluang = 1,
+        write('\33\[31\33\[1mMaaf kamu tidak beruntung, mohon untuk menghubungi truck-kun lagi :)\33\[m\n'),
+        halt
+    ),
+    
     NewGold is Gold-10,
     retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)),
-    random(1,9,P),
-    /*add potion, addItem(P),*/
-    write('Kamu berhasil membeli potion'),
-    /*Cara Nambahin Potion ke inventory gimana? formatnya berbeda gitu*/
-    shop, !.
+    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)).
 
 /*Gacha Gagal, duid ga cukup*/
 gacha:-
