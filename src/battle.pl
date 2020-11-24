@@ -17,8 +17,8 @@ encounterEnemy(_) :-
 	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
 	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m%d\33\[m\n',[Nama,HP]),
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
-	write('- fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
-	write('- run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
+	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
+	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
 	write('Tuliskan inisial dari command'), nl,
 	random(1, 10, P),
 	asserta(peluang(P)),
@@ -56,13 +56,13 @@ run :-
 	!;
 	/*********Mau Lari tapi udah berhadapan dengan musuh******/
 	isRun(_),
-	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl.
+	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl.
 
 /*******************FIGHT********************/
 /********Belum ketemu musuh*********/
 fight :-
 	\+ isEnemyAlive(_),
-	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh. Mau nyerang siapa?'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh. Mau nyerang siapa?'), nl, nl,
 	!;
 	/********Berhasil Bertarung*********/
 	\+ isFighting(_),
@@ -72,8 +72,8 @@ fight :-
 	enemy(_, NamaEnemy, _, _, _, _),
 	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
 	write('Perintah tersedia :\n'),
-	write('- attack (\33\[31m\33\[1ma\33\[m)'), nl,
-	write('- run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
+	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
+	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
 	% TODO : Add other information
 	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
@@ -107,16 +107,15 @@ attackComment :-
 	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[XPDrop]),
 	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
-	sleep(0.5),
 	asserta(isBattleDone(1)),
 	isQuestDone(EnemyID),
 	checkLevelUp, % TODO : Cek multiple lvl up
 	prompt, !.
-
+% TODO : Extra, auto fight for qol
 /********Belum ketemu musuh*********/
 attack :-
 	\+ isEnemyAlive(_),
-	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl, nl,
 	!;
 
 	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/ % TODO : Add run, usepot

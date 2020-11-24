@@ -4,32 +4,31 @@
 
 shop:-
     /*deket shop*/
-    write('Perintah / gold'),nl,
-    write('- potion / 10'), nl,
-    write('- gacha / (40 - 70)'), nl,
-    write('- quit'), nl,
-    write('Tuliskan g untuk gacha dan p untuk potion!'), nl,
+    write('\33\[37m\33\[1mSelamat datang pada tempat pembakaran\33\[m \33\[33m\33\[1muang\33\[m\33\[37m\33\[1m!'), nl,
+    write('Ini adalah barang yang dapat dibeli \33\[m'),nl,
+    write('• \33\[35m\33\[1mpotion\33\[m \33\[33m\33\[1m10 gold\33\[m'), nl,
+    write('• \33\[35m\33\[1mgacha\33\[m  \33\[33m\33\[1m40\33\[m \33\[37m\33\[1mhingga\33\[m \33\[33m\33\[1m70 gold\33\[m'), nl,
+    write('Tekan sembarang tombol untuk quit shop'), nl,
+    write('Tuliskan inisial untuk membeli barang'), nl,
     write('> '),
-    get_key(X), nl,
+    get_key(X), nl, nl,
     (
         X = 103,
-        gacha, !;
+        gacha, prompt, !;
 
         X = 112,
-        beliPotion, !;
+        beliPotion, prompt, !;
 
-        X = 113, !
+        !
     ),
-    % TODO : Print, check weird input
-    prompt,
-    nl, !.
+    !.
 
 
 /*beli potion gagal, duid ga cukup*/
 beliPotion:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold < 10,
-    write('Uang kamu tidak cukup, silahkan farming dulu :)'), nl;
+    write('\33\[33m\33\[1mUang\33\[m kamu \33\[31m\33\[1mtidak cukup\33\[m, silahkan farming dulu :)'), nl;
 
 
 /*beli potion berhasil, duid cukup*/
@@ -80,7 +79,7 @@ beliPotion:-
 gacha:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold < 40,
-    write('Uang kamu tidak cukup, silahkan farming dulu :)'), nl;
+    write('\33\[33m\33\[1mUang\33\[m kamu \33\[31m\33\[1mtidak cukup\33\[m, silahkan farming dulu :)'), nl;
 
 
 /*Gacha Berhasil(uang cukup)*/
