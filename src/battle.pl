@@ -303,7 +303,7 @@ isQuestDone(EnemyID) :-
 specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
-	enemy(_,EnemyN,HPEnemy,_,DefEnemy,_),
+	enemy(_,EnemyN,_,_,_,_),
 	special_skill(Class, SName, SMana),
 	NewMana is Mana - SMana,
 	(

@@ -37,7 +37,7 @@ main :-
     set_seed(Rseed),
     (
         IsUnicodeMode is 1,
-        shell('clear'),
+        % shell('clear'),
         first_screen,
         help(IsUnicodeMode),
         printRandomizedTrivia,
@@ -189,7 +189,7 @@ sideStatus :-
 
 sideStatusQuest :-
     findall(A,questList(A,_),L),
-    length(L,Size),
+    length(L,_),
     % Location is Size + 12,
     questList(ID,Ct),
     monster(ID,Name,_,_,_,_),
