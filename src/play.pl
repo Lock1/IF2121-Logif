@@ -341,7 +341,7 @@ manaRegen :-
         NewMana is Mana + 1, !;
 
         IDTipe = 'archer',
-        Mana < 60,
+        Mana < 30,
         NewMana is Mana + 1, !;
 
         IDTipe = 'sorcerer',
@@ -362,7 +362,7 @@ hpRegen :-
         NewHP is HP + 2, !;
 
         IDTipe = 'archer',
-        HP < 70,
+        HP < 60,
         NewHP is HP + 1, !;
 
         IDTipe = 'sorcerer',
