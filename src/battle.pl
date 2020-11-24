@@ -25,6 +25,22 @@ encounterEnemy(_) :-
 	asserta(isEnemyAlive(1)),
 	call(battleLoop).
 
+
+encounterDragon(_) :-
+	ID =:= 99,
+	monster(ID, Nama, HP, Atk, Def, XP),
+	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
+	write('\33\[m'), flush_output,
+	format('\33\[36m\33\[1mLAST FIGHT\33\[m WITH \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
+	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m%d\33\[m\n',[Nama,HP]),
+	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
+	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
+	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
+	write('Tuliskan inisial dari command'), nl,
+	random(1, 10, P),
+	asserta(peluang(P)),
+	asserta(isEnemyAlive(1)),
+	call(battleLoop).
 /********Lari********/
 
 /********Mau Lari tapi belum ketemu musuh******/
@@ -256,3 +272,6 @@ specialAttack :-
 	retract(statPlayer(IDTipe, Nama, HP,NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 	asserta(statPlayer(IDTipe, Nama, HP,NewMana, OldAtk, Def, Lvl, XP, Gold));
 	).
+
+bossfight :-
+	statPlayer(IDTipe, Nama, HP,Mana, Atk, Def, Lvl, XP, Gold),

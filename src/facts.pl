@@ -52,3 +52,5 @@ potion(23, okultisme, 0, 60).
 special_skill(swordsman, baliho-fpi, 30).
 special_skill(archer, cupid-arrow, 25).
 special_skill(sorcerer, santet, 30).
+
+boss(duragonnnn, 999, 100, 30).
