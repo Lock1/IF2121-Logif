@@ -1,4 +1,3 @@
-# Logif-IF2121
 # Tugas Besar - Logika Komputasional - IF2121
 <!-- FAQ Link https://docs.google.com/spreadsheets/d/1QkNJaG0cs0F3fyr8cIbdDV4myj_dXvvyGqcqPybjT2A/edit#gid=0 -->
 <!-- TODO : Add information -->
@@ -28,7 +27,7 @@
 
 <!-- **Search** \ -->
 <!-- ![Search Query](/other/img/search-query.gif) \ -->
-**UI & Movement**
+**UI & Movement** \
 ![UI](/other/img/ui.gif)
 
 <!-- **How to Use** \
