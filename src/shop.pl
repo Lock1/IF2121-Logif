@@ -4,21 +4,25 @@
 
 shop:-
     /*deket shop*/
-    write('Perintah , harga(gold)'),nl,
-    write('- beliPotion, 10'),nl,
-    write('- gacha, 50'),nl,
-    write('- keluar, 0'),nl,
+    write('Perintah / gold'),nl,
+    write('- potion / 10'), nl,
+    write('- gacha / 50'), nl,
+    write('- quit'), nl,
     write('Tuliskan g untuk gacha dan p untuk potion!'), nl,
-    write('>'),
+    write('> '),
     get_key(X), nl,
     (
         X = 103,
         gacha;
 
         X = 112,
-        beliPotion
+        beliPotion;
+
+        X = 113
     ),
-    nl,!.
+    % TODO : Print
+    prompt,
+    nl, !.
 
 
 /*beli potion gagal, duid ga cukup*/
@@ -34,8 +38,8 @@ beliPotion:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold > 10,
     NewGold is Gold-10,
-    retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)),
+    retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)),
     random(1,9,P),
     /*add potion, addItem(P),*/
     write('Kamu berhasil membeli potion'),
@@ -46,19 +50,20 @@ beliPotion:-
 gacha:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold < 50,
-    write('Uang kamu tidak cukup, silahkan farming dulu'), nl,
-    write('Pencet sembarang tombol!'), nl,
-    get_key_no_echo(X),!;
+    write('Uang kamu tidak cukup, silahkan farming dulu'), nl;
+    % write('Pencet sembarang tombol!'), nl,
+    % get_key_no_echo(X),!;
 
 /*Gacha Berhasil(uang cukup)*/
     randomize,
     statPlayer(Tipe,_,_,_,_,_,_,_,Gold),
     item(_,Tipe,_,_,_,_),
     Gold >= 50,
-    findall(X, item(_,_,_,X,_,_), L), % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus
-    random(0, 100, Peluang),
+    findall(Y, item(_,_,_,Y,_,_), L),
+    % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus
+    random(1, 100, Peluang),
     (
-        Peluang =< 10,
+        Peluang =< 10, Peluang > 1,
         nth(0, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
@@ -82,16 +87,19 @@ gacha:-
         addItem(Item_id),
         write('You get '), write(X), nl;
 
-        Peluang <100, Peluang > 70,
+        Peluang < 100, Peluang > 70,
         nth(4, L, X),
         item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(X), nl
+        write('You get '), write(X), nl;
 
+        Peluang = 1,
+        write('\33\[31\33\[1mMaaf kamu tidak beruntung, mohon untuk menghubungi truck-kun lagi :)\33\[m\n'),
+        halt
     ),
     NewGold is Gold-50,
-    retract(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, Tipe, HPPlayer, mana, Atk, DefPlayer, Lvl, XP, NewGold)), get_key_no_echo(X).
+    retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)).
 
 /*keluar:-
     .

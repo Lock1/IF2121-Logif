@@ -71,7 +71,7 @@ gameLoop :-
             X = 'greedisgood', call(greedisgood);
             X = 'whosyourdaddy', call(whosyourdaddy);
             X = 'hesoyam', call(hesoyam);
-            X = 'y', call(addItem(17)); % DEBUG
+            X = 'y', call(addItem(2)); % DEBUG
             X = 'hidden', hidden
         )
         % TODO : Extra, Handler message
@@ -105,7 +105,7 @@ start :-
     asserta(isGameStarted(1)),
     username_input,
     choose_class.
-% TODO : Level up
+
 status :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'), nl,
@@ -213,10 +213,6 @@ quit :-
 quit :-
     write('Yah masa baru segini quit sih, lemah!!!!'), nl, halt.
 
-/*
-inventory :- % TODO : Inventory integration
-*/
-
 
 /* ----------------------- Decision branch ---------------------- */
 choose_class :-
@@ -260,7 +256,7 @@ username_input :-
     sleep(0.2),
     classScreen(IsUnicodeMode).
 
-doQuest(X,Y) :-% TODO : Battle interaction
+doQuest(X,Y) :-
     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
     random(1,500,Rmv),
@@ -357,10 +353,10 @@ setLocation(X,Y) :-
     asserta(playerLocation(X,Y)). % TODO : Shop
 
 collisionCheck(X,Y) :-
-    quest(X,Y), doQuest(X,Y), !;
+    quest(X,Y), doQuest(X,Y), !; % TODO : 3 Enemy
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
-    shop(X,Y), clear, call(shop), clear, !; % TODO : collision check
-    randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
+    shop(X,Y), clear, call(shop), clear, !; % TODO : collision check and set location
+    \+shop(X,Y), randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
 randomEncounter :-

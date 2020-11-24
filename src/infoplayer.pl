@@ -40,23 +40,23 @@ delItem(ItemID) :-
 listing([],[],[]).
 listing(List1, List2, List3) :-
     [W1|W2]=List1,
-    format('┃ Name   │ %24s  ┃',[W1]), nl,
+    format('┃ Name   │ %26s  ┃',[W1]), nl,
     [X1|X2]=List2,
-    format('┃ Attack │ %24d  ┃',[X1]), nl, % TODO : Rescale
+    format('┃ Attack │ %26d  ┃',[X1]), nl, % TODO : Rescale
     [Y1|Y2]=List3,
-    format('┃ Def    │ %24d  ┃',[Y1]), nl,
-    write('┃                                    ┃'),nl,
+    format('┃ Def    │ %26d  ┃',[Y1]), nl,
+    write('┠────────┴─────────────────────────────────┨'),nl,
     listing(W2, X2, Y2).
 
 listItem :-
     findall(ItemName, inventory(_,_,_,ItemName,_,_), Names),
     findall(Attack, inventory(_,_,_,_,Attack,_), Attacks),
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
-    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
-    write('┃               Weapon               ┃'), nl,
-    write('┠────────────────────────────────────┨'), nl,
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃                Weapon                ┃'), nl,
+    write('┠──────────────────────────────────────┨'), nl,
     listing(Names, Attacks, Defs),
-    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
+    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
 listingPotion([],[],[]).
 listingPotion(List1, List2, List3):-

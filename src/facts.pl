@@ -17,7 +17,7 @@ monster(6, bomber, 25, 45, 1, 48).
 
 item(1, swordsman, sword, excalibur_kw1, 50, 0).
 item(2, swordsman, sword, samehadawibu, 45, 0).
-item(3, swordsman, sword, pedangzabuza, 42, 0).
+item(3, swordsman, sword, pedang_zabuza, 42, 0).
 
 item(4, archer, bow, lightningarrow, 47, 0).
 item(5, archer, bow, archdemon, 42, 0).
