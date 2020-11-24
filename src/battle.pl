@@ -272,28 +272,31 @@ isQuestDone(EnemyID) :-
 specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
-	enemy(_,_,HPEnemy,_,DefEnemy,_),
+	enemy(_,EnemyN,HPEnemy,_,DefEnemy,_),
 	special_skill(Class, SName, SMana),
 	NewMana is Mana - SMana,
 	(
 		NewMana >= 0,
 		(
 			Class = 'swordsman',
-			NewHP is HP + 5 + Lvl,
-			% NewDef is Def+999,
-			%
-			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-			% asserta(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
-			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			enemyAttackComment,
-			% retract(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
-			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold));
+			HealScaling is Lvl*2,
+			TotalHeal is HealScaling + 8,
+			NewHP is HP + TotalHeal,
+			% NewDef is Def + 999,
 
-			Class = 'archer', % FIXME : Rip attack
+			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
+			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
+			format('\33\[37m\33\[1mSerangan\33\[m \33\[31m\33\[1m%s\33\[m \33\[37m\33\[1mterblock!\33\[m\n',[EnemyN]),
+			format('\33\[33m\33\[1m%s\33\[m menyembuhkan HP sebanyak \33\[31m\33\[1m%d\33\[m\n',[SName,TotalHeal]),
+			format('Darah \33\[36m\33\[1mkamu\33\[m menjadi \33\[31m\33\[1m%d\33\[m dan mana tersisa \33\[36m\33\[1m%d\33\[m\n',[NewHP,NewMana]), !;
+
+
+			Class = 'archer',
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			attack, attack, attack, nl;
+			attack, attack, nl;
 
 			Class = 'sorcerer',
 			SantetAtk is Atk+150,
