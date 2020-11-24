@@ -10,7 +10,7 @@
 /********Ketemu Musuh*********/
 % TODO : Extra, gameloop for legacy version
 encounterEnemy(_) :-
-	random(1, 7, ID), % TODO : Battle tick
+	random(1, 7, ID),
 	monster(ID, Nama, HP, Atk, Def, XP),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('\33\[m'), flush_output,
@@ -74,7 +74,6 @@ fight :-
 	write('Perintah tersedia :\n'),
 	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
 	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
-	% TODO : Add other information
 	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
 	isFighting(_), \+ isRun(_),
@@ -109,7 +108,7 @@ attackComment :-
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	asserta(isBattleDone(1)),
 	isQuestDone(EnemyID),
-	checkLevelUp, % TODO : Cek multiple lvl up
+	checkLevelUp,
 	prompt, !.
 % TODO : Extra, auto fight for qol
 /********Belum ketemu musuh*********/
@@ -118,7 +117,7 @@ attack :-
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl, nl,
 	!;
 
-	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/ % TODO : Add run, usepot
+	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/ % TODO : Add usepot
 	/***********Attack biasa********/
 
 	isEnemyAlive(_),
@@ -189,7 +188,7 @@ battleLoop :-
 	    % % catch(read(X), error(_,_), errorMessage), (
 	        X = 102, call(fight), battleLoop, !;
 	        X = 114, call(run), battleLoop, !;
-	        X = 113, call(quit), !; % TODO : Complete battle sequence
+	        X = 113, call(quit), !;
 			isFighting(_), (
 				X = 97, call(attack), battleLoop, ! % lowercase 'a' key
 			); write('Tombol tidak diketahui\n\n'), battleLoop, !

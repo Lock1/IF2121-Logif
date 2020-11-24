@@ -132,10 +132,9 @@ questStatus :-
     write( '┠───────────┼───────┨\n'),
     format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]),
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\n').
-    % TODO : Integrate quest.
     % TODO : Extra, Filter input 'a,b'
 
-% TODO : Integrate usepot
+% TODO : Integrate usepot and equip
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -272,7 +271,7 @@ doQuest(X,Y) :-
     ),
     retract(quest(X,Y)),
     prompt,
-    (shell('clear'), !; overwriteClear, !). % FIXME : Weird legacy behaviour
+    (shell('clear'), !; overwriteClear, !).
 
 greedisgood :-
     write('\33\[33m\33\[1mResource granted\33\[m\n'),
@@ -355,9 +354,9 @@ setLocation(X,Y) :-
     asserta(playerLocation(X,Y)).
 
 collisionCheck(X,Y) :-
-    quest(X,Y), doQuest(X,Y), !; % TODO : 3 Enemy
+    quest(X,Y), doQuest(X,Y), !;
     dragon(X,Y), write('battle gan'), !; % TODO : Boss battle
-    shop(X,Y), clear, call(shop), clear, !; % TODO : collision check and set location
+    shop(X,Y), clear, call(shop), clear, !;
     \+shop(X,Y), randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
@@ -385,7 +384,7 @@ switchMove(X) :-
     X > 0, clear, sideStatus, \+map.
 
 move :-
-    clear, % TODO : Wipe tekan
+    clear,
     sideStatus,
     \+map,
     write('Tekan e untuk command mode                  '), nl,
