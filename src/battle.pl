@@ -293,7 +293,7 @@ isQuestDone(EnemyID) :-
 	retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
 	asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
 	monster(EnemyID, EnemyName, _, _, _, _),
-	format('\33\[33m\33\[1mQuest %s sudah selesai!\33\[m\n',[EnemyName]);
+	format('\33\[33m\33\[1mQuest %s sudah selesai!\33\[m\n',[EnemyName]),isQuest(0);
 
 	NewCnt is Cnt-1,
 	retract(questList(EnemyID, Cnt)),

@@ -5,6 +5,7 @@ height(25).
 :- dynamic(quest/2).
 :- dynamic(dragon/2).
 :- dynamic(playerLocation/2).
+:- dynamic(teleporter/2).
 
 /*Random dragon and shop*/
 setInitialMap :-
@@ -18,7 +19,8 @@ setInitialMap :-
     asserta(dragon(Absis1, Ordinat1)),
     asserta(playerLocation(Absis2, Ordinat2)),
     setQuest(3),
-    setShop(3).
+    setShop(3),
+    setTeleporter(10).
 
 setQuest(X) :-
     X is 0;
@@ -41,6 +43,17 @@ setShop(X) :-
     asserta(shop(Absis, Ordinat)),
     X2 is X-1,
     setShop(X2),!.
+
+setTeleporter(X) :-
+    X is 0;
+    randomize,
+    width(W),
+    height(H),
+    random(1, W, Absis),
+    random(1, H, Ordinat),
+    asserta(teleporter(Absis, Ordinat)),
+    X2 is X-1,
+    setTeleporter(X2),!.
 
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
@@ -113,6 +126,18 @@ setMap(X,Y) :- /*Draw Right Border*/
     Y < H+1,
     quest(X, Y), !,
     write('\33\[33m\33\[1mQ\33\[m'),
+    flush_output,
+    write('\33\[37m\33\[1m'),flush_output,
+    X2 is X+1,
+    setMap(X2, Y),!;
+
+    /*Draw Teleporter*/
+    X > 0,
+    X < W+1,
+    Y > 0,
+    Y < H+1,
+    teleporter(X, Y), !,
+    write('\33\[33m\33\[1mO\33\[m'),
     flush_output,
     write('\33\[37m\33\[1m'),flush_output,
     X2 is X+1,
