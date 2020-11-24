@@ -165,8 +165,6 @@ questStatus :- % TODO : Extra, check quest print
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
     % TODO : Extra, Filter input 'a,b'
 
-% TODO : Integrate equip
-
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
@@ -292,7 +290,7 @@ username_input :-
     sleep(1),
     classScreen(IsUnicodeMode).
 
-% doQuest(X,Y) :- % TODO : add quest
+% doQuest(X,Y) :-
 %     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
 %     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
 %     random(1,500,Rmv),
@@ -431,8 +429,21 @@ deleteItemInventory :-
     write('Tulis ID item yang ingin dihapus\n'),
     write('\33\[32m\33\[1mDelete >> \33\[m'),
     catch(read(ItemID), error(_,_), errorMessage),
-    delItem(ItemID).
+    (
+        currentWeapon(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
+        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
 
+        currentArmor(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
+        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
+
+        currentMish(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
+        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
+
+        delItem(ItemID)
+    ), !.
 
 victory :-
     write('\33\[32m\33\[1m'), % ANSI Formatting
@@ -494,8 +505,8 @@ collisionCheck(X,Y) :-
     quest(X,Y), doQuest2(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
     teleporter(X,Y), randomTeleport(X,Y), !;
-    shop(X,Y), clear, call(shop), clear, !; % TODO : Choice
-    (   % TODO : Teleport
+    shop(X,Y), clear, call(shop), clear, !;
+    (
     \+shop(X,Y);
     \+dragon(X,Y)
     ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;

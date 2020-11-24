@@ -62,12 +62,12 @@ encounterDragon(_) :-
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
 	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
 	write('• status (\33\[36m\33\[1mx\33\[m)'), flush_output, nl,
-	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
+	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl, % TODO : Special UI
 	write('Tuliskan inisial dari command'), nl,
 	random(1, 10, P1),
 	asserta(peluangLari(P1)),
 	asserta(isEnemyAlive(1)),
-	call(battleLoop).
+	call(battleLoop), !.
 /********Lari********/
 
 /********Mau Lari tapi belum ketemu musuh******/
@@ -99,7 +99,7 @@ run :-
 	!;
 	/*********Mau Lari tapi udah berhadapan dengan musuh******/
 	isRun(_),
-	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl.
+	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl. % FIXME : Extra, multiple run
 
 /*******************FIGHT********************/
 /********Belum ketemu musuh*********/
@@ -153,6 +153,7 @@ attackComment :-
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	asserta(isBattleDone(done)),
 	isQuestDone(EnemyID),
+	isAllQuestComplete,
 	checkLevelUp,
 	prompt, !.
 % TODO : Extra, auto fight for qol
@@ -301,6 +302,10 @@ isQuestDone(EnemyID) :-
 		retract(questList(EnemyID, Cnt)),
 		asserta(questList(EnemyID, NewCnt))
 	), !;
+	!.
+
+
+isAllQuestComplete :-
 	\+questList(_,_),
 	(
 		retract(isQuest(_)),
@@ -312,8 +317,8 @@ isQuestDone(EnemyID) :-
 		asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
 		write('\n\33\[33m\33\[1mQuest sudah selesai!\33\[m\n'),
 		format('Kamu mendapatkan \33\[32m\33\[1m%d XP\33\[m dan \33\[33m\33\[1m%d gold\33\[m!\n',[XPBounty,GoldBounty])
-	), !;
-	!.
+	), !; !.
+
 
 specialAttack :-
 	isEnemyAlive(_),

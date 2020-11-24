@@ -27,6 +27,7 @@ addItem(ItemID) :-
     asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!
     ).
 
+
 delItem(ItemID) :-
     ItemID>15,
     (
@@ -148,7 +149,7 @@ drinkPot :-
 
 equipItem :-
     listItem,
-    write('Masukkan ID item yang akan diequip, \n\33\[34m\33\[1mEquip >> \33\[m'),
+    write('Masukkan ID item yang akan diequip, \n\33\[32m\33\[1mEquip >> \33\[m'),
     catch(read(X), error(_,_), errorMessage),
     equip(X).
 
@@ -251,7 +252,7 @@ equip(ItemID) :- % TODO : Extra, Inv sidebar
     );
 
     write('Tidak sesuai kelas.\n\n').
-% TODO : Delete current equipment
+
 
 usePotion(PID) :-
     inventoryP(PID, Name, PlusHP, PlusMana),
