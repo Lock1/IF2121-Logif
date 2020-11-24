@@ -135,5 +135,5 @@ usePotion(PID) :-
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
     retract(inventoryP(PID, Name, PlusHP, PlusMana)),
-    format('\33\[33m\33\[1m%s\33\[m Telah diminum\n',[Name]),!;
+    format('\33\[33m\33\[1m%s\33\[m telah diminum\n',[Name]),!;
     write('Potion tidak ditemukan\n').

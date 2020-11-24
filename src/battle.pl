@@ -74,7 +74,9 @@ fight :-
 	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
 	write('Perintah tersedia :\n'),
 	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
+	write('• skill (\33\[34m\33\[1mc\33\[m)'), nl,
 	write('• status (\33\[36m\33\[1ms\33\[m)'), nl,
+	write('• potion (\33\[35m\33\[1me\33\[m)'), nl,
 	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
 	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
@@ -188,14 +190,15 @@ battleLoop :-
 		get_key(X), nl,
 		(
 	    % % catch(read(X), error(_,_), errorMessage), (
-	        X = 102, call(fight), battleLoop, !;
-	        X = 114, call(run), battleLoop, !;
-	        X = 115, \+status, battleLoop, !;
-	        X = 100, call(drinkPot), get_key_no_echo(_), battleLoop, !; % FIXME : Read get interaction
-	        X = 113, call(quit), !;
+	        X = 102, call(fight), battleLoop, !; % f key
+	        X = 114, call(run), battleLoop, !; % r key
+	        X = 115, \+status, battleLoop, !; % s key
+
+	        X = 41, call(quit), !; % 1 key
 			isFighting(_), (
-				% X = 97, call(attack), battleLoop, !, % lowercase 'a' key
-				X = 97, call(specialAttack), battleLoop, ! % lowercase 'a' key
+				X = 97, call(attack), battleLoop, !, % a key
+		 		X = 101, call(drinkPot), get_key_no_echo(_), battleLoop, !; % e key
+				X = 99, call(specialAttack), battleLoop, ! % c
 			);
 			write('Tombol tidak diketahui\n\n'), battleLoop, !
 	    )
