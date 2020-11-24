@@ -433,7 +433,7 @@ setLocation(X,Y) :-
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
-    dragon(X,Y), encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !; % TODO : Boss battle
+    dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !; % TODO : Boss battle
     shop(X,Y), clear, call(shop), clear, !;
     (
     \+shop(X,Y);
