@@ -286,13 +286,22 @@ greedisgood :-
     checkLevelUp, !.
 
 whosyourdaddy :-
-    write('\33\[33m\33\[1mGod mode granted\33\[m\n'),
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    Atk >= 100000,
+    NewAtk is 20,
+    NewDef is 5,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+    write('\33\[31m\33\[1mGod mode deactivated\33\[m\n'), !;
+
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    Atk < 100000,
     NewAtk is 100000,
     NewDef is 100000,
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
-    checkLevelUp, !.
+    write('\33\[33m\33\[1mGod mode activated\33\[m\n'), !.
+
 
 hesoyam :-
     write('\33\[37m\33\[1mCheat activated\33\[m\n'),
@@ -301,8 +310,7 @@ hesoyam :-
     NewHP is 999,
     NewGold is Gold + 1000,
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, NewDef, Lvl, XP, NewGold)),
-    checkLevelUp, !.
+    asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, NewDef, Lvl, XP, NewGold)), !.
 
 
 /* -------------------------- Movement -------------------------- */
@@ -453,45 +461,41 @@ help(X) :-
 classScreen(X) :-
     X is 1,
     write('┎─────────────────────────────────────────────────────────────────────────────────────────────────────────────┒'), nl,
-    write('┃                            ███                                                                              '), nl,
-    write('┃                           ░▓█░                                                                              '), nl,
-    write('┃                          ████                                                                               '), nl,
-    write('┃                          ███▒                                                                               '), nl,
-    write('┃                         ▒██                                                                                 '), nl,
-    write('┃                         ██                                                                                  '), nl,
-    write('┃                        ▓█                                                                                   '), nl,
-    write('┃                       ▒█▒                                                                                   '), nl,
-    write('┃                       █▓                                                                                    '), nl,
-    write('┃                      ██                                                                                     '), nl,
-    write('┃                     ▓█░                                                                                     '), nl,
-    write('┃                    ▒█▓                                                                                      '), nl,
-    write('┃     ▒▓██▒         ░██                                                                                       '), nl,
-    write('┃        ▒▓▓▓▓▒▓▓▓▒▓██▒                                                                                       '), nl,
-    write('┃          ░███████▓▓▓▓▓▒                                                                                     '), nl,
-    write('┃          ▒▓████▓▓▓███████▓░                                                                                 '), nl,
-    write('┃           ▓████▓▓█████████▓███▓▒                                                                            '), nl,
-    write('┃          ▒███▓▓▓████████▓    ░▒▓                                                                            '), nl,
-    write('┃          ▓▓▓▓▓▒▓██████▒                                                                                     '), nl,
-    write('┃         ▒▓▓▓▓▒▓██▓▓██▒                                                                                      '), nl,
-    write('┃        ░▓▒▓▓▒▒▓█▓▓██▒                                                                                       '), nl,
-    write('┃        ▓▓▓▒▓▒▓█▓▓▓█▓                                                                                        '), nl,
-    write('┃       ▒▓▓▒▒▒▓██▓▓█▓                                                                                         '), nl,
-    write('┃      ░▓▓▓▒▒▓██▓▓█▓           ░▒▓▒░                                                                          '), nl,
-    write('┃      ▓▓▓▓▒▓▓█▓▓██░         ▒██▓▓░                                                                           '), nl,
-    write('┃     ▒▓▓▓▒▒▓▓▓▓▓█░       ░▒▓▓░                                                                               '), nl,
-    write('┃    ░▓▓▓▓▒▒▓▓▓▓▓░      ▒▓▒░                                                                                  '), nl,
-    write('┃    ▓▒▓▒▒▒▓▓▓▓▓▒▒▒▒▒▒▓██▒                                                                                    '), nl,
-    write('┃   ▒▓▓▒▒▒▓▓▓▓▓▒▓▓▓▓███████▓▓▒░░▒▒▒░                                                                          '), nl,
-    write('┃  ░▓▓▓▒▒▓▓▓▓▓▒▒▓▓▓▓▓█▓▓▒                                                                                     '), nl,
-    write('┃  ▓▓▓▒▒▓▓▓▓▓▓▒▓▓▓█▓▓░                                                                                        '), nl,
-    write('┃ ▒█▓▓▓▓▓▓▓▓▓▒▓█▓▓░                                                                                           '), nl,
-    write('┃▒██▓▓▓▓████▓▓▓░                                                                                              '), nl,
-    write('┃▒▓▓▓▓▓▓▓▓▓▒                                                                                                  '), nl,
-
-    % TODO : Move art
-
-
-    write('┃                Swordsman                         Archer                        Sorcerer                     ┃'), nl,
+    write('┃                \33\[31m\33\[1mSwordsman\33\[m                         \33\[32m\33\[1mArcher\33\[m                        \33\[36m\33\[1mSorcerer\33\[m                     ┃'), flush_output, nl,
+    write('┃                              ███                                                                            ┃'), flush_output, nl,
+    write('┃                             ░▓█░                                                                            ┃'), flush_output, nl,
+    write('┃                            ████                                                  ░░▒▓▒░░                    ┃'), flush_output, nl,
+    write('┃                            ███▒                                                 █▓▓██▓▓▒▒▒                  ┃'), flush_output, nl,
+    write('┃                           ▒██                  ░ ▒█▒                            ░▒░░░▓████▓                 ┃'), flush_output, nl,
+    write('┃                           ██                  ▓▓████▓                           ▒▓▓██▓▓▓▒░                  ┃'), flush_output, nl,
+    write('┃                          ▓█                     ▓▓▓███                           ░█████▒                    ┃'), flush_output, nl,
+    write('┃                         ▒█▒                      ░  ▓██▒                        ░▓██▓░                      ┃'), flush_output, nl,
+    write('┃                         █▓                      ░▒    ▓██                       ▓██▓                        ┃'), flush_output, nl,
+    write('┃                        ██                       ░▒      ██░                     ▓███░                       ┃'), flush_output, nl,
+    write('┃                       ▓█░                       ░▒       ▓█▒                    ▓███░                       ┃'), flush_output, nl,
+    write('┃                      ▒█▓                        ▒▒        ▓█▒                   ░███░                       ┃'), flush_output, nl,
+    write('┃       ▒▓██▒         ░██                         ░▒         ██▒                  ░███▓                       ┃'), flush_output, nl,
+    write('┃          ▒▓▓▓▓▒▓▓▓▒▓██▒                         ▒▒          █▓                   ▒███▒                      ┃'), flush_output, nl,
+    write('┃            ░███████▓▓▓▓▓▒                       ░▒          ▒█▓                  ░███░                      ┃'), flush_output, nl,
+    write('┃            ▒▓████▓▓▓███████▓░                   ▒▒           ██▒                ▓██▓                        ┃'), flush_output, nl,
+    write('┃             ▓████▓▓█████████▓███▓▒              ▒▓           ▓█▓                ▒█▓                         ┃'), flush_output, nl,
+    write('┃            ▒███▓▓▓████████▓    ░▒▓              ▒▒           ▓█▓                ▒█▓                         ┃'), flush_output, nl,
+    write('┃            ▓▓▓▓▓▒▓██████▒                       ░▓           ▒█▒                ░██                         ┃'), flush_output, nl,
+    write('┃           ▒▓▓▓▓▒▓██▓▓██▒                        ▒▒           ██▒                 ▓█▒                        ┃'), flush_output, nl,
+    write('┃          ░▓▒▓▓▒▒▓█▓▓██▒                         ░▒          ▒█░                  ▓█▓                        ┃'), flush_output, nl,
+    write('┃          ▓▓▓▒▓▒▓█▓▓▓█▓                          ░▒         ░█▓                   ▓██▒                       ┃'), flush_output, nl,
+    write('┃         ▒▓▓▒▒▒▓██▓▓█▓                           ▒▒         ██                     ▓█▓                       ┃'), flush_output, nl,
+    write('┃        ░▓▓▓▒▒▓██▓▓█▓           ░▒▓▒░            ░▒       ░██                        ▓█▓                     ┃'), flush_output, nl,
+    write('┃        ▓▓▓▓▒▓▓█▓▓██░         ▒██▓▓░             ▒▒      ▓██                          ▓██░                   ┃'), flush_output, nl,
+    write('┃       ▒▓▓▓▒▒▓▓▓▓▓█░       ░▒▓▓░                 ░▒     ██▓                           ▒██░                   ┃'), flush_output, nl,
+    write('┃      ░▓▓▓▓▒▒▓▓▓▓▓░      ▒▓▒░                    ▒▒   ▓██░                             ▒█▓                   ┃'), flush_output, nl,
+    write('┃      ▓▒▓▒▒▒▓▓▓▓▓▒▒▒▒▒▒▓██▒                      ░░ ░██▒                                ▓█▓                  ┃'), flush_output, nl,
+    write('┃     ▒▓▓▒▒▒▓▓▓▓▓▒▓▓▓▓███████▓▓▒░░▒▒▒░             ▒▓█░                                   ▓█▓                 ┃'), flush_output, nl,
+    write('┃    ░▓▓▓▒▒▓▓▓▓▓▒▒▓▓▓▓▓█▓▓▒                     ▒▓███▒                                     ▓█▓                ┃'), flush_output, nl,
+    write('┃    ▓▓▓▒▒▓▓▓▓▓▓▒▓▓▓█▓▓░                        █▓▒█▓                                       ▓█▓               ┃'), flush_output, nl,
+    write('┃   ▒█▓▓▓▓▓▓▓▓▓▒▓█▓▓░                              ▒                                         ▓█▓              ┃'), flush_output, nl,
+    write('┃  ▒██▓▓▓▓████▓▓▓░                                                                            ▓█▓             ┃'), flush_output, nl,
+    write('┃  ▒▓▓▓▓▓▓▓▓▓▒                                                                                 ▓█▓            ┃'), flush_output, nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
     write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
     write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
