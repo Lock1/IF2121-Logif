@@ -65,7 +65,7 @@ fight :-
 	\+ isEnemyAlive(_),
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh. Mau nyerang siapa?'), nl, nl,
 	!;
-	/********Berhasil Bertarung*********/ % TODO : Player crit
+	/********Berhasil Bertarung*********/
 	\+ isFighting(_),
 	% asserta(isRun(1)), % DEBUG
 	asserta(isFighting(1)),
@@ -125,6 +125,13 @@ normalAttack :-
 
 	isEnemyAlive(_),
 	write('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1mattack\33\[m!'), nl,
+	attack,
+	call(attackComment),
+	!.
+
+
+attack :-
+	isEnemyAlive(_),
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
 	random(-7,5,AtkSpread),
@@ -150,12 +157,8 @@ normalAttack :-
 	format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[AtkPlayer]), nl,
 	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
-	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)),
+	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)).
 
-
-	call(attackComment),
-	!.
-% TODO : Special attack using mana
 
 
 /**********************ATTACK MUSUH***********************/
@@ -270,18 +273,18 @@ specialAttack :-
 			% retract(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold));
 
-			Class = 'archer', % FIXME : If killed, it wont show mana cost % FIXME : Rip attack
+			Class = 'archer', % FIXME : Rip attack
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			normalAttack;
+			attack, attack, attack, nl;
 
 			Class = 'sorcerer',
 			SantetAtk is Atk+150,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			\+normalAttack,
+			attack,
 			retract(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold))
 		), !;
