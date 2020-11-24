@@ -97,3 +97,21 @@ checkLevelUp :-
     retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
     format('\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]), checkLevelUp; !.
+
+equip(ItemID) :-
+    ItemID =< 15,
+    inventory(ID,_,_,Name,WAtk,ADef),
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewAtk is WAtk+Atk,
+    NewDef is ADef+Def,
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)).
+
+usePotion(PID) :-
+    inventoryP(ID, Name, PlusHP, PlusMana),
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewHP is HP+PlusHP,
+    NewMana is Mana+PlusMana,
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
+    retract(inventoryP(ID, Name, PlusHP, PlusMana)).
