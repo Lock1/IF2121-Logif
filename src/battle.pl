@@ -221,3 +221,38 @@ isQuestDone(EnemyID) :-
 	retract(questList(EnemyID, Cnt)),
 	asserta(questList(EnemyID, NewCnt))
 	); !.
+
+specialAttack :-
+	isEnemyAlive(_),
+	statPlayer(Class,_,_,Mana,Atk,Def,_,_,_),
+	enemy(_,_,HPEnemy,_,DefEnemy,_),
+	special_skill(Class,SName, SMana),
+	(
+	Class = 'swordsman',
+	NewDef is Def+999,
+	NewMana is Mana-SMana,
+	retract(statPlayer(_,_,_,Mana,_,Def,_,_,_)),
+	asserta(statPlayer(IDTipe, Nama, HP,NewMana, Atk,NewDef, Lvl, XP, Gold)),
+	enemyTurn,
+	enemyAttackComment,
+	OldDef is NewDef-999,
+	retract(statPlayer(IDTipe, Nama, HP,NewMana, Atk,NewDef, Lvl, XP, Gold)),
+	asserta(statPlayer(IDTipe, Nama, HP,NewMana, Atk,OldDef, Lvl, XP, Gold));
+
+	Class = 'archer',
+	attack,
+	attackComment,
+	attack,
+	attackComment;
+
+	Class = 'sorcerer'
+	SantetAtk is Atk+150,
+	NewMana is Mana-SMana,
+	retract(statPlayer(_,_,_,Mana,Atk,_,_,_,_)),
+	asserta(statPlayer(IDTipe, Nama, HP,NewMana, SantetAtk, Def, Lvl, XP, Gold)),
+	enemyTurn,
+	enemyAttackComment,
+	OldAtk is SantetAtk-150,
+	retract(statPlayer(IDTipe, Nama, HP,NewMana, SantetAtk, Def, Lvl, XP, Gold)),
+	asserta(statPlayer(IDTipe, Nama, HP,NewMana, OldAtk, Def, Lvl, XP, Gold));
+	).
