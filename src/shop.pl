@@ -51,7 +51,6 @@ gacha:-
     get_key_no_echo(X),!;
 
 /*Gacha Berhasil(uang cukup)*/
-    %for some reason balik ke mode move
     randomize,
     statPlayer(Tipe,_,_,_,_,_,_,_,Gold),
     item(_,Tipe,_,_,_,_),
@@ -60,34 +59,34 @@ gacha:-
     random(0, 100, Peluang),
     (
         Peluang =< 10,
-        B is nth(0, L, X),
-        item(Item_id, _,_, B, _, _),
+        nth(0, L, X),
+        item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(B), nl;
+        write('You get '), write(X), nl;
 
         Peluang =< 30, Peluang > 10,
-        B is nth(1, L, X),
-        item(Item_id, _,_, B, _, _),
+        nth(1, L, X),
+        item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(B), nl;
+        write('You get '), write(X), nl;
 
         Peluang =< 55, Peluang > 30,
-        B is nth(2, L, X),
-        item(Item_id, _,_, B, _, _),
+        nth(2, L, X),
+        item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(B), nl;
+        write('You get '), write(X), nl;
 
         Peluang =< 70, Peluang > 55,
-        B is nth(3, L, X),
-        item(Item_id, _,_, B, _, _),
+        nth(3, L, X),
+        item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(B), nl;
+        write('You get '), write(X), nl;
 
         Peluang <100, Peluang > 70,
-        B is nth(4, L, X),
-        item(Item_id, _,_, B, _, _),
+        nth(4, L, X),
+        item(Item_id, _,_, X, _, _),
         addItem(Item_id),
-        write('You get '), write(B), nl
+        write('You get '), write(X), nl
 
     ),
     NewGold is Gold-50,
