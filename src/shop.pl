@@ -53,7 +53,7 @@ gacha:-
 /*Gacha Berhasil(uang cukup)*/
     %for some reason balik ke mode move
     randomize,
-    statPlayer(_,Tipe,_,_,_,_,_,_,Gold),
+    statPlayer(Tipe,_,_,_,_,_,_,_,Gold),
     item(_,Tipe,_,_,_,_),
     Gold >= 50,
     findall(X, item(_,_,_,X,_,_), L), % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus
