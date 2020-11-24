@@ -95,40 +95,31 @@ gacha:-
     random(1, 10000, Peluang),
     (
         Peluang =< 1000, Peluang > 1,
-        nth(0, L, X),
-        item(Item_id, _,_, X, _, _),
-        addItem(Item_id),
-        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
+        nth(0, L, X);
 
         Peluang =< 3000, Peluang > 1000,
-        nth(1, L, X),
-        item(Item_id, _,_, X, _, _),
-        addItem(Item_id),
-        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
+        nth(1, L, X);
 
         Peluang =< 5500, Peluang > 3000,
-        nth(2, L, X),
-        item(Item_id, _,_, X, _, _),
-        addItem(Item_id),
-        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
+        nth(2, L, X);
 
         Peluang =< 7000, Peluang > 5500,
-        nth(3, L, X),
-        item(Item_id, _,_, X, _, _),
-        addItem(Item_id),
-        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
+        nth(3, L, X);
 
         Peluang < 10000, Peluang > 7000,
-        nth(4, L, X),
-        item(Item_id, _,_, X, _, _),
-        addItem(Item_id),
-        format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]);
+        nth(4, L, X);
+% TODO : More
+
 
         Peluang = 1, % 0.01% chance to quit
         flush_output,
         write('\33\[31m\33\[1mMaaf kamu tidak beruntung, mohon untuk menghubungi truck-kun lagi :)\33\[m\n'),
         halt
     ),
+    item(Item_id, _,_, X, _, _),
+    addItem(Item_id),
+    format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]),
+
     NewGold is Gold - GachaCost,
     retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)).

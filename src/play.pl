@@ -78,9 +78,10 @@ gameLoop :-
             X = 'm', call(move);
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
-            X = 'y', call(addItem(17)); % DEBUG
-            X = 'y', call(addItem(23)); % DEBUG
-            X = 'e', call(kuontol); % DEBUG
+            X = 'y', call(addItem(18)); % DEBUG
+            X = 'y', call(addItem(2)); % DEBUG
+            X = 'y', call(addItem(11)); % DEBUG
+            X = 'y', call(addItem(22)); % DEBUG
 
             % Super-obscure-feature
             X = 'greedisgood', call(greedisgood);
@@ -332,7 +333,49 @@ hesoyam :-
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, NewDef, Lvl, XP, NewGold)), !.
 
+manaRegen :-
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    (
+        IDTipe = 'swordsman',
+        Mana < 50,
+        NewMana is Mana + 1, !;
 
+        IDTipe = 'archer',
+        Mana < 60,
+        NewMana is Mana + 1, !;
+
+        IDTipe = 'sorcerer',
+        Mana < 99,
+        NewMana is Mana + 2, !;
+
+        NewMana is Mana, !
+    ),
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)), !;
+    !.
+
+hpRegen :-
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    (
+        IDTipe = 'swordsman',
+        HP < 149,
+        NewHP is HP + 2, !;
+
+        IDTipe = 'archer',
+        HP < 70,
+        NewHP is HP + 1, !;
+
+        IDTipe = 'sorcerer',
+        HP < 100,
+        NewHP is HP + 1, !;
+
+        NewHP is HP, !
+    ),
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, Def, Lvl, XP, Gold)), !;
+    !.
+
+% TODO : Split class level up
 /* -------------------------- Movement -------------------------- */
 w :-
     playerLocation(TPX,TPY),
@@ -404,6 +447,7 @@ switchMove(X) :-
     X is 97, a;
     X is 115, s;
     X is 100, d;
+    X is 105, listInventory, prompt, clear, sideStatus, \+map;
     X > 0, clear, sideStatus, \+map.
 
 move :-
@@ -422,6 +466,7 @@ toggleRawMode :-
     get_key_no_echo(user_input,X),
     % overwriteClear,
     % lineWipeAtPlayer,
+    manaRegen, hpRegen,
     (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl,
     horizontalCursorAbsolutePosition(1), write('\33\[1D'), flush_output, toggleRawMode, !).
     % Press e to break
@@ -518,11 +563,11 @@ classScreen(X) :-
     write('┃  ▒██▓▓▓▓████▓▓▓░                                                                            ▓█▓             ┃'), flush_output, nl,
     write('┃  ▒▓▓▓▓▓▓▓▓▓▒                                                                                 ▓█▓            ┃'), flush_output, nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
-    write('┃                 \33\[31m\33\[1mHP\33\[m  300                         \33\[31m\33\[1mHP\33\[m  280                        \33\[31m\33\[1mHP\33\[m  270                      ┃'), nl,
-    write('┃                 \33\[36m\33\[1mMP\33\[m   50                         \33\[36m\33\[1mMP\33\[m   60                        \33\[36m\33\[1mMP\33\[m  100                      ┃'), nl,
-    write('┃                 \33\[33m\33\[1mAtk\33\[m  25                         \33\[33m\33\[1mAtk\33\[m  17                        \33\[33m\33\[1mAtk\33\[m  23                      ┃'), nl,
-    write('┃                 \33\[35m\33\[1mDef\33\[m   5                         \33\[35m\33\[1mDef\33\[m   3                        \33\[35m\33\[1mDef\33\[m   2                      ┃'), nl,
-    write('┃                 \33\[33m\33\[1mCrit\33\[m   5                         \33\[33m\33\[1mCrit\33\[m   16                        \33\[33m\33\[1mCrit\33\[m   8                      ┃'), nl,
+    write('┃                 \33\[31m\33\[1mHP\33\[m   220                         \33\[31m\33\[1mHP\33\[m   150                        \33\[31m\33\[1mHP\33\[m   200                   ┃'), nl,
+    write('┃                 \33\[36m\33\[1mMP\33\[m    50                         \33\[36m\33\[1mMP\33\[m    60                        \33\[36m\33\[1mMP\33\[m   100                   ┃'), nl,
+    write('┃                 \33\[33m\33\[1mAtk\33\[m   25                         \33\[33m\33\[1mAtk\33\[m   16                        \33\[33m\33\[1mAtk\33\[m   23                   ┃'), nl,
+    write('┃                 \33\[35m\33\[1mDef\33\[m    5                         \33\[35m\33\[1mDef\33\[m    4                        \33\[35m\33\[1mDef\33\[m    2                   ┃'), nl,
+    write('┃                 \33\[33m\33\[1mCrit\33\[m  5%                         \33\[33m\33\[1mCrit\33\[m 16%                        \33\[33m\33\[1mCrit\33\[m  8%                   ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
 
     X is 0,

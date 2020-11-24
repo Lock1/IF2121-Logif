@@ -14,7 +14,7 @@ encounterEnemy(_) :-
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('\33\[m'), sideStatus, write('\33\[1000A\33\[1000D'), flush_output,
 	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
-	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m%d\33\[m\n',[Nama,HP]),
+	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m\33\[1m%d\33\[m\n',[Nama,HP]),
 	sleep(0.2),
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
 	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
@@ -138,7 +138,7 @@ normalAttack :-
 		ClassType = 'archer',
 		random(1,100,CritRoll), CritRoll < 17,
 		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
-		AtkPlayer is BaseAtkPlayer*4 + AtkSpread;	% 4 x multiplier
+		AtkPlayer is BaseAtkPlayer*5 + AtkSpread;	% 4 x multiplier
 
 		ClassType = 'sorcerer',
 		random(1,100,CritRoll), CritRoll < 9,
@@ -147,7 +147,7 @@ normalAttack :-
 
 		AtkPlayer is BaseAtkPlayer + AtkSpread, !
 	),
-	format('Serangan dengan \33\[31m%d\33\[m damage!',[AtkPlayer]), nl,
+	format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[AtkPlayer]), nl,
 	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)),
@@ -163,7 +163,7 @@ normalAttack :-
 enemyAttackComment :-
 	statPlayer(_,_,HPPlayer,Mana,_,_,_,_,_),
 	HPPlayer > 0,
-	format('Darah \33\[36m\33\[1mkamu\33\[m tersisa \33\[31m%d\33\[m dan mana tersisa \33\[36m%d\33\[m\n\n',[HPPlayer,Mana]), !;
+	format('Darah \33\[36m\33\[1mkamu\33\[m tersisa \33\[31m\33\[1m%d\33\[m dan mana tersisa \33\[36m\33\[1m%d\33\[m\n\n',[HPPlayer,Mana]), !;
 	/********Comment kalau pemain sudah kalah********/
 	statPlayer(_,_,HPPlayer,_,_,_,_,_,_),
 	HPPlayer =< 0,
@@ -216,7 +216,7 @@ battleLoop :-
 	        X = 41, call(quit), !; % 1 key
 			isFighting(_), (
 				X = 97, call(normalAttack), battleLoop, !; % a key
-		 		X = 101, call(drinkPot), get_key_no_echo(_), battleLoop, !; % e key % Skyrim mode, drink everything at 1 nanosec
+		 		X = 101, call(drinkPot), enemyTurn, battleLoop, !; % e key, Not Skyrim mode
 				X = 99, call(specialAttack), battleLoop, ! % c
 			), !;
 			write('Tombol tidak diketahui\n\n'), battleLoop, !
@@ -227,9 +227,9 @@ battleLoop :-
 
 /***********************KALAH********************************/
 lose :-
-	retract(isEnemyAlive(_)),
-	retract(isFighting(_)),
-	retract(isRun(_)),
+	% retract(isEnemyAlive(_)),
+	% retract(isFighting(_)),
+	% retract(isRun(_)),
 	halt.
 
 isQuestDone(EnemyID) :-
@@ -260,16 +260,17 @@ specialAttack :-
 		NewMana >= 0,
 		(
 			Class = 'swordsman',
-			NewDef is Def+999,
-
+			NewHP is HP + 5 + Lvl,
+			% NewDef is Def+999,
+			%
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
+			% asserta(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			enemyAttackComment,
-			retract(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
-			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold));
+			% retract(statPlayer(Class, Nama, HP, NewMana, Atk, NewDef, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold));
 
-			Class = 'archer',
+			Class = 'archer', % FIXME : If killed, it wont show mana cost % FIXME : Rip attack
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
