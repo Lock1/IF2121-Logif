@@ -433,7 +433,8 @@ setLocation(X,Y) :-
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
-    dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !; % TODO : Boss battle
+    dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
+    teleporter(X,Y), randomize, width(W), height(H), random(1, W, Absis), random(1, H, Ordinat), retract(player(X,Y)), asserta(player(Absis, Ordinat)), !;
     shop(X,Y), clear, call(shop), clear, !; % TODO : Choice
     (   % TODO : Teleport
     \+shop(X,Y);
