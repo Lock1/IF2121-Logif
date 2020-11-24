@@ -135,10 +135,8 @@ normalAttack :-
 	\+ isEnemyAlive(_),
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl, nl,
 	!;
-
 	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/
 	/***********Attack biasa********/
-
 	isEnemyAlive(_),
 	write('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1mattack\33\[m!'), nl,
 	attack,
@@ -150,7 +148,7 @@ attack :-
 	isEnemyAlive(_),
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
-	random(-7,5,AtkSpread),
+	random(-5,3,AtkSpread),
 	% Critical Roll
 	(
 		ClassType = 'swordsman',
@@ -282,21 +280,24 @@ specialAttack :-
 			HealScaling is Lvl*2,
 			TotalHeal is HealScaling + 8,
 			NewHP is HP + TotalHeal,
-			% NewDef is Def + 999,
-
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			format('\33\[37m\33\[1mSerangan\33\[m \33\[31m\33\[1m%s\33\[m \33\[37m\33\[1mterblock!\33\[m\n',[EnemyN]),
 			format('\33\[33m\33\[1m%s\33\[m menyembuhkan HP sebanyak \33\[31m\33\[1m%d\33\[m\n',[SName,TotalHeal]),
-			format('Darah \33\[36m\33\[1mkamu\33\[m menjadi \33\[31m\33\[1m%d\33\[m dan mana tersisa \33\[36m\33\[1m%d\33\[m\n',[NewHP,NewMana]), !;
-
+			format('Darah \33\[36m\33\[1mkamu\33\[m menjadi \33\[31m\33\[1m%d\33\[m dan mana tersisa \33\[36m\33\[1m%d\33\[m\n\n',[NewHP,NewMana]), !;
 
 			Class = 'archer',
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			attack, attack, nl;
+			attack, !, attack, !,
+			(
+				enemy(_,_,NewEHP,_,_,_),
+				NewEHP > 0,
+				format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n\n',[EnemyN,NewEHP]);
+				call(attackComment)
+			);
 
 			Class = 'sorcerer',
 			SantetAtk is Atk+150,
@@ -305,7 +306,14 @@ specialAttack :-
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			attack,
 			retract(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
-			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold))
+			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
+			(
+				enemy(_,_,NewEHP,_,_,_),
+				NewEHP > 0,
+				format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n\n',[EnemyN,NewEHP]),
+				enemyTurn, !;
+				call(attackComment), !
+			)
 		), !;
 		ManaNeeded is (-1)*NewMana,
 		format('Kurang \33\[36m\33\[1m%d mana\33\[m untuk \33\[33m\33\[1m%s\33\[m\n', [ManaNeeded,SName]),
