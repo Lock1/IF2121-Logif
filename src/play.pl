@@ -122,29 +122,35 @@ start :-
 
 status :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    write('\33\[37m\33\[1m'),flush_output,
     write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'), nl,
     write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'), nl,
     write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'), nl,
     write('┃ HP / MP │  '),
     format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
     write(' / '),
-    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'), nl,
+    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output,
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
     write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'), nl,
     write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'), nl,
-    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]), write(' ┃'), nl,
+    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
     write('┃ Gold    │ '),
-    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, write(' ┃'), nl,
+    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl,
     questStatus.
 
 questStatus :-
     questList(ID,Ct),
     monster(ID,Name,_,_,_,_),
+    write('\33\[37m\33\[1m'),flush_output,
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
     write( '┃  Monster  │ Count ┃\n'),
     write( '┠───────────┼───────┨\n'),
     format('┃ \33\[31m\33\[1m%-9s\33\[m │ %5d ┃\n',[Name,Ct]),
-    write( '┗━━━━━━━━━━━┷━━━━━━━┛\n').
+    write('\33\[37m\33\[1m'),flush_output,
+    write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
     % TODO : Extra, Filter input 'a,b'
 
 % TODO : Integrate equip
@@ -514,8 +520,9 @@ classScreen(X) :-
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
     write('┃                 \33\[31m\33\[1mHP\33\[m  300                         \33\[31m\33\[1mHP\33\[m  280                        \33\[31m\33\[1mHP\33\[m  270                      ┃'), nl,
     write('┃                 \33\[36m\33\[1mMP\33\[m   50                         \33\[36m\33\[1mMP\33\[m   60                        \33\[36m\33\[1mMP\33\[m  100                      ┃'), nl,
-    write('┃                 \33\[33m\33\[1mAtk\33\[m  25                         \33\[33m\33\[1mAtk\33\[m  21                        \33\[33m\33\[1mAtk\33\[m  23                      ┃'), nl,
+    write('┃                 \33\[33m\33\[1mAtk\33\[m  25                         \33\[33m\33\[1mAtk\33\[m  17                        \33\[33m\33\[1mAtk\33\[m  23                      ┃'), nl,
     write('┃                 \33\[35m\33\[1mDef\33\[m   5                         \33\[35m\33\[1mDef\33\[m   3                        \33\[35m\33\[1mDef\33\[m   2                      ┃'), nl,
+    write('┃                 \33\[33m\33\[1mCrit\33\[m   5                         \33\[33m\33\[1mCrit\33\[m   16                        \33\[33m\33\[1mCrit\33\[m   8                      ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
 
     X is 0,

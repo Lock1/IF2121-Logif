@@ -18,7 +18,7 @@ encounterEnemy(_) :-
 	sleep(0.2),
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
 	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
-	write('• status (\33\[36m\33\[1ms\33\[m)'), flush_output, nl,
+	write('• status (\33\[36m\33\[1mx\33\[m)'), flush_output, nl,
 	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
 	write('Tuliskan inisial dari command'), nl,
 	random(1, 10, P),
@@ -31,7 +31,7 @@ encounterEnemy(_) :-
 /********Mau Lari tapi belum ketemu musuh******/
 run :-
 	\+ isEnemyAlive(_),
-	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh lho'), nl,
+	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh lho'), nl, nl,
 	!;
 	/***********Gagal Lari *********/
 	\+ isRun(_),
@@ -75,10 +75,9 @@ fight :-
 	write('Perintah tersedia :\n'),
 	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
 	write('• skill (\33\[34m\33\[1mc\33\[m)'), nl,
-	write('• status (\33\[36m\33\[1ms\33\[m)'), nl,
+	write('• status (\33\[36m\33\[1mx\33\[m)'), nl,
 	write('• potion (\33\[35m\33\[1me\33\[m)'), nl,
 	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
-	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
 	isFighting(_), \+ isRun(_),
 	isEnemyAlive(_),
@@ -110,13 +109,13 @@ attackComment :-
 	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[XPDrop]),
 	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
-	asserta(isBattleDone(1)),
+	asserta(isBattleDone(done)),
 	isQuestDone(EnemyID),
 	checkLevelUp,
 	prompt, !.
 % TODO : Extra, auto fight for qol
 /********Belum ketemu musuh*********/
-attack :-
+normalAttack :-
 	\+ isEnemyAlive(_),
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl, nl,
 	!;
@@ -125,15 +124,35 @@ attack :-
 	/***********Attack biasa********/
 
 	isEnemyAlive(_),
-	statPlayer(_,_,_,_,BaseAtkPlayer,_,_,_,_),
+	write('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1mattack\33\[m!'), nl,
+	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
 	random(-7,5,AtkSpread),
-	AtkPlayer is BaseAtkPlayer + AtkSpread,
+	% Critical Roll
+	(
+		ClassType = 'swordsman',
+		random(1,100,CritRoll), CritRoll < 6,
+		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
+		AtkPlayer is BaseAtkPlayer*4//3 + AtkSpread; % 1,3~ x multiplier
+
+		ClassType = 'archer',
+		random(1,100,CritRoll), CritRoll < 17,
+		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
+		AtkPlayer is BaseAtkPlayer*4 + AtkSpread;	% 4 x multiplier
+
+		ClassType = 'sorcerer',
+		random(1,100,CritRoll), CritRoll < 9,
+		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
+		AtkPlayer is BaseAtkPlayer*3//2 + AtkSpread; % 1,5 x multiplier
+
+		AtkPlayer is BaseAtkPlayer + AtkSpread, !
+	),
+	format('Serangan dengan \33\[31m%d\33\[m damage!',[AtkPlayer]), nl,
 	NewHPEnemy is (HPEnemy - (AtkPlayer - DefEnemy)),
 	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)),
-	write('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1mattack\33\[m!'), nl,
-	format('Serangan dengan \33\[31m%d\33\[m damage!',[AtkPlayer]), nl,
+
+
 	call(attackComment),
 	!.
 % TODO : Special attack using mana
@@ -184,7 +203,7 @@ enemyTurn :-
 % -------------------- Battle Loop --------------------
 
 battleLoop :-
-	isBattleDone(_), retract(isBattleDone(_)), !;
+	isBattleDone(X), retract(isBattleDone(X)), !;
 	(
 		write('\33\[32m\33\[1mBattle >> \33\[m'),
 		get_key(X), nl,
@@ -192,16 +211,16 @@ battleLoop :-
 	    % % catch(read(X), error(_,_), errorMessage), (
 	        X = 102, call(fight), battleLoop, !; % f key
 	        X = 114, call(run), battleLoop, !; % r key
-	        X = 115, \+status, battleLoop, !; % s key
+	        X = 120, \+status, battleLoop, !; % x key
 
 	        X = 41, call(quit), !; % 1 key
 			isFighting(_), (
-				X = 97, call(attack), battleLoop, !, % a key
-		 		X = 101, call(drinkPot), get_key_no_echo(_), battleLoop, !; % e key
+				X = 97, call(normalAttack), battleLoop, !; % a key
+		 		X = 101, call(drinkPot), get_key_no_echo(_), battleLoop, !; % e key % Skyrim mode, drink everything at 1 nanosec
 				X = 99, call(specialAttack), battleLoop, ! % c
-			);
+			), !;
 			write('Tombol tidak diketahui\n\n'), battleLoop, !
-	    )
+	    ), !
 	).
 
 
@@ -251,16 +270,17 @@ specialAttack :-
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold));
 
 			Class = 'archer',
+			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			% attack, % TODO : Attack split
-			attack;
+			normalAttack;
 
 			Class = 'sorcerer',
 			SantetAtk is Atk+150,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			\+attack,
+			\+normalAttack,
 			retract(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold))
 		), !;

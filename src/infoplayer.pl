@@ -110,12 +110,6 @@ drinkPot :-
     catch(read(X), error(_,_), errorMessage),
     usePotion(X).
 
-:- dynamic(currentEquipment/3).
-kuontol :-
-    listItem,
-    write('Masukkan ID Item \n> '),
-    catch(read(X), error(_,_), errorMessage),
-    equip(X).
 
 % Weapon, Armor, Misc
 equip(ItemID) :-

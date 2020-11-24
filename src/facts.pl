@@ -1,6 +1,6 @@
 /* Class(ID_pilihan, class_type, HP, mana, attack, def) //parameters could change*/
 class(1, swordsman, 300, 50, 25, 5).
-class(2, archer, 280, 60, 21, 3).
+class(2, archer, 280, 60, 17, 3).
 class(3, sorcerer, 270, 100, 23, 2).
 
 /* Monster(ID, name, HP, atk, def, exp_drop) //parameters could change*/
