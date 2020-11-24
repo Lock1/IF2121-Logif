@@ -37,8 +37,7 @@ encounterDragon(_) :-
 	random(1, 10, P1),
 	asserta(peluangLari(P1)),
 	asserta(isEnemyAlive(1)),
-	call(battleLoop),
-	write('duragon gan').
+	call(battleLoop).
 /********Lari********/
 
 /********Mau Lari tapi belum ketemu musuh******/

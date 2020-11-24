@@ -375,6 +375,18 @@ hpRegen :-
     asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, Def, Lvl, XP, Gold)), !;
     !.
 
+victory :-
+    write('\33\[32m\33\[1m'), % ANSI Formatting
+    flush_output,
+    write('██╗░░░██╗███████╗███████╗  ███╗░░░███╗███████╗███╗░░██╗░█████╗░███╗░░██╗░██████╗░'),nl,
+    write('╚██╗░██╔╝██╔════╝██╔════╝  ████╗░████║██╔════╝████╗░██║██╔══██╗████╗░██║██╔════╝░'),nl,
+    write('░╚████╔╝░█████╗░░█████╗░░  ██╔████╔██║█████╗░░██╔██╗██║███████║██╔██╗██║██║░░██╗░'),nl,
+    write('░░╚██╔╝░░██╔══╝░░██╔══╝░░  ██║╚██╔╝██║██╔══╝░░██║╚████║██╔══██║██║╚████║██║░░╚██╗'),nl,
+    write('░░░██║░░░███████╗███████╗  ██║░╚═╝░██║███████╗██║░╚███║██║░░██║██║░╚███║╚██████╔╝'),nl,
+    write('░░░╚═╝░░░╚══════╝╚══════╝  ╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝╚═╝░░╚═╝╚═╝░░╚══╝░╚═════╝░'),nl,
+    flush_output, sleep(3),
+    halt.
+
 % TODO : Split class level up
 /* -------------------------- Movement -------------------------- */
 w :-
@@ -421,7 +433,7 @@ setLocation(X,Y) :-
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !;
-    dragon(X,Y), write('battle gan'), encounterDragon(_), !; % TODO : Boss battle
+    dragon(X,Y), encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !; % TODO : Boss battle
     shop(X,Y), clear, call(shop), clear, !;
     (
     \+shop(X,Y);
