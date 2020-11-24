@@ -19,13 +19,45 @@ shop:-
         X = 112,
         beliPotion, prompt, !;
 
+        X = 115,
+        beliPotionID, prompt, !;
+
         !
     ),
     !.
 
+beliPotionID :-
+    write('List Healing Potion berdasarkan ID: '), nl,
+    write('1. Lesser Healing Potion'), nl,
+    write('2. Healing Potion'), nl,
+    write('3. Greater Healing Potion'), nl,
+    write('4. Alkohol'), nl,
+
+    write('List Mana Potion berdasarkan ID: '), nl,
+    write('5. Lesser Mana Potion'), nl,
+    write('6. Mana Potion'), nl,
+    write('7. Greater Mana Potion'), nl,
+    write('8. okultisme'), nl,
+
+    write('Tulis ID'), nl,
+    write('> '), get_key(X),
+    statPlayer(_,_,_,_,_,_,_,_,Gold),
+    (
+        X = 1, Gold >= 20, NewGold is Gold-20, addItem(16), !;
+        X = 2, Gold >= 30, NewGold is Gold-30, addItem(17), !;
+        X = 3, Gold >= 40, NewGold is Gold-40, addItem(18), !;
+        X = 4, Gold >= 60, NewGold is Gold-60, addItem(19), !;
+        X = 5, Gold >= 20, NewGold is Gold-20, addItem(20), !;
+        X = 6, Gold >= 30, NewGold is Gold-30, addItem(21), !;
+        X = 7, Gold >= 40, NewGold is Gold-40, addItem(22), !;
+        X = 8, Gold >= 60, NewGold is Gold-60, addItem(23), !
+    ),
+    
+    retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)), !.
 
 /*beli potion gagal, duid ga cukup*/
-beliPotion:-
+beliPotion :-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold < 10,
     write('\33\[33m\33\[1mUang\33\[m kamu \33\[31m\33\[1mtidak cukup\33\[m, silahkan farming dulu :)'), nl;
