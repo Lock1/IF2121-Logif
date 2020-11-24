@@ -23,6 +23,7 @@
 :- dynamic(player/1).
 
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
+% Support untuk terminal gprolog diwindows telah didrop dikarenakan deadline
 
 % Inisialisasi program
 :- initialization(main).
@@ -62,17 +63,28 @@ gameLoop :-
         isGameStarted(_), (
             X = 'map', \+map, write('\33\[m'), flush_output;
             X = 'status', call(status);
+            X = 'move', call(move);
+            X = 'inventory', call(listInventory);
+            X = 'drink', call(drinkPot);
+            X = 'shop', call(shopError);
             % X = 'w', call(w); % TODO : Extra, legacy support
             % X = 'a', call(a);
             % X = 's', call(s);
             % X = 'd', call(d);
-            X = 'move', call(move);
-            X = 'inventory', call(listInventory);
-            X = 'shop', call(shopError);
+
+            % Short version
+            X = 'mp', \+map, write('\33\[m'), flush_output;
+            X = 's', call(status);
+            X = 'm', call(move);
+            X = 'i', call(listInventory);
+            X = 'd', call(drinkPot);
+            X = 'y', call(addItem(4)); % DEBUG
+            X = 'e', call(kuontol); % DEBUG
+
+            % Super-obscure-feature
             X = 'greedisgood', call(greedisgood);
             X = 'whosyourdaddy', call(whosyourdaddy);
             X = 'hesoyam', call(hesoyam);
-            X = 'y', call(addItem(2)); % DEBUG
             X = 'hidden', hidden
         )
         % TODO : Extra, Handler message
@@ -247,14 +259,13 @@ isIDValid(X) :-
 username_input :-
     unicode(IsUnicodeMode),
     write('Hello, fellow \33\[32m\33\[1nadventurer\33\[m! Welcome to our \33\[33mtavern\33\[m!'), nl,
-    sleep(0.8),
+    sleep(0.2),
     write('Would you like to tell me \33\[32m\33\[1myour\33\[m name?'), nl,
-    sleep(1),
+    sleep(0.5),
     write('Your name: \33\[32m\33\[1m'), flush_output, catch(read(Name), error(_,_), errorMessage), asserta(player(Name)), nl, nl,
-    format('\33\[mHello, \33\[32m\33\[1m%s\33\[m! in this world, you can choose between \33\[36m\33\[1mthree\33\[m classes\n',[Name]),
-    sleep(0.2),
+    catch(format('\33\[mHello, \33\[32m\33\[1m%s\33\[m! in this world, you can choose between \33\[36m\33\[1mthree\33\[m classes\n',[Name]), error(_,_), errorMessage),
     write('Each class has its own \33\[33m\33\[1munique\33\[m stats and gameplay'), nl,
-    sleep(0.2),
+    sleep(1),
     classScreen(IsUnicodeMode).
 
 doQuest(X,Y) :-

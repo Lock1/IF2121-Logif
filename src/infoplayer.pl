@@ -37,29 +37,34 @@ delItem(ItemID) :-
     ItemID=<15,
     retract(inventory(ItemID,_,_,_,_,_)), !.
 
-listing([],[],[]).
-listing(List1, List2, List3) :-
+listing([],[],[],[]).
+listing(ListID, List1, List2, List3) :-
+    [I1|I2]=ListID,
     [W1|W2]=List1,
     [X1|X2]=List2,
     [Y1|Y2]=List3,
+    format('┃ ID     │ %26d  ┃',[I1]), nl,
     format('┃ Name   │ \33\[33m\33\[1m%26s\33\[m  ┃',[W1]), nl,
     format('┃ Attack │ %26d  ┃',[X1]), nl,
     format('┃ Def    │ %26d  ┃',[Y1]), nl, % TODO : Formatting
     write('┠────────┴────────────────────────────┨'),nl,
-    listing(W2, X2, Y2).
+    listing(I2, W2, X2, Y2).
 
 listItem :-
+    findall(ItemID, inventory(ItemID,_,_,_,_,_), IDs),
     findall(ItemName, inventory(_,_,_,ItemName,_,_), Names),
     findall(Attack, inventory(_,_,_,_,Attack,_), Attacks),
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
     write('┃                Weapon                ┃'), nl,
     write('┠───────── ────────────────────────────┨'), nl,
-    listing(Names, Attacks, Defs),
+    listing(IDs, Names, Attacks, Defs),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
-listingPotion([],[],[]).
-listingPotion(List1, List2, List3):-
+listingPotion([],[],[],[]).
+listingPotion(ListID, List1, List2, List3):-
+    [I1|I2]=ListID,
+    format('┃ ID            │ %19d  ┃',[I1]), nl,
     [A1|A2]=List1,
     format('┃ Name          │ %19s  ┃',[A1]), nl,
     [B1|B2]=List2,
@@ -67,16 +72,17 @@ listingPotion(List1, List2, List3):-
     [C1|C2]=List3,
     format('┃ Mana Restored │ %19d  ┃',[C1]), nl,
     write('┃                                      ┃'),nl,
-    listingPotion(A2, B2, C2).
+    listingPotion(I2, A2, B2, C2).
 
 listPotion :-
+    findall(PotionID, inventoryP(PotionID,_,_,_), PIDs),
     findall(PotionName, inventoryP(_,PotionName,_,_), PNames),
     findall(PlusHP, inventoryP(_,_,PlusHP,_), HPs),
     findall(PlusMana, inventoryP(_,_,_,PlusMana), ManaS),
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
     write('┃                Potion                ┃'), nl,
     write('┠──────────────────────────────────────┨'), nl,
-    listingPotion(PNames, HPs, ManaS),
+    listingPotion(PIDs, PNames, HPs, ManaS),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'), nl.
 
 listInventory :-
@@ -98,6 +104,20 @@ checkLevelUp :-
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
     format('\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]), checkLevelUp; !.
 
+drinkPot :-
+    listPotion,
+    write('Masukkan ID Potion \n> '),
+    catch(read(X), error(_,_), errorMessage),
+    usePotion(X).
+
+:- dynamic(currentEquipment/3).
+kuontol :-
+    listItem,
+    write('Masukkan ID Item \n> '),
+    catch(read(X), error(_,_), errorMessage),
+    equip(X).
+
+% Weapon, Armor, Misc
 equip(ItemID) :-
     ItemID =< 15,
     inventory(ID,_,_,Name,WAtk,ADef),
@@ -108,10 +128,12 @@ equip(ItemID) :-
     asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)).
 
 usePotion(PID) :-
-    inventoryP(ID, Name, PlusHP, PlusMana),
+    inventoryP(PID, Name, PlusHP, PlusMana),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     NewHP is HP+PlusHP,
     NewMana is Mana+PlusMana,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
-    retract(inventoryP(ID, Name, PlusHP, PlusMana)).
+    retract(inventoryP(PID, Name, PlusHP, PlusMana)),
+    format('\33\[33m\33\[1m%s\33\[m Telah diminum\n',[Name]),!;
+    write('Potion tidak ditemukan\n').
