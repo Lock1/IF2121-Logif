@@ -110,7 +110,9 @@ drinkPot :-
     catch(read(X), error(_,_), errorMessage),
     usePotion(X).
 
-:- dynamic(currentEquipment/3).
+:- dynamic(currentWapon/1).
+:- dynamic(currentArmor/1).
+:- dynamic(currentMisc/1).
 kuontol :-
     listItem,
     write('Masukkan ID Item \n> '),
@@ -119,14 +121,38 @@ kuontol :-
 
 % Weapon, Armor, Misc
 equip(ItemID) :-
-    ItemID =< 15,
-    inventory(ID,_,_,Name,WAtk,ADef),
-    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    (
+    \+currentWeapon(_),
+    ItemID =< 9, ItemID > 0,
+    inventory(IDWeapon,Tipe,_,Name,WAtk,_),
+    asserta(currentWeapon(IDWeapon)),
+    statPlayer(Tipe, _, _, _, Atk, _, _, _, _),
+    NewAtk is WAtk+Atk,
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, Def, Lvl, XP, Gold));
+
+    \+currentArmor(_),
+    ItemID > 9, ItemID <13,
+    inventory(IDArmor, Tipe, _, Name, _,ADef),
+    asserta(currentArmor(IDArmor)),
+    statPlayer(Tipe, _, _, _, _, Def, _, _, _),
+    NewDef is ADef+Def,
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, HP, Mana, Atk, NewDef, Lvl, XP, Gold));
+
+    \+currentMisc(_),
+    ItemID > 12, ItemID =< 15,
+    inventory(IDMisc, Tipe, _, Name, WAtk, ADef),
+    asserta(currentMisc(IDMisc)),
+    statPlayer(Tipe, _, _, _, Atk, Def, _, _, _),
     NewAtk is WAtk+Atk,
     NewDef is ADef+Def,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)).
-
+    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold));
+    
+    write('sudah nge equip barang kok mau equip lagi')
+    ).
+  
 usePotion(PID) :-
     inventoryP(PID, Name, PlusHP, PlusMana),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
