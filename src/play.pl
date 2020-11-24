@@ -62,13 +62,13 @@ gameLoop :-
         isGameStarted(_), (
             X = 'map', \+map, write('\33\[m'), flush_output;
             X = 'status', call(status);
-            X = 'w', call(w);
-            X = 'a', call(a);
-            X = 's', call(s);
-            X = 'd', call(d);
+            % X = 'w', call(w); % TODO : Extra, legacy support
+            % X = 'a', call(a);
+            % X = 's', call(s);
+            % X = 'd', call(d);
             X = 'move', call(move);
             X = 'inventory', call(listInventory);
-            X = 'shop', call(shop);
+            X = 'shop', call(shopError);
             X = 'greedisgood', call(greedisgood);
             X = 'whosyourdaddy', call(whosyourdaddy);
             X = 'hesoyam', call(hesoyam);
@@ -115,7 +115,7 @@ status :-
     write('┃ HP / MP │  '),
     format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
     write(' / '),
-    format('\33\[34m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'), nl,
+    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'), nl,
     write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'), nl,
     write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'), nl,
     write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]), write(' ┃'), nl,
@@ -135,7 +135,7 @@ questStatus :-
     % TODO : Integrate quest.
     % TODO : Extra, Filter input 'a,b'
 
-
+% TODO : Integrate usepot
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -149,7 +149,7 @@ sideStatus :-
     write('┃ HP / MP │  '),
     format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
     write(' / '),
-    format('\33\[34m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'),
+    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
     write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
@@ -218,20 +218,22 @@ quit :-
 /* ----------------------- Decision branch ---------------------- */
 choose_class :-
     write('(Type class name with lowercase)\n'),
-    write('Choose your class: '), catch(read(ClassType), error(_,_), errorMessage), nl,
+    write('Choose your class: \33\[37m\33\[1m'), catch(read(ClassType), error(_,_), errorMessage), nl,
+    write('\33\[m'), flush_output,
     class(ClassID, ClassType, HP, Mana, Atk, Def),
     (
         ClassID =:= 1,
-        write('You have chosen Swordsman'), nl;
+        write('You have chosen \33\[31m\33\[1mSwordsman\33\[m'), nl;
 
         ClassID =:= 2,
-        write('You have chosen Archer'), nl;
+        write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl;
 
         ClassID =:= 3,
-        write('You have chosen Sorcerer'), nl
+        write('You have chosen \33\[36m\33\[1mSorcerer\33\[m'), nl
 
     ) -> (write('\nYou may begin your journey.\n'),\+map, write('\33\[m'), flush_output,
-    write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
+    % write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
+    write('Use \33\[32m\33\[1mmove.\33\[m for movement!'), nl),
 
     player(Name),
     Lvl is 1, Xp is 0, Gold is 0,
@@ -245,15 +247,14 @@ isIDValid(X) :-
 
 username_input :-
     unicode(IsUnicodeMode),
-    write('Hello, adventurer, welcome to our headquarter'), nl,
+    write('Hello, fellow \33\[32m\33\[1nadventurer\33\[m! Welcome to our \33\[33mtavern\33\[m!'), nl,
     sleep(0.8),
-    write('Would you like to tell me your name?'), nl,
+    write('Would you like to tell me \33\[32m\33\[1myour\33\[m name?'), nl,
     sleep(1),
-    write('Your name: '), catch(read(Name), error(_,_), errorMessage), asserta(player(Name)), nl, nl,
-
-    write('Hello, '), write(Name), write('. in this world, you can choose between three classes'), nl,
+    write('Your name: \33\[32m\33\[1m'), flush_output, catch(read(Name), error(_,_), errorMessage), asserta(player(Name)), nl, nl,
+    format('\33\[mHello, \33\[32m\33\[1m%s\33\[m! in this world, you can choose between \33\[36m\33\[1mthree\33\[m classes\n',[Name]),
     sleep(0.2),
-    write('Each class has its own unique stats and gameplay'), nl,
+    write('Each class has its own \33\[33m\33\[1munique\33\[m stats and gameplay'), nl,
     sleep(0.2),
     classScreen(IsUnicodeMode).
 
@@ -351,7 +352,7 @@ d :-
 
 setLocation(X,Y) :-
     retract(playerLocation(_,_)),
-    asserta(playerLocation(X,Y)). % TODO : Shop
+    asserta(playerLocation(X,Y)).
 
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest(X,Y), !; % TODO : 3 Enemy
@@ -381,10 +382,10 @@ switchMove(X) :-
     X is 97, a;
     X is 115, s;
     X is 100, d;
-    X > 0, sideStatus, \+map.
+    X > 0, clear, sideStatus, \+map.
 
 move :-
-    clear,
+    clear, % TODO : Wipe tekan
     sideStatus,
     \+map,
     write('Tekan e untuk command mode                  '), nl,
@@ -392,14 +393,15 @@ move :-
     toggleRawMode,
     write('\33\[m'),
     flush_output,
-    clear,
+    % clear,
     write('Telah Kembali ke command mode'), nl.
 
 toggleRawMode :-
     get_key_no_echo(user_input,X),
     % overwriteClear,
-    lineWipeAtPlayer,
-    (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl, horizontalCursorAbsolutePosition(1), toggleRawMode, !).
+    % lineWipeAtPlayer,
+    (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl,
+    horizontalCursorAbsolutePosition(1), write('\33\[1D'), flush_output, toggleRawMode, !).
     % Press e to break
 
 /* ----------------------- Draw procedure ----------------------- */
@@ -431,7 +433,7 @@ help(X) :-
     write('│   ┃  map.       : Menampilkan peta              ┃    │ '), nl,
     write('│   ┃  status.    : Menampilkan kondisi saat ini  ┃    │ '), nl,
     write('│   ┃  inventory. : Menampilkan barang            ┃    │ '), nl,
-    write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
+    % write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
     write('│   ┃  move.      : Masuk ke mode movement        ┃    │ '), nl,
     write('│   ┃  help.      : Menampilkan bantuan           ┃    │ '), nl,
     write('│   ┃  clear.     : Membersihkan layar            ┃    │ '), nl,
@@ -447,7 +449,7 @@ help(X) :-
     write('|   | 2. map.       : Menampilkan peta             |     | '), nl,
     write('|   | 3. status.    : Menampilkan kondisi saat ini |     | '), nl,
     write('|   | 3. inventory. : Menampilkan kondisi saat ini |     | '), nl,
-    write('|   | 4. w a s d    : Bergerak dengan arah wasd    |     | '), nl,
+    % write('|   | 4. w a s d    : Bergerak dengan arah wasd    |     | '), nl,
     write('|   | 5. move.      : Masuk ke mode movement       |     | '), nl,
     write('|   | 6. help.      : Menampilkan bantuan          |     | '), nl,
     write('|   | 7. clear.     : Membersihkan layar           |     | '), nl,
@@ -494,10 +496,10 @@ classScreen(X) :-
     write('┃  ▒██▓▓▓▓████▓▓▓░                                                                            ▓█▓             ┃'), flush_output, nl,
     write('┃  ▒▓▓▓▓▓▓▓▓▓▒                                                                                 ▓█▓            ┃'), flush_output, nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
-    write('┃                 HP  300                         HP  280                        HP  270                      ┃'), nl,
-    write('┃                 MP   50                         MP   60                        MP  100                      ┃'), nl,
-    write('┃                 Atk  25                         Atk  21                        Atk  23                      ┃'), nl,
-    write('┃                 Def   5                         Def   3                        Def   2                      ┃'), nl,
+    write('┃                 \33\[31m\33\[1mHP\33\[m  300                         \33\[31m\33\[1mHP\33\[m  280                        \33\[31m\33\[1mHP\33\[m  270                      ┃'), nl,
+    write('┃                 \33\[36m\33\[1mMP\33\[m   50                         \33\[36m\33\[1mMP\33\[m   60                        \33\[36m\33\[1mMP\33\[m  100                      ┃'), nl,
+    write('┃                 \33\[33m\33\[1mAtk\33\[m  25                         \33\[33m\33\[1mAtk\33\[m  21                        \33\[33m\33\[1mAtk\33\[m  23                      ┃'), nl,
+    write('┃                 \33\[35m\33\[1mDef\33\[m   5                         \33\[35m\33\[1mDef\33\[m   3                        \33\[35m\33\[1mDef\33\[m   2                      ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
 
     X is 0,

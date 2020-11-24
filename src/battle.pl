@@ -66,18 +66,20 @@ fight :-
 	!;
 	/********Berhasil Bertarung*********/
 	\+ isFighting(_),
-	asserta(isRun(1)),
+	% asserta(isRun(1)), % DEBUG
 	asserta(isFighting(1)),
 	isEnemyAlive(_),
 	enemy(_, NamaEnemy, _, _, _, _),
 	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
-	write('Perintah tersedia :\n- attack (\33\[31m\33\[1ma\33\[m)\n\n');
+	write('Perintah tersedia :\n'),
+	write('- attack (\33\[31m\33\[1ma\33\[m)'), nl,
+	write('- run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
 	% TODO : Add other information
 	% TODO : Extra, status sidebar
 	/********Sudah ketemu musuh tapi fight lagi*******/
-	isFighting(_),
+	isFighting(_), \+ isRun(_),
 	isEnemyAlive(_),
-	write('\33\[36m\33\[1mKamu\33\[m sedang melawan musuh loh'), nl.
+	write('\33\[36m\33\[1mKamu\33\[m sedang melawan musuh loh'), nl, nl.
 
 /******************ATTACK**********************/
 /********Comment kalau musuh masih belum kalah********/
@@ -98,7 +100,7 @@ attackComment :-
 	NewXP is (XPPlayer + XPDrop + XPSpread),
 	NewGold is (GoldPlayer + GoldDrop),
 	retract(enemy(_,_,_,_,_,_)),
-	retract(isRun(_)),
+	% retract(isRun(_)),
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
 	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, _)),
@@ -117,7 +119,7 @@ attack :-
 	write('\33\[36m\33\[1mKamu\33\[m belum ketemu musuh, mau nyerang siapa?'), nl,
 	!;
 
-	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/
+	/*Formatnya statPlayer(IDTipe, Nama, HP, mana, Atk, Def, Lvl, XP, Gold)*/ % TODO : Add run, usepot
 	/***********Attack biasa********/
 
 	isEnemyAlive(_),
@@ -140,7 +142,7 @@ attack :-
 enemyAttackComment :-
 	statPlayer(_,_,HPPlayer,Mana,_,_,_,_,_),
 	HPPlayer > 0,
-	format('Darah \33\[36m\33\[1mkamu\33\[m tersisa \33\[31m%d\33\[m dan mana tersisa \33\[34m%d\33\[m\n\n',[HPPlayer,Mana]), !;
+	format('Darah \33\[36m\33\[1mkamu\33\[m tersisa \33\[31m%d\33\[m dan mana tersisa \33\[36m%d\33\[m\n\n',[HPPlayer,Mana]), !;
 	/********Comment kalau pemain sudah kalah********/
 	statPlayer(_,_,HPPlayer,_,_,_,_,_,_),
 	HPPlayer =< 0,

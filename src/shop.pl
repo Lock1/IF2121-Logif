@@ -13,14 +13,14 @@ shop:-
     get_key(X), nl,
     (
         X = 103,
-        gacha;
+        gacha, !;
 
         X = 112,
-        beliPotion;
+        beliPotion, !;
 
-        X = 113
+        X = 113, !
     ),
-    % TODO : Print
+    % TODO : Print, check weird input
     prompt,
     nl, !.
 
@@ -29,16 +29,13 @@ shop:-
 beliPotion:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold < 10,
-    write('Uang kamu tidak cukup, silahkan farming dulu'), nl,
-    write('Pencet sembarang tombol!'), nl,
-    get_key_no_echo(X),!;
+    write('Uang kamu tidak cukup, silahkan farming dulu :)'), nl;
 
 
 /*beli potion berhasil, duid cukup*/
     randomize,
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold > 10,
-    potion(_,Nama,_,_),
     findall(Nama, potion(_,Nama,_,_), L),
     random(1,100,Peluang),
 
@@ -71,24 +68,20 @@ beliPotion:-
         nth(4, L, Nama1),
         potion(PotionID,Nama1,_,_),
         addItem(PotionID),
-        write('You get '), write(Nama1), nl;
+        write('You get '), write(Nama1), nl
 
-        Peluang = 1,
-        write('\33\[31\33\[1mMaaf kamu tidak beruntung, mohon untuk menghubungi truck-kun lagi :)\33\[m\n'),
-        halt
     ),
-    
+
     NewGold is Gold-10,
     retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, NewGold)).
 
-/*Gacha Gagal, duid ga cukup*/
+/*Gacha Gagal, duid ga cukup*/ % TODO : randomizer drop
 gacha:-
     statPlayer(_,_,_,_,_,_,_,_,Gold),
-    Gold < 50,
-    write('Uang kamu tidak cukup, silahkan farming dulu'), nl;
-    % write('Pencet sembarang tombol!'), nl,
-    % get_key_no_echo(X),!;
+    Gold < 40,
+    write('Uang kamu tidak cukup, silahkan farming dulu :)'), nl;
+
 
 /*Gacha Berhasil(uang cukup)*/
     randomize,
@@ -146,5 +139,5 @@ gacha:-
 */
 
 /*gagal, shop ga pada tempatnya*/
-shop:-
-    write('gabisa beli disini woy, gaada yang jualan. Pergi ketempat shop sono!'),!.
+shopError:-
+    write('gabisa beli disini woy, gaada yang jualan. Pergi ketempat shop sono!').
