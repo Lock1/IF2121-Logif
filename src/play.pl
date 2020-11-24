@@ -23,7 +23,8 @@
 :- dynamic(player/1).
 :- dynamic(isQuest/1).
 :- dynamic(critChance/1). % TODO : Extra, add crit chance status data
-% TODO : Extra, add dodge stat
+:- dynamic(dodgeChance/1).
+:- dynamic(hitChance/1). % Internal "dodge" value for enemies
 
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 % Support untuk terminal gprolog diwindows telah didrop dikarenakan deadline
@@ -252,15 +253,15 @@ choose_class :-
     (
         ClassID =:= 1,
         write('You have chosen \33\[31m\33\[1mSwordsman\33\[m'), nl,
-        asserta(critChance(5));
+        asserta(critChance(5)), asserta(dodgeChance(5)), asserta(hitChance(80));
 
         ClassID =:= 2,
         write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl,
-        asserta(critChance(16));
+        asserta(critChance(16)), asserta(dodgeChance(15)), asserta(hitChance(90));
 
         ClassID =:= 3,
         write('You have chosen \33\[36m\33\[1mSorcerer\33\[m'), nl,
-        asserta(critChance(8))
+        asserta(critChance(8)), asserta(dodgeChance(10)), asserta(hitChance(85))
 
     ) -> (write('\nYou may begin your journey.\n'),\+map, write('\33\[m'), flush_output,
     % write('Use \33\[32m\33\[1mmove.\33\[m for better movement control!'), nl),
@@ -656,11 +657,12 @@ classScreen(X) :-
     write('┃  ▒██▓▓▓▓████▓▓▓░                                                                            ▓█▓             ┃'), flush_output, nl,
     write('┃  ▒▓▓▓▓▓▓▓▓▓▒                                                                                 ▓█▓            ┃'), flush_output, nl,
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
-    write('┃                 \33\[31m\33\[1mHP\33\[m   220                         \33\[31m\33\[1mHP\33\[m   150                        \33\[31m\33\[1mHP\33\[m   200                   ┃'), nl,
-    write('┃                 \33\[36m\33\[1mMP\33\[m    50                         \33\[36m\33\[1mMP\33\[m    60                        \33\[36m\33\[1mMP\33\[m   100                   ┃'), nl,
-    write('┃                 \33\[33m\33\[1mAtk\33\[m   25                         \33\[33m\33\[1mAtk\33\[m   16                        \33\[33m\33\[1mAtk\33\[m   23                   ┃'), nl,
-    write('┃                 \33\[35m\33\[1mDef\33\[m    5                         \33\[35m\33\[1mDef\33\[m    4                        \33\[35m\33\[1mDef\33\[m    2                   ┃'), nl,
-    write('┃                 \33\[33m\33\[1mCrit\33\[m  5%                         \33\[33m\33\[1mCrit\33\[m 16%                        \33\[33m\33\[1mCrit\33\[m  8%                   ┃'), nl,
+    write('┃                \33\[31m\33\[1mHP\33\[m    180                        \33\[31m\33\[1mHP\33\[m    120                       \33\[31m\33\[1mHP\33\[m    150                   ┃'), nl,
+    write('┃                \33\[36m\33\[1mMP\33\[m     50                        \33\[36m\33\[1mMP\33\[m     60                       \33\[36m\33\[1mMP\33\[m    100                   ┃'), nl,
+    write('┃                \33\[33m\33\[1mAtk\33\[m    25                        \33\[33m\33\[1mAtk\33\[m    13                       \33\[33m\33\[1mAtk\33\[m    17                   ┃'), nl,
+    write('┃                \33\[35m\33\[1mDef\33\[m     5                        \33\[35m\33\[1mDef\33\[m     4                       \33\[35m\33\[1mDef\33\[m     2                   ┃'), nl,
+    write('┃                \33\[32m\33\[2mCrit\33\[m   5%                        \33\[32m\33\[2mCrit\33\[m  16%                       \33\[32m\33\[2mCrit\33\[m   8%                   ┃'), nl,
+    write('┃                \33\[37m\33\[2mDodge\33\[m  5%                        \33\[37m\33\[2mDodge\33\[m 15%                       \33\[37m\33\[2mDodge\33\[m 10%                   ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
 
     X is 0,

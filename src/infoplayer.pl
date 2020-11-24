@@ -127,8 +127,9 @@ listInventory :-
 
 checkLevelUp :-
     statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold),
-    critChance(CritChance), % Intentionally obscure stat
-    XPToLvlUp is CurrentLvl*20 + 80,
+    dodgeChance(DodgeChance), critChance(CritChance), % Intentionally obscure stat
+
+    XPToLvlUp is CurrentLvl*30 + 90,
     XPToLvlUp =< CurrentXP,
     NewXP is CurrentXP - XPToLvlUp, LvlUp is CurrentLvl + 1,
     (
@@ -137,30 +138,37 @@ checkLevelUp :-
         ManaGain is CurrentLvl*3 + 45,
         AtkGain is CurrentLvl//2 + 1,
         DefGain is CurrentLvl//3 + 2,
-        CritGain is CurrentLvl//4;
+        CritGain is CurrentLvl//4,
+        DodgeGain is CurrentLvl//3;
 
         IDTipe = 'archer',
         HPGain is CurrentLvl*5 + 20,
         ManaGain is CurrentLvl*2 + 10,
         AtkGain is CurrentLvl//2 + 2,
         DefGain is CurrentLvl//3 + 1,
-        CritGain is CurrentLvl//2;
+        CritGain is CurrentLvl//2,
+        DodgeGain is CurrentLvl//2 + 1;
 
         IDTipe = 'sorcerer',
         HPGain is CurrentLvl*5 + 40,
         ManaGain is CurrentLvl*4 + 60,
         AtkGain is CurrentLvl//2 + 1,
         DefGain is CurrentLvl//3 + 1,
-        CritGain is CurrentLvl//3
+        CritGain is CurrentLvl//3,
+        DodgeGain is CurrentLvl//5 + 1
     ),
     NewHP is CurrentHP + HPGain,
     NewMana is CurrentMana + ManaGain,
     NewAtk is CurrentAtk + AtkGain,
     NewDef is CurrentDef + DefGain,
     NewCrit is CritChance + CritGain,
+    NewDodge is DodgeChance + DodgeGain,
 
     retract(critChance(CritChance)),
     asserta(critChance(NewCrit)),
+
+    retract(dodgeChance(DodgeChance)),
+    asserta(dodgeChance(NewDodge)),
 
     retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
@@ -172,6 +180,7 @@ checkLevelUp :-
     format('┃ Atk   \33\[m\33\[33m\33\[2m\33\[2m%4d\33\[1m \33\[32m→ \33\[33m%5d \33\[37m│ \33\[32m↑ \33\[37m%4d ┃\n',[CurrentAtk , NewAtk , AtkGain]),
     format('┃ Def   \33\[35m%4d \33\[32m→ \33\[33m%5d \33\[37m│ \33\[32m↑ \33\[37m%4d ┃\n',[CurrentDef , NewDef , DefGain]),
     format('┃ Crit  \33\[m\33\[37m\33\[2m\33\[2m%3d%s\33\[m\33\[1m \33\[32m→  \33\[33m%3d%s \33\[37m│ \33\[32m↑  \33\[37m%2d%s ┃\n',[CritChance, '%', NewCrit, '%', CritGain, '%']),
+    format('┃ Dodge \33\[m\33\[37m\33\[2m\33\[2m%3d%s\33\[m\33\[1m \33\[32m→  \33\[33m%3d%s \33\[37m│ \33\[32m↑  \33\[37m%2d%s ┃\n',[DodgeChance, '%', NewDodge, '%', DodgeGain, '%']),
     write('┗━━━━━━━━━━━━━━━━━━━━┷━━━━━━━━┛\n'),
 
     write('\33\[33mTekan sembarang tombol untuk melanjutkan level up.\33\[m\n'), get_key_no_echo(_),

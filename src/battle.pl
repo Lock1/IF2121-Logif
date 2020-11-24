@@ -178,9 +178,16 @@ attack :-
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
 	random(-5,3,AtkSpread),
+	random(-5,5,ChanceSpread),
+	random(1,100,HitRoll),
 	critChance(CritChance),
-	% Critical Roll
-	(
+	hitChance(RawHitChance),
+	HitChance is RawHitChance + ChanceSpread,
+
+	% Hit branch
+	HitRoll =< HitChance, (
+		% Critical Roll
+		(
 		ClassType = 'swordsman',
 		random(1,100,CritRoll), CritRoll =< CritChance,
 		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
@@ -197,18 +204,21 @@ attack :-
 		AtkPlayer is BaseAtkPlayer*3//2 + AtkSpread; % 1,5 x multiplier
 
 		AtkPlayer is BaseAtkPlayer + AtkSpread, !
-	),
-	TotalDamage is AtkPlayer - DefEnemy,
-	(
+		),
+		TotalDamage is AtkPlayer - DefEnemy,
+		(
 		TotalDamage > 0,
 		format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[TotalDamage]), nl,
 		NewHPEnemy is (HPEnemy - TotalDamage), !;
 
 		write('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
 		NewHPEnemy is HPEnemy, !
-	),
-	retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
-	asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop)).
+		),
+		retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
+		asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop))
+	), !;
+	% Miss branch
+	write('\33\[31m\33\[1mMiss!\33\[m\n'), !.
 
 
 
@@ -242,15 +252,25 @@ enemyTurn :-
 	enemy(_, NamaEnemy, _, AtkEnemy,_, _),
 	statPlayer(_,_,HPPlayer,_,_,DefPlayer,_,_,_),
 	random(-3,4,AtkSpread),
-	Serangan is (AtkEnemy - DefPlayer + AtkSpread),
-	(
-		NewHP is (HPPlayer - Serangan), NewHP =< HPPlayer, !;
-		NewHP is HPPlayer, !
-	),
-	format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m%d\33\[m\n',[NamaEnemy,Serangan]),
-	retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
-	asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
-	enemyAttackComment.
+	random(-2,2,DodgeSpread),
+	random(1,100,DodgeRoll),
+	dodgeChance(RawDodgeChance),
+	DodgeChance is RawDodgeChance + DodgeSpread,
+	DodgeRoll > DodgeChance, (
+		Serangan is (AtkEnemy - DefPlayer + AtkSpread),
+		(
+			NewHP is (HPPlayer - Serangan), NewHP =< HPPlayer,
+			format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m%d\33\[m\n',[NamaEnemy,Serangan]), !;
+
+			NewHP is HPPlayer,
+			format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m0\33\[m\n',[NamaEnemy]), !
+		),
+
+		retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
+		asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
+		enemyAttackComment
+	), !;
+	write('\33\[33m\33\[1mDodged!\33\[m\n'), enemyAttackComment, !.
 
 
 
@@ -357,7 +377,7 @@ specialAttack :-
 			);
 
 			Class = 'sorcerer',
-			SantetAtk is Atk+150,
+			SantetAtk is Atk*2+10,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
