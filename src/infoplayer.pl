@@ -133,16 +133,60 @@ drinkPot :-
     usePotion(X), !;
     write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n\n'), !.
 
+:- dynamic(currentWapon/1).
+:- dynamic(currentArmor/1).
+:- dynamic(currentMisc/1).
+kuontol :-
+    listItem,
+    write('Masukkan ID Item \n> '),
+    catch(read(X), error(_,_), errorMessage),
+    equip(X).
 
 % Weapon, Armor, Misc
 equip(ItemID) :-
-    ItemID =< 15,
-    inventory(ID,_,_,Name,WAtk,ADef),
-    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    (
+    \+currentWeapon(_),
+    ItemID =< 9, ItemID > 0,
+    statPlayer(Tipe, _, _, _, Atk, _, _, _, _),
+    inventory(IDWeapon,Tipe,_,Name,WAtk,_),
+    (
+    asserta(currentWeapon(IDWeapon)),
+    NewAtk is WAtk+Atk,
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, Def, Lvl, XP, Gold));
+
+    write("Tidak sesuai kelas"),!
+    );
+
+    \+currentArmor(_),
+    ItemID > 9, ItemID <13,
+    statPlayer(Tipe, _, _, _, _, Def, _, _, _),
+    inventory(IDArmor, Tipe, _, Name, _,ADef),
+    (
+    asserta(currentArmor(IDWeapon)),
+    NewDef is ADef+Def,
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, HP, Mana, Atk, NewDef, Lvl, XP, Gold));
+
+    write("Tidak sesuai kelas"),!
+    );
+
+    \+currentMisc(_),
+    ItemID > 12, ItemID =< 15,
+    statPlayer(Tipe, _, _, _, Atk, Def, _, _, _),
+    inventory(IDMisc, Tipe, _, Name, WAtk, ADef),
+    (
+    asserta(currentWeapon(IDWeapon)),
     NewAtk is WAtk+Atk,
     NewDef is ADef+Def,
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)).
+    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold));
+
+    write("Tidak sesuai kelas"),!
+    );
+
+    write('sudah nge equip barang kok mau equip lagi')
+    ).
 
 usePotion(PID) :-
     inventoryP(PID, Name, PlusHP, PlusMana),
