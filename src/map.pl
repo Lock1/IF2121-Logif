@@ -137,7 +137,7 @@ setMap(X,Y) :- /*Draw Right Border*/
     Y > 0,
     Y < H+1,
     teleporter(X, Y), !,
-    write('\33\[33m\33\[1mO\33\[m'),
+    write('\33\[35m\33\[1m•\33\[m'),
     flush_output,
     write('\33\[37m\33\[1m'),flush_output,
     X2 is X+1,

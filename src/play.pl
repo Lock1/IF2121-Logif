@@ -79,6 +79,7 @@ gameLoop :-
             X = 'm', call(move);
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
+            X = 'x', call(deleteItemInventory),
             X = 'y', call(addItem(18)); % DEBUG
             X = 'y', call(addItem(2)); % DEBUG
             X = 'y', call(addItem(11)); % DEBUG
@@ -403,6 +404,14 @@ hpRegen :-
     asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, Def, Lvl, XP, Gold)), !;
     !.
 
+deleteItemInventory :-
+    listInventory,
+    write('Tulis ID item yang ingin dihapus\n'),
+    write('\33\[32m\33\[1mDelete >> \33\[m'),
+    catch(read(ItemID), error(_,_), errorMessage),
+    delItem(ItemID).
+
+
 victory :-
     write('\33\[32m\33\[1m'), % ANSI Formatting
     flush_output,
@@ -462,13 +471,19 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest2(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
-    teleporter(X,Y), randomize, width(W), height(H), random(1, W, Absis), random(1, H, Ordinat), retract(player(X,Y)), asserta(player(Absis, Ordinat)), !;
+    teleporter(X,Y), randomTeleport(X,Y), !;
     shop(X,Y), clear, call(shop), clear, !; % TODO : Choice
     (   % TODO : Teleport
     \+shop(X,Y);
     \+dragon(X,Y)
     ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
+
+randomTeleport(X,Y) :-
+    randomize, width(W), height(H),
+    random(1, W, RAbsis), random(1, H, ROrdinat),
+    setLocation(RAbsis, ROrdinat), retract(teleporter(X,Y)).
+
 
 randomEncounter :-
     randomize, (

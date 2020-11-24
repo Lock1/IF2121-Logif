@@ -25,17 +25,26 @@ addItem(ItemID) :-
     ).
 
 delItem(ItemID) :-
-    \+inventory(ItemID,_,_,_,_,_),
-    write('There is no specified item to delete'),!,fail;
-
-    \+inventoryP(ItemID,_,_,_),
-    write('There is no specified potion to delete'),!,fail;
-
     ItemID>15,
-    retract(inventoryP(ItemID,_,_,_));
+    (
+        retract(inventoryP(ItemID,ItemN,_,_)),
+        format('\33\[33m\33\[1m%s\33\[37m telah dihapus.\33\[m\n',[ItemN]), !;
+
+        \+inventory(ItemID,_,_,_,_,_),
+        write('There is no specified item to delete\n'), !
+    ), !;
 
     ItemID=<15,
-    retract(inventory(ItemID,_,_,_,_,_)), !.
+    (
+        retract(inventory(ItemID,_,_,ItemN,_,_)),
+        format('\33\[33m\33\[1m%s\33\[37m telah dihapus.\33\[m\n',[ItemN]), !;
+
+        \+inventoryP(ItemID,_,_,_),
+        write('There is no specified potion to delete\n'), !
+    ), !.
+
+
+
 
 listing([],[],[],[]).
 listing(ListID, List1, List2, List3) :-
