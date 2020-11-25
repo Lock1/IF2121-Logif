@@ -9,6 +9,7 @@
 :- dynamic(peluangLari/1).
 :- dynamic(isRun/1).
 :- dynamic(isBattleDone/1).
+:- dynamic(isCrit/1).
 
 /********Ketemu Musuh*********/
 % TODO : Non essential, gameloop for legacy version
@@ -181,7 +182,7 @@ attack :-
 	isEnemyAlive(_),
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
-	random(-5,3,AtkSpread),
+	random(-3,3,AtkSpread),
 	random(-5,5,ChanceSpread),
 	random(1,100,HitRoll),
 	critChance(CritChance),
@@ -192,31 +193,44 @@ attack :-
 	HitRoll =< HitChance, (
 		% Critical Roll
 		(
-		ClassType = 'swordsman',
-		random(1,100,CritRoll), CritRoll =< CritChance,
-		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
-		AtkPlayer is BaseAtkPlayer*4//3 + AtkSpread; % 1,3~ x multiplier
+			ClassType = 'swordsman',
+			random(1,100,CritRoll), CritRoll =< CritChance,
+			asserta(isCrit(1)),
+			AtkPlayer is BaseAtkPlayer*4//3 + AtkSpread, !; % 1,3~ x multiplier
 
-		ClassType = 'archer',
-		random(1,100,CritRoll), CritRoll =< CritChance,
-		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
-		AtkPlayer is BaseAtkPlayer*5 + AtkSpread;	% 4 x multiplier
+			ClassType = 'archer',
+			random(1,100,CritRoll), CritRoll =< CritChance,
+			asserta(isCrit(1)),
+			AtkPlayer is BaseAtkPlayer*5 + AtkSpread, !;	% 4 x multiplier
 
-		ClassType = 'sorcerer',
-		random(1,100,CritRoll), CritRoll =< CritChance,
-		write('\33\[33m\33\[1mCritical Hit!\33\[m\n'),
-		AtkPlayer is BaseAtkPlayer*3//2 + AtkSpread; % 1,5 x multiplier
+			ClassType = 'sorcerer',
+			random(1,100,CritRoll), CritRoll =< CritChance,
+			asserta(isCrit(1)),
+			AtkPlayer is BaseAtkPlayer*3//2 + AtkSpread; % 1,5 x multiplier
 
-		AtkPlayer is BaseAtkPlayer + AtkSpread, !
+			AtkPlayer is BaseAtkPlayer + AtkSpread, !
 		),
 		TotalDamage is AtkPlayer - DefEnemy,
-		(
-		TotalDamage > 0,
-		format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[TotalDamage]), nl,
-		NewHPEnemy is (HPEnemy - TotalDamage), !;
 
-		write('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
-		NewHPEnemy is HPEnemy, !
+		(
+			isCrit(1), (
+				TotalDamage > 0,
+				format('\33\[33m\33\[1mCritical Hit!\33\[m dengan \33\[33m\33\[1m%d\33\[m damage!',[TotalDamage]), nl,
+				NewHPEnemy is (HPEnemy - TotalDamage), retract(isCrit(1)), !;
+
+				write('\33\[33m\33\[1mCritical Hit!\33\[m dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
+				NewHPEnemy is HPEnemy,
+				retract(isCrit(1)), !
+			), !;
+
+			(
+				TotalDamage > 0,
+				format('Serangan dengan \33\[33m\33\[1m%d\33\[m damage!',[TotalDamage]), nl,
+				NewHPEnemy is (HPEnemy - TotalDamage), !;
+
+				write('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
+				NewHPEnemy is HPEnemy, !
+			), !
 		),
 		retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 		asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop))
