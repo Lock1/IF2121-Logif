@@ -396,7 +396,13 @@ specialAttack :- % FIXME : Heal Potion HP Cap
 		( % TODO : Extra, cooldown
 			Class = 'swordsman',
 			TotalHeal is SkillModifier,
-			NewHP is HP + TotalHeal, incrementTurnCounter,
+			class(_,Class,MaxHP,_,_,_),
+			HealedHP is HP + TotalHeal, (
+				HealedHP > MaxHP, NewHP is MaxHP, !;
+				NewHP is HealedHP, !
+			),
+
+			incrementTurnCounter,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),

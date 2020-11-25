@@ -21,14 +21,19 @@ addItem(ItemID) :-
     !,fail;
 
     /*bisa ga ya kira2*/
-    ItemID>15,
+    ItemID>15, ItemID =< 100,
     potion(ItemID, PotionName, PlusHP, PlusMana),
     asserta(inventoryP(ItemID, PotionName, PlusHP, PlusMana)),!;
 
     ItemID=<15,
     item(ItemID, Class, Category, ItemName, Attack, Def),
+    asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!;
+
+    ItemID > 100,
+    item(ItemID, Class, Category, ItemName, Attack, Def),
+    write('\33\[33m\33\[1mLegendary granted\33\[m\n'),
     asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!
-    ).
+    ), !.
 
 
 delItem(ItemID) :-
@@ -54,7 +59,7 @@ delItem(ItemID) :-
 % --- Equip and using potion ----
 equip(ItemID) :- % TODO : Extra, Inv sidebar
     currentWeapon(A),
-    ItemID =< 9, ItemID > 0,
+    (ItemID =< 9, ItemID > 0, !; ItemID > 100, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID,Tipe,_,Name,WAtk,_),
     inventory(A,_,_,OldName,OldAtk,_),
@@ -92,8 +97,10 @@ equip(ItemID) :- % TODO : Extra, Inv sidebar
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID, Tipe, _, Name, WAtk, ADef),
     inventory(C,_,_,OldName,OldAtk,OldDef),
-    (
-        retract(currentMisc(C)),
+    ( % TODO : Power pot
+    % TODO : Layer mode
+    % TODO : Equipment awal
+        retract(currentMisc(C)), % TODO : Inventory bar
         asserta(currentMisc(ItemID)),
         NewAtk is Atk - OldAtk + WAtk,
         NewDef is Def - OldDef + ADef,
@@ -109,7 +116,7 @@ equip(ItemID) :- % TODO : Extra, Inv sidebar
 
 
     % Equip new item
-    ItemID =< 9, ItemID > 0,
+    (ItemID =< 9, ItemID > 0, !; ItemID > 100, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID,Tipe,_,Name,WAtk,_),
     (
@@ -155,8 +162,17 @@ equip(ItemID) :- % TODO : Extra, Inv sidebar
 usePotion(PID) :-
     inventoryP(PID, Name, PlusHP, PlusMana),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    NewHP is HP+PlusHP,
-    NewMana is Mana+PlusMana,
+    class(_,Tipe, MaxHP, MaxMP,_,_),
+    RestoredHP is HP+PlusHP,
+    RestoredMana is Mana+PlusMana,
+    (
+        RestoredHP > MaxHP, NewHP is MaxHP, !;
+        NewHP is RestoredHP, !
+    ),
+    (
+        RestoredMana > MaxMP, NewMana is MaxMP, !;
+        NewMana is RestoredMana, !
+    ),
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
     retract(inventoryP(PID, Name, PlusHP, PlusMana)),
@@ -175,7 +191,12 @@ listing(ListID, List1, List2, List3) :-
     % format('┃ Name   │ \33\[33m\33\[1m%26s\33\[m  ┃',[W1]), nl,
     % format('┃ Attack │ %26d  ┃',[X1]), nl,
     % format('┃ Def    │ %26d  ┃',[Y1]), nl,
-    format('\33\[37m\33\[1m┃ %2d │ \33\[33m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl,
+    (
+        I1 > 100,
+        format('\33\[37m\33\[1m┃ %3d │ \33\[33m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl, !;
+
+        format('\33\[37m\33\[1m┃ %3d │ \33\[37m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl, !
+    ),
     % write('┠────────┴────────────────────────────┨'),nl,
     listing(I2, W2, X2, Y2).
 
@@ -186,14 +207,14 @@ listItem :-
     findall(Attack, inventory(_,_,_,_,Attack,_), Attacks),
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
-    write('┃                  Weapon                   ┃'), nl,
-    write('┠────┬──────────────────────────┬─────┬─────┨'), nl,
-    write('┃ ID │ Nama                     │ Atk │ Def ┃'), nl,
-    write('┠────┼──────────────────────────┼─────┼─────┨'), nl,
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃                   Weapon                   ┃'), nl,
+    write('┠─────┬──────────────────────────┬─────┬─────┨'), nl,
+    write('┃ ID  │ Nama                     │ Atk │ Def ┃'), nl,
+    write('┠─────┼──────────────────────────┼─────┼─────┨'), nl,
     listing(IDs, Names, Attacks, Defs),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┗━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
+    write('┗━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
     write('\33\[m'), flush_output, !;
     write('\33\[37m\33\[1mKamu tidak memiliki item\33\[m\n'), !.
 

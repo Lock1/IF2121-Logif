@@ -41,6 +41,13 @@ item(7, sorcerer, wand, 'Avadacadavra', 7, 0).
 item(8, sorcerer, wand, 'Rainbow Rod', 14, 0).
 item(9, sorcerer, wand, 'Tongkat Gandalf', 20, 0).
 
+item(101, swordsman, sword, 'Zenith', 80, 0).
+item(102, archer, bow, 'S.D.M.G.', 60, 0).
+item(103, sorcerer, wand, 'Lunar Flare', 50, 0).
+
+
+
+
 item(10, swordsman, armor, 'Baju Orang Marah', 0, 8).
 item(11, archer, armor, 'Baju Orang Miskin', 0, 4).
 item(12, sorcerer, armor, 'Baju Orang Jenggotan', 0, 6).
@@ -73,9 +80,9 @@ levelUpXPRequirement(CurrentLvl, R) :-
 
 % ----------- Konfigurasi lain ------------
 
-loadingStepDuration(0.01).
+loadingStepDuration(0.004).
 % loadingStepDuration(0.001). % DEBUG
-loadingBarSize(4).
+loadingBarSize(52).
 % loadingBarSize(14).
 % Half frame loading bar
 % Change 1/8 or 1/2 on loadingPBar

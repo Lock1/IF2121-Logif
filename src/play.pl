@@ -91,7 +91,9 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(17));
+            X = 'y', call(addItem(6));
+            X = 'y', call(addItem(102));
+            X = 'y', call(addItem(5));
 
 
             % Super-obscure-feature
@@ -310,7 +312,7 @@ username_input :-
 doQuest2(X,Y) :-
     \+ isQuest(_),
     player(Username), randomize, clear,
-    format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
+    questCount(QCount),
     generateUniqueTriplet(P),
     P = [A,B,C],
     Mnstr is A,
@@ -322,9 +324,22 @@ doQuest2(X,Y) :-
     Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
     Cnt2 is mod(Rv2, 6) + 1, monster(Mnstr2,Name2,_,_,_,_),
     Cnt3 is mod(Rv3, 6) + 1, monster(Mnstr3,Name3,_,_,_,_),
-    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
-    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt2, Name2]),
-    format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt3, Name3]),
+    (
+        QCount is 3, format('Hello, \33\[32m\33\[1m%s\33\[m! It\'s time for some adventure!\nSlain ', [Username]), !;
+        QCount is 2, format('\33\[32m\33\[1m%s\33\[m! I need your help again, can you clear these annoying ', [Username]), !;
+        QCount is 1, format('Hey \33\[32m\33\[1m%s\33\[m! I think I found something interesting down here, but these ', [Username]), !
+
+    ),
+    format('\33\[31m\33\[1m%d %s\33\[m, \33\[31m\33\[1m%d %s\33\[m, \33\[31m\33\[1m%d %s\33\[m ',[Cnt, Name, Cnt2, Name2, Cnt3, Name3]),
+    (
+        QCount is 3, write('for me and I\'ll give you some rewards.\n'), !;
+        QCount is 2, write('for me?\n'), !;
+        QCount is 1, write('always guarding the area, can you clean it for me? I\'ll give you some \33\[33m\33\[1minteresing\33\[m too in return.\n'), !
+
+    ),
+
+
+
     asserta(questList(Mnstr,Cnt)),
     asserta(questList(Mnstr2,Cnt2)),
     asserta(questList(Mnstr3,Cnt3)),
@@ -478,10 +493,10 @@ clearFightStatus :-
 % Terminal raw mode input, non-blocking mode for more fluid play
 % Press m to back to command mode
 switchMove(X) :-
-    X is 119, w;
-    X is 97, a;
-    X is 115, s;
-    X is 100, d;
+    X is 119, w, manaRegen, hpRegen;
+    X is 97, a, manaRegen, hpRegen;
+    X is 115, s, manaRegen, hpRegen;
+    X is 100, d, manaRegen, hpRegen;
     X is 105, listInventory, prompt, clear, sideStatus, \+map;
     X is 99, drinkPot, prompt, clear, sideStatus, \+map;
     X > 0, clear, sideStatus, \+map.
@@ -490,7 +505,7 @@ toggleRawMode :-
     get_key_no_echo(user_input,X),
     % overwriteClear,
     % lineWipeAtPlayer,
-    manaRegen, hpRegen,
+
     (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl,
     horizontalCursorAbsolutePosition(1), write('\33\[1D'), flush_output, toggleRawMode, !).
     % Press e to break
@@ -799,7 +814,7 @@ sideStatusQuest :-
     monster(ID,Name,_,_,_,_),
 
     % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Extra, Create name list
-    write('\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
+    write('\33\[37m\33\[1m\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
     write( '┃  Monster  │ Count ┃\n'),
@@ -811,11 +826,11 @@ sideStatusQuest :-
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
-    write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.');
+    write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.'), !;
     % format('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Location]),flush_output,
 
     write('\33\[100A\33\[1000D\33\[62C\33\[9B'),flush_output,
-    write('Tidak ada quest').
+    write('Tidak ada quest'), !.
 
 % sideStatusQuestInner(I,Size,Name,Ct) :-
 %     I is Size;

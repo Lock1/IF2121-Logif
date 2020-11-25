@@ -9,6 +9,7 @@ height(25).
 :- dynamic(dragon/2).
 :- dynamic(playerLocation/2).
 :- dynamic(teleporter/2).
+:- dynamic(questCount/3).
 
 /*Random dragon and shop*/
 setInitialMap :-
@@ -22,8 +23,9 @@ setInitialMap :-
     asserta(dragon(Absis1, Ordinat1)),
     asserta(playerLocation(Absis2, Ordinat2)),
     setQuest(3),
+    asserta(questCount(3)),
     setShop(3),
-    setTeleporter(10).
+    setTeleporter(1).
 
 setQuest(X) :-
     X is 0;

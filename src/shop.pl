@@ -87,9 +87,10 @@ beliPotion :-
     %     Peluang =< 10000, Peluang > 9750, nth(7, L, Nama1), !
     % ),
     % random(1,7,Rx),
-    random(0,9,Rx), % TODO : Non essential, non uniform random distribution
-    nth(Rx, L, Nama1),
+    % random(0,9,Rx), % TODO : Non essential, non uniform random distribution
+    % nth(Rx, L, Nama1),
 
+    random(0,8,PotionID),
     potion(PotionID,Nama1,_,_),
     addItem(PotionID),
     format('You get \33\[33m\33\[1m%s\33\[m!\n',[Nama1]),
@@ -114,7 +115,7 @@ gacha:-
     format('You spent \33\[33m%d\33\[m gold.\n', [GachaCost]),
     findall(Y, item(_,_,_,Y,_,_), L),
     % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus
-    random(1, 15, Peluang), nth(Peluang, L, X),
+    % random(1, 15, Peluang), nth(Peluang, L, X),
     % (
     %     Peluang =< 1000, Peluang > 1,
     %     nth(0, L, X);
@@ -128,7 +129,7 @@ gacha:-
     %     Peluang =< 7000, Peluang > 5500,
     %     nth(3, L, X);
     %
-    %     Peluang < 10000, Peluang > 7000,
+    %     Peluang < 10000, Peluang > 7000, % FIXME : Taking Quest but back to command mode causing some problem
     %     nth(4, L, X);
     %
     %
@@ -140,9 +141,9 @@ gacha:-
     % ),
 
 
-
-    item(Item_id, _,_, X, _, _),
-    addItem(Item_id),
+    random(1, 15, Peluang),
+    item(Peluang, _,_, X, _, _),
+    addItem(Peluang),
     format('You get \33\[33m\33\[1m%s\33\[m!\n',[X]),
 
     NewGold is Gold - GachaCost,
