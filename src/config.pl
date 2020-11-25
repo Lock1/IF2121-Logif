@@ -14,7 +14,7 @@ monster(3, 'Wolf', 90, 12, 3, 55).
 monster(4, 'Skeleton', 100, 15, 3, 42).
 monster(5, 'Zombie', 65, 20, 2, 32).
 monster(6, 'Bomber', 25, 45, 1, 48).
-monster(99, 'Tubes Duragon', 999, 45, 25, 2000).
+monster(99, 'Duragon', 999, 45, 25, 2000).
 
 /* Item(item_id, class_type, category, item_name, attack, def) possibly dont need gold since gacha anyway //parameters could change*/
 /* Item terbagi sesuai dengan jenis class dan category */

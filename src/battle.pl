@@ -10,23 +10,22 @@
 :- dynamic(isRun/1).
 :- dynamic(isBattleDone/1).
 :- dynamic(isCrit/1).
+:- dynamic(turnCount/1).
 
 /********Ketemu Musuh*********/
 % TODO : Non essential, gameloop for legacy version
 encounterEnemy(_) :-
 	random(1, 7, ID),
+	asserta(turnCount(1)),
 	monster(ID, Nama, HP, Atk, Def, XP),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('\33\[m'), sideStatus, write('\33\[1000A\33\[1000D'), flush_output,
-	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
 	enemyHPBar,
+	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
 	% format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m\33\[1m%d\33\[m\n',[Nama,HP]),
 	sleep(0.2),
-	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
-	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
-	write('• status (\33\[36m\33\[1mx\33\[m)'), flush_output, nl,
-	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
-	write('Tuliskan inisial dari command'), nl,
+	battleStartHelp,
+
 	random(1, 10, P),
 	asserta(peluangLari(P)),
 	asserta(isEnemyAlive(1)),
@@ -67,11 +66,7 @@ encounterDragon(_) :-
 	write('        ██─██▀██─▀─██▄▄▄▄─███─██████─▄████─██─██▄─█─▄─███─███'),nl,
 	write('        ▀▄▄▄▄▄▀▄▄▀▄▄▀▄▄▄▄▄▀▀▄▄▄▀▀▀▀▄▄▄▀▀▀▄▄▄▀▄▄▄▄▄▀▄▀▄▀▀▄▄▄▀▀'),nl,
 	write('\33\[31m\33\[1m\33\[m'),
-	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
-	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
-	write('• status (\33\[36m\33\[1mx\33\[m)'), flush_output, nl,
-	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl, % TODO : Non essential, Special UI
-	write('Tuliskan inisial dari command'), nl,
+	% TODO : Non essential, Special UI
 	random(1, 10, P1),
 	asserta(peluangLari(P1)),
 	asserta(isEnemyAlive(1)),
@@ -91,7 +86,8 @@ run :-
 	write('\33\[36m\33\[1mKamu\33\[m \33\[31m\33\[1mgagal\33\[m run. Semangat bertarung~~ (^///^)'), nl,
 	retract(peluangLari(P)),
 	asserta(isRun(1)),
-	fight;
+	prompt,
+	fight, !;
 	/************Berhasil Lari************/
 	\+ isRun(_),
 	isEnemyAlive(_),
@@ -119,15 +115,10 @@ fight :-
 	\+ isFighting(_),
 	% asserta(isRun(1)),
 	asserta(isFighting(1)),
-	isEnemyAlive(_),
-	enemy(_, NamaEnemy, _, _, _, _),
-	format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
-	write('Perintah tersedia :\n'),
-	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
-	write('• skill (\33\[34m\33\[1mc\33\[m)'), nl,
-	write('• status (\33\[36m\33\[1mx\33\[m)'), nl,
-	write('• potion (\33\[35m\33\[1me\33\[m)'), nl,
-	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl;
+	isEnemyAlive(_);
+	% enemy(_, NamaEnemy, _, _, _, _),
+	% format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
+	% attackHelp;
 	/********Sudah ketemu musuh tapi fight lagi*******/
 	isFighting(_), \+ isRun(_),
 	isEnemyAlive(_),
@@ -138,14 +129,15 @@ fight :-
 attackComment :-
 	enemy(_, NamaEnemy, HPEnemy, _, _, _),
 	HPEnemy > 0,
-	enemyHPBar,
+	% enemyHPBar,
+	incrementTurnCounter,
 	% format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n',[NamaEnemy,HPEnemy]),
 	enemyTurn,
 	!;
 	/********Comment kalau musuh sudah kalah********/
 	enemy(EnemyID, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
-	enemyHPBar,
+	% clear, battleUIDraw,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
 	statPlayer(_,_,_,_,_,_,_,XPPlayer,GoldPlayer),
 	MaxGoldDrop is 25+XPDrop//2,
@@ -153,11 +145,14 @@ attackComment :-
 	random(-5,5,XPSpread),
 	NewXP is (XPPlayer + XPDrop + XPSpread),
 	NewGold is (GoldPlayer + GoldDrop),
+	write('\33\[100A\33\[100D'), battleUIDraw,
 	retract(enemy(_,_,_,_,_,_)),
 	% retract(isRun(_)),
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
+	retract(turnCount(_)),
 	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, _)),
+	write('\33\[100A\33\[100D\33\[18B'),
 	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[XPDrop]),
 	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
@@ -165,7 +160,8 @@ attackComment :-
 	isQuestDone(EnemyID),
 	isAllQuestComplete,
 	checkLevelUp,
-	write('\33\[37m\33\[2mTekan sembarang tombol mengakhiri battle\33\[m\n'), get_key_no_echo(_), !.
+	write('\33\[37m\33\[2mTekan sembarang tombol mengakhiri battle\33\[m\n'),
+	get_key_no_echo(_), !.
 % TODO : Extra, auto fight for qol
 /********Belum ketemu musuh*********/
 normalAttack :-
@@ -247,13 +243,13 @@ attack :-
 /**********************ATTACK MUSUH***********************/
 /********Comment kalau pemain masih belum kalah********/
 enemyAttackComment :-
-	statPlayer(_,_,HPPlayer,Mana,_,_,_,_,_),
-	HPPlayer > 0,
-	format('Darah \33\[36m\33\[1mkamu\33\[m tersisa \33\[31m\33\[1m%d\33\[m dan mana tersisa \33\[36m\33\[1m%d\33\[m\n\n',[HPPlayer,Mana]), !;
+	statPlayer(_,_,HPPlayer,_,_,_,_,_,_),
+	HPPlayer > 0, !;
 	/********Comment kalau pemain sudah kalah********/
 	statPlayer(_,_,HPPlayer,_,_,_,_,_,_),
 	HPPlayer =< 0,
 	sleep(0.3),
+	write('\33\[100A\33\[100D\33\[22B'), flush_output,
 	write('\33\[31m\33\[1m'),
 	flush_output,
 	write('Darah kamu sudah habis'), nl,
@@ -282,43 +278,59 @@ enemyTurn :-
 		Serangan is (AtkEnemy - DefPlayer + AtkSpread),
 		(
 			NewHP is (HPPlayer - Serangan), NewHP =< HPPlayer,
-			format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m%d\33\[m\n',[NamaEnemy,Serangan]), !;
+			format('\n\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m%d\33\[m\n',[NamaEnemy,Serangan]), !;
 
 			NewHP is HPPlayer,
-			format('\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m0\33\[m\n',[NamaEnemy]), !
+			format('\n\33\[31m\33\[1m%s\33\[m melakukan serangan sebesar \33\[31m0\33\[m\n',[NamaEnemy]), !
 		),
 
 		retract(statPlayer(IDTipe, Nama, HPPlayer, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
 		asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, DefPlayer, Lvl, XP, Gold)),
 		enemyAttackComment
 	), !;
-	write('\33\[33m\33\[1mDodged!\33\[m\n'), enemyAttackComment, !.
+	write('\n\33\[33m\33\[1mDodged!\33\[m\n'), enemyAttackComment, !.
 
 
 
 % -------------------- Battle Loop --------------------
 
 battleLoop :-
-	isBattleDone(X), retract(isBattleDone(X)), !;
+	isBattleDone(O), retract(isBattleDone(O)), !;
 	(
-		write('\33\[32m\33\[1mBattle >> \33\[m'),
-		get_key(X), nl,
+
+		turnCount(P), (
+			P > 1,
+			write('\33\[100A\33\[100D'), flush_output, battleUIDraw,
+			write('\33\[32m\33\[1mBattle >>                      \33\[m\33\[21D'), !;
+
+			P = 1,
+			write('\33\[32m\33\[1mBattle >>                      \33\[m\33\[21D'),
+			flush_output, !
+
+			% write('\33\[32m\33\[1mBattle >> \33\[m'), !
+		),
+		get_key(X),
 		(
 	    % % catch(read(X), error(_,_), errorMessage), (
-	        X = 102, call(fight), battleLoop, !; % f key
-	        X = 114, call(run), battleLoop, !; % r key
+	        X = 102, call(fight), clear, battleUIDraw, battleLoop, !; % f key
+	        X = 114, clear, battleUIDraw, call(run), clear, battleUIDraw, battleLoop, !; % r key
 	        X = 120, \+status, battleLoop, !; % x key
 
 	        X = 41, call(quit), !; % 1 key
-			isFighting(_), (
-				X = 97, call(normalAttack), battleLoop, !; % a key
-		 		X = 101, call(drinkPot), enemyTurn, battleLoop, !; % e key, Not Skyrim mode
+			isFighting(_), clear, battleUIDraw, write('\33\[32m\33\[1mBattle >> \33\[m\n'), (
+				X = 97,  call(normalAttack), battleLoop, !; % a key
+		 		X = 101, call(drinkPot), incrementTurnCounter, enemyTurn, battleLoop, !; % e key, Not Skyrim mode
 				X = 99, call(specialAttack), battleLoop, ! % c
 			), !;
-			write('Tombol tidak diketahui\n\n'), battleLoop, !
+			write('\nTombol tidak diketahui\n\n'), battleLoop, !
 	    ), !
 	).
 
+incrementTurnCounter :-
+	turnCount(X),
+	retract(turnCount(X)),
+	Nx is X + 1,
+	asserta(turnCount(Nx)), !.
 
 
 /***********************KALAH********************************/
@@ -373,11 +385,11 @@ specialAttack :-
 	NewMana is Mana - SMana,
 	(
 		NewMana >= 0,
-		(
+		( % TODO : Extra, cooldown
 			Class = 'swordsman',
 			HealScaling is Lvl*2,
 			TotalHeal is HealScaling + 8,
-			NewHP is HP + TotalHeal,
+			NewHP is HP + TotalHeal, incrementTurnCounter,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
@@ -393,8 +405,7 @@ specialAttack :-
 			attack, !, attack, !, attack, !,
 			(
 				enemy(_,_,NewEHP,_,_,_),
-				NewEHP > 0,
-				enemyHPBar;
+				NewEHP > 0, incrementTurnCounter;
 				call(attackComment)
 			), enemyTurn, !;
 
@@ -408,8 +419,7 @@ specialAttack :-
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			(
 				enemy(_,_,NewEHP,_,_,_),
-				NewEHP > 0,
-				enemyHPBar,
+				NewEHP > 0, incrementTurnCounter,
 				enemyTurn, !;
 				call(attackComment), !
 			)
@@ -421,14 +431,32 @@ specialAttack :-
 	% NewMana is Mana - SMana,
 
 
+battleStartHelp :-
+	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
+	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
+	write('• status (\33\[36m\33\[1mx\33\[m)'), flush_output, nl,
+	write('• run (\33\[33m\33\[1mr\33\[m)'), flush_output, nl,
+	write('Tuliskan inisial dari command'), nl.
 
 
+attackHelp :-
+	write('\33\[37mPerintah tersedia :\33\[m\n'),
+	write('• attack (\33\[31m\33\[1ma\33\[m)'), nl,
+	write('• skill (\33\[34m\33\[1mc\33\[m)'), nl,
+	write('• status (\33\[36m\33\[1mx\33\[m)'), nl,
+	write('• potion (\33\[35m\33\[1me\33\[m)'), nl,
+	write('• run (\33\[33m\33\[1mr\33\[m)'), nl, nl.
 
 
 % Misc
 % healthBarDraw :-
 
-
+battleUIDraw :-
+	sideStatus,
+	enemyHPBar,
+	attackHelp,
+	% playerHPBar,
+	!.
 % playerHPBar :-
 
 enemyHPBar :-

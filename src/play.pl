@@ -91,6 +91,7 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
+            X = 'y', call(addItem(17));
 
 
             % Super-obscure-feature
