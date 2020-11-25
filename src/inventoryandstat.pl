@@ -45,6 +45,21 @@ delItem(ItemID) :-
         \+inventory(ItemID,_,_,_,_,_),
         write('There is no specified item to delete\n'), !
     ), !;
+    ItemID > 103, (
+        retract(inventoryP(ItemID,ItemN,_,_)),
+        format('\33\[33m\33\[1m%s\33\[37m telah dihapus.\33\[m\n',[ItemN]), !;
+
+        \+inventory(ItemID,_,_,_,_,_),
+        write('There is no specified item to delete\n'), !
+    ), !;
+
+    ItemID > 100, ItemID < 104, (
+        retract(inventoryP(ItemID,ItemN,_,_)),
+        format('\33\[31m\33\[1m%s telah dihapus.\33\[m\n',[ItemN]), !;
+
+        \+inventory(ItemID,_,_,_,_,_),
+        write('There is no specified item to delete\n'), !
+    ), !;
 
     ItemID=<15,
     (
@@ -271,9 +286,18 @@ checkLevelUp :-
         ManaGain is CurrentLvl + 3,
         AtkGain is 1,
         DefGain is 2,
-        NewCrit is CurrentLvl // 2 + 5,
-        NewDodge is CurrentLvl // 3 + 5,
-        ManaReduction is 1,
+        (
+            CritChance < 99, NewCrit is CurrentLvl // 2 + 5, !;
+            NewCrit is 100, !
+        ),
+        (
+            DodgeChance < 99, NewDodge is CurrentLvl // 3 + 5, !;
+            NewDodge is 100, !
+        ),
+        (
+            ManaCost > 5, ManaReduction is 1, !;
+            ManaReduction is 0, !
+        ),
         NewModifier is CurrentLvl // 2 + 10; % Heal 10, upgrade every 2 level
 
         IDTipe = 'archer',
@@ -281,9 +305,18 @@ checkLevelUp :-
         ManaGain is CurrentLvl + 1,
         AtkGain is 2,
         DefGain is 1,
-        NewCrit is CritChance + 1,
-        NewDodge is CurrentLvl // 2 + 15,
-        ManaReduction is 1,
+        (
+            CritChance < 99, NewCrit is CritChance + 1, !;
+            NewCrit is 100, !
+        ),
+        (
+            DodgeChance < 99, NewDodge is CurrentLvl // 2 + 15, !;
+            NewDodge is 100, !
+        ),
+        (
+            ManaCost > 5, ManaReduction is 1, !;
+            ManaReduction is 0, !
+        ),
         NewModifier is CurrentLvl // 5 + 2; % Base 2 attack, upgrade every 5 level
 
         IDTipe = 'sorcerer',
@@ -291,9 +324,18 @@ checkLevelUp :-
         ManaGain is CurrentLvl + 5,
         AtkGain is 1,
         DefGain is 1,
-        NewCrit is CurrentLvl // 2 + 8, % TODO : Non essential, complete integration of crit dodge
-        NewDodge is CurrentLvl // 3 + 10,
-        ManaReduction is 1,
+        (
+            CritChance < 99, NewCrit is CurrentLvl // 2 + 8, % TODO : Non essential, complete integration of crit dodge
+            NewCrit is 100, !
+        ),
+        (
+            DodgeChance < 99, NewDodge is CurrentLvl // 3 + 10, !;
+            NewDodge is 100, !
+        ),
+        (
+            ManaCost > 5, ManaReduction is 1, !;
+            ManaReduction is 0, !
+        ),
         NewModifier is CurrentLvl // 5 + 2 % Multiplier 2, upgrade every 5 level
     ),
     NewHP is CurrentHP + HPGain,
