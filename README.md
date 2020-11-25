@@ -57,8 +57,8 @@ GNU/Prolog                    | 1.4.5
 Ascgen2                       | 2.0.0
 
 
-**Dependencies**
-Program ini tidak membutuhkan library eksternal.
+**Dependencies** \
+Program ini tidak membutuhkan library eksternal \
 Seluruh program dikoding menggunakan 
 fitur standard GNU/Prolog.
 
