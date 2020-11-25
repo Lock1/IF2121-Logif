@@ -204,10 +204,12 @@ drinkPot :-
     write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n\n'), !.
 
 equipItem :-
+    inventory(_,_,_,_,_,_),
     listItem,
     write('Masukkan ID item yang akan diequip, \n\33\[32m\33\[1mEquip >> \33\[m'),
     catch(read(X), error(_,_), errorMessage),
-    equip(X).
+    equip(X), !;
+    write('\33\[37m\33\[1mKamu tidak memiliki item\33\[m\n\n'), !.
 
 listInventory :-
     listItem,
@@ -337,17 +339,15 @@ doQuest2(X,Y) :-
 
 manaRegen :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    (
+    class(_, IDTipe, _, MaxMana, _, _),
+    Mana < MaxMana, (
         IDTipe = 'swordsman',
-        Mana < 50,
         NewMana is Mana + 1, !;
 
         IDTipe = 'archer',
-        Mana < 60,
         NewMana is Mana + 1, !;
 
         IDTipe = 'sorcerer',
-        Mana < 99,
         NewMana is Mana + 2, !;
 
         NewMana is Mana, !
@@ -358,17 +358,15 @@ manaRegen :-
 
 hpRegen :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    (
+    class(_, IDTipe, MaxHP, _, _, _),
+    HP < MaxHP, (
         IDTipe = 'swordsman',
-        HP < 179,
         NewHP is HP + 2, !;
 
         IDTipe = 'archer',
-        HP < 120,
         NewHP is HP + 1, !;
 
         IDTipe = 'sorcerer',
-        HP < 150,
         NewHP is HP + 1, !;
 
         NewHP is HP, !
@@ -633,12 +631,12 @@ classScreen(X) :-
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
     write('┃                \33\[31m\33\[1mHP\33\[m    180                        \33\[31m\33\[1mHP\33\[m    120                       \33\[31m\33\[1mHP\33\[m    150                   ┃'), nl,
     write('┃                \33\[36m\33\[1mMP\33\[m     50                        \33\[36m\33\[1mMP\33\[m     60                       \33\[36m\33\[1mMP\33\[m    100                   ┃'), nl,
-    write('┃                \33\[33m\33\[1mAtk\33\[m    25                        \33\[33m\33\[1mAtk\33\[m    13                       \33\[33m\33\[1mAtk\33\[m    17                   ┃'), nl,
+    write('┃                \33\[33m\33\[1mAtk\33\[m    17                        \33\[33m\33\[1mAtk\33\[m    13                       \33\[33m\33\[1mAtk\33\[m    15                   ┃'), nl,
     write('┃                \33\[35m\33\[1mDef\33\[m     5                        \33\[35m\33\[1mDef\33\[m     4                       \33\[35m\33\[1mDef\33\[m     2                   ┃'), nl,
     write('┃                \33\[32m\33\[2mCrit\33\[m   5%                        \33\[32m\33\[2mCrit\33\[m  16%                       \33\[32m\33\[2mCrit\33\[m   8%                   ┃'), nl,
     write('┃                \33\[37m\33\[2mDodge\33\[m  5%                        \33\[37m\33\[2mDodge\33\[m 15%                       \33\[37m\33\[2mDodge\33\[m 10%                   ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
-
+% TODO : Extra, luck stat
     X is 0,
     write('+-----------+-----------+-----------+'), nl,
     write('| Swordsman |  Archer   |  Sorcerer |'), nl,
@@ -762,7 +760,7 @@ questStatus :- % TODO : Extra, check quest print
     % TODO : Non essential, Filter input 'a,b'
 
 sideStatus :-
-    statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    statPlayer(TipeKelas, Nama, _, _, Atk, Def, Lvl, XP, Gold),
     write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
     write('\33\[37m\33\[1m'),flush_output,
     write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'),
@@ -770,26 +768,26 @@ sideStatus :-
     write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[2B'),flush_output,
     write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'),
+    % write('\33\[100A\33\[1000D\33\[62C\33\[3B'),flush_output,
+    % write('┃ HP / MP │  '),
+    % format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
+    % write(' / '),
+    % format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output,
+    % write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[3B'),flush_output,
-    write('┃ HP / MP │  '),
-    format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
-    write(' / '),
-    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output,
-    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
     write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
+    write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
     write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
+    write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
     write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
+    write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
     write('┃ Gold    │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
+    write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    call(sideStatusQuest),
+    call(sideStatusQuest), call(playerHPBar), call(playerMPBar),
     write('\33\[100A\33\[1000D'),flush_output.
 
 sideStatusQuest :-
@@ -827,6 +825,53 @@ sideStatusQuest :-
 % TODO : Extra, inventory sidebar
 
 
+playerHPBar :-
+	statPlayer(TipeKelas, _, CurrentHP, _, _, _, _, _, _),
+	class(_, TipeKelas, DefaultMaxHP, _, _, _),
+    write('\33\[100A\33\[100D\33\[86C'), flush_output,
+	write('\33\[37m\33\[1m╔════╦════════════╦═══════════╗'),
+    write('\33\[100A\33\[100D\33\[69C\33\[1B'), flush_output,
+	write('\33\[37m\33\[1m║ \33\[31m\33\[1mHP\33\[m \33\[37m\33\[1m║ '),
+	CurrentPercent is (CurrentHP*10) //DefaultMaxHP,
+	Remain is 10 - CurrentPercent,
+	(
+		CurrentPercent >= 0, CurrentPercent < 11,
+		innerHPBar(CurrentPercent, Remain), !;
+
+		write('\33\[m\33\[31m\33\[2m██████████\33\[m'), !
+	),
+	(
+		CurrentHP >= 0,
+		format(' \33\[37m\33\[1m║ %3d / %3d ║',[CurrentHP,DefaultMaxHP]), !;
+
+		format(' \33\[37m\33\[1m║ %3d / %3d ║',[0,DefaultMaxHP]), !
+	),
+    write('\33\[100A\33\[100D\33\[69C\33\[2B'), flush_output,
+	write('\33\[37m\33\[1m╚════╩════════════╩═══════════╝\n').
+
+playerMPBar :-
+	statPlayer(TipeKelas, _,_, CurrentMana, _, _, _, _, _),
+	class(_, TipeKelas, _, DefaultMaxMana, _, _),
+    write('\33\[100A\33\[100D\33\[86C\33\[3B'), flush_output,
+	write('\33\[37m\33\[1m╔════╦════════════╦═══════════╗'),
+    write('\33\[100A\33\[100D\33\[69C\33\[4B'), flush_output,
+	write('\33\[37m\33\[1m║ \33\[36m\33\[1mMP\33\[m \33\[37m\33\[1m║ '),
+	CurrentPercent is (CurrentMana*10) //DefaultMaxMana,
+	Remain is 10 - CurrentPercent,
+	(
+		CurrentPercent >= 0, CurrentPercent < 11,
+		innerMPBar(CurrentPercent, Remain), !;
+
+		write('\33\[m\33\[36m\33\[2m██████████\33\[m'), !
+	),
+	(
+		CurrentMana >= 0,
+		format(' \33\[37m\33\[1m║ %3d / %3d ║',[CurrentMana,DefaultMaxMana]), !;
+
+		format(' \33\[37m\33\[1m║ %3d / %3d ║',[0,DefaultMaxMana]), !
+	),
+    write('\33\[100A\33\[100D\33\[69C\33\[5B'), flush_output,
+	write('\33\[37m\33\[1m╚════╩════════════╩═══════════╝\n').
 
 
 

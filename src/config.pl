@@ -2,9 +2,9 @@
 
 % ------------ Konfigurasi Gameplay -------------
 /* Class(ID_pilihan, class_type, HP, mana, attack, def) //parameters could change*/
-class(1, swordsman, 180, 50, 25, 5).
+class(1, swordsman, 180, 50, 17, 5).
 class(2, archer, 120, 60, 13, 4).
-class(3, sorcerer, 150, 100, 17, 2).
+class(3, sorcerer, 150, 100, 15, 2).
 
 /* Monster(ID, name, HP, atk, def, exp_drop) //parameters could change*/
 /* Tipe monster sesuai dengan spek */
@@ -20,24 +20,25 @@ monster(99, 'duragon', 999, 45, 25, 2000).
 /* Item terbagi sesuai dengan jenis class dan category */
 
 item(1, swordsman, sword, 'True-Excalibur KW1', 10, 0).
-item(2, swordsman, sword, 'Samehadawibu', 35, 0).
-item(3, swordsman, sword, 'Pedang Zabuza', 55, 0).
+item(2, swordsman, sword, 'Samehadawibu', 12, 0).
+item(3, swordsman, sword, 'Pedang Zabuza', 17, 0).
+% TODO : Extra, all quest then legendary weapon
 
-item(4, archer, bow, 'Pulse Bow', 15, 0).
-item(5, archer, bow, 'Phantasm', 25, 0).
-item(6, archer, bow, 'Tsunami', 40, 0).
+item(4, archer, bow, 'Wooden Bow', 5, 0).
+item(5, archer, bow, 'Daedalus Stormbow', 15, 0).
+item(6, archer, bow, 'Tsunami', 25, 0).
 
-item(7, sorcerer, wand, 'Avadacadavra', 15, 0).
-item(8, sorcerer, wand, 'Rainbow Rod', 30, 0).
-item(9, sorcerer, wand, 'Tongkat Gandalf', 60, 0).
+item(7, sorcerer, wand, 'Avadacadavra', 7, 0).
+item(8, sorcerer, wand, 'Rainbow Rod', 14, 0).
+item(9, sorcerer, wand, 'Tongkat Gandalf', 20, 0).
 
 item(10, swordsman, armor, 'Baju Orang Marah', 0, 8).
 item(11, archer, armor, 'Baju Orang Miskin', 0, 4).
 item(12, sorcerer, armor, 'Baju Orang Jenggotan', 0, 6).
 
-item(13, swordsman, statup, 'Gelang Baja', 5, 2).
-item(14, sorcerer, statup, 'Gelang Sihir', 10, 1).
-item(15, archer, statup, 'Gelang Karet', 10, 0).
+item(13, swordsman, statup, 'Gelang Baja', 3, 2).
+item(14, sorcerer, statup, 'Gelang Sihir', 4, 2).
+item(15, archer, statup, 'Gelang Karet', 6, 1).
 
 /*Potion(ID, _, _,Name, HP+, Mana+)*/
 potion(16, 'Lesser Healing Potion', 10, 0).
@@ -53,7 +54,7 @@ potion(23, 'okultisme', 0, 60).
 % TODO : Extra, boost potion
 
 /* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
-special_skill(swordsman, 'baliho yang dicopot', 15).
+special_skill(swordsman, 'baliho', 15).
 special_skill(archer, 'rapid fire', 10).
 special_skill(sorcerer, 'santet', 30).
 

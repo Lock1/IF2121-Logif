@@ -183,7 +183,8 @@ attack :-
 	isEnemyAlive(_),
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
 	enemy(_, _, HPEnemy, _, DefEnemy, _),
-	random(-3,3,AtkSpread),
+	randomize,
+	random(-2,2,AtkSpread),
 	random(-5,5,ChanceSpread),
 	random(1,100,HitRoll),
 	critChance(CritChance),
@@ -318,7 +319,7 @@ battleLoop :-
 	    % % catch(read(X), error(_,_), errorMessage), (
 	        X = 102, call(fight), clear, battleUIDraw, battleLoop, !; % f key
 	        X = 114, clear, battleUIDraw, call(run), clear, battleUIDraw, battleLoop, !; % r key
-	        X = 120, \+status, battleLoop, !; % x key
+	        X = 120, nl, \+status, battleLoop, !; % x key
 
 	        X = 41, call(quit), !; % 1 key
 			isFighting(_), clear, battleUIDraw, write('\33\[32m\33\[1mBattle >> \33\[m\n'), (
@@ -399,19 +400,18 @@ specialAttack :-
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			format('\33\[37m\33\[1mSerangan\33\[m \33\[31m\33\[1m%s\33\[m \33\[37m\33\[1mterblock!\33\[m\n',[EnemyN]),
 			format('\33\[33m\33\[1m%s\33\[m menyembuhkan HP sebanyak \33\[31m\33\[1m%d\33\[m\n',[SName,TotalHeal]),
-			format('Darah \33\[36m\33\[1mkamu\33\[m menjadi \33\[31m\33\[1m%d\33\[m dan mana tersisa \33\[36m\33\[1m%d\33\[m\n\n',[NewHP,NewMana]), !;
+			format('Darah \33\[36m\33\[1mkamu\33\[m menjadi \33\[31m\33\[1m%d\33\[m\n\n',[NewHP,NewMana]), !;
 
 			Class = 'archer',
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			format('Tersisa \33\[36m\33\[1m%d\33\[m mana\n',[NewMana]),
 			attack, !, attack, !, attack, !,
 			(
 				enemy(_,_,NewEHP,_,_,_),
-				NewEHP > 0, incrementTurnCounter;
+				NewEHP > 0, incrementTurnCounter, enemyTurn;
 				call(attackComment)
-			), enemyTurn, !;
+			), !;
 
 			Class = 'sorcerer',
 			SantetAtk is Atk*2+20,
@@ -497,4 +497,16 @@ innerHPBar(C,M) :-
 
 	!.
 
+innerMPBar(C,M) :-
+	C > 0,
+	write('\33\[m\33\[36m\33\[1m█\33\[m'),
+	Cr is C - 1,
+	innerMPBar(Cr,M), !;
+
+	M > 0,
+	write('\33\[m\33\[36m\33\[2m█\33\[m'),
+	Mr is M - 1,
+	innerMPBar(C,Mr), !;
+
+	!.
 /* ---------------------------------------------------------------------------------------- */
