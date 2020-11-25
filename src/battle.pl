@@ -1,3 +1,7 @@
+/* ------------------------------------ Battle Section ------------------------------------
+13519178 / Akeyla Pradia Naufal
+13519214 / Tanur Rizaldi Rahardjo
+*/
 :- dynamic(enemy/6).
 :- dynamic(statPlayer/9).
 :- dynamic(isEnemyAlive/1).
@@ -398,4 +402,4 @@ specialAttack :-
 	).
 	% NewMana is Mana - SMana,
 
-	%
+/* ---------------------------------------------------------------------------------------- */
