@@ -487,14 +487,22 @@ collisionCheck(X,Y) :-
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
     stair(X,Y), moveNextFloor, !;
     shop(X,Y), clear, call(shop), clear, !;
-    % ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
+    % ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % DEBUG
     setLocation(X,Y).
 
 moveNextFloor :-
-    randomize, width(W), height(H), destroyMap, incrementFloor,
-    generateMap,
-    random(1, W, RAbsis), random(1, H, ROrdinat), % TODO : Floor
-    setLocation(RAbsis, ROrdinat).%, retract(stair(X,Y)).
+    write('Lanjutkan ke lantai selanjutnya? (y/n)\n'),
+    get_key_no_echo(X),
+    (
+        X = 121,
+        randomize, width(W), height(H), destroyMap, incrementFloor, generateMap,
+        random(1, W, RAbsis), random(1, H, ROrdinat),
+        setLocation(RAbsis, ROrdinat), clear, !;
+
+        X = 110, clear, !;
+
+        write('Input tidak diketahui\n\n'), moveNextFloor, !
+    ).%, retract(stair(X,Y)).
 
 
 randomEncounter :-
