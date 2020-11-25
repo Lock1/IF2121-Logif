@@ -93,7 +93,7 @@ levelUpXPRequirement(CurrentLvl, R) :-
 % ----------- Konfigurasi lain ------------
 
 loadingStepDuration(0.004).
-% loadingStepDuration(0.001). % DEBUG
+% loadingStepDuration(0.001).
 loadingBarSize(52).
 % loadingBarSize(14).
 % Half frame loading bar

@@ -98,7 +98,6 @@ equip(ItemID) :-
     inventory(ItemID, Tipe, _, Name, WAtk, ADef),
     inventory(C,_,_,OldName,OldAtk,OldDef),
     (
-    % TODO : Extra, Power pot
         retract(currentMisc(C)),
         asserta(currentMisc(ItemID)),
         NewAtk is Atk - OldAtk + WAtk,

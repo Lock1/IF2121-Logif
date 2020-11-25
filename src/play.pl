@@ -94,9 +94,9 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(6));
-            X = 'y', call(addItem(102));
-            X = 'y', call(addItem(5));
+            % X = 'y', call(addItem(6));
+            % X = 'y', call(addItem(102));
+            % X = 'y', call(addItem(5));
 
 
             % Super-obscure-feature
@@ -496,7 +496,7 @@ collisionCheck(X,Y) :-
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
     stair(X,Y), moveNextFloor, !;
     shop(X,Y), clear, call(shop), clear, !;
-    % ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !; % DEBUG
+    ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
 moveNextFloor :-
@@ -686,7 +686,7 @@ classScreen(X) :-
     write('┃                \33\[32m\33\[2mCrit\33\[m   5%                        \33\[32m\33\[2mCrit\33\[m  16%                       \33\[32m\33\[2mCrit\33\[m   8%                   ┃'), nl,
     write('┃                \33\[37m\33\[2mDodge\33\[m  5%                        \33\[37m\33\[2mDodge\33\[m 15%                       \33\[37m\33\[2mDodge\33\[m 10%                   ┃'), nl,
     write('┖─────────────────────────────────────────────────────────────────────────────────────────────────────────────┚'), nl;
-% TODO : Extra, luck stat
+% TODO : Non essential, luck stat
     X is 0,
     write('+-----------+-----------+-----------+'), nl,
     write('| Swordsman |  Archer   |  Sorcerer |'), nl,
@@ -797,17 +797,28 @@ printRandomizedTrivia :-
     listSelect(TList,Index,Trivia),
     write(Trivia), nl.
 % UI Drawer
-questStatus :- % TODO : Extra, check quest print
-    questList(ID,Ct), % FIXME : Extra, status battle
-    monster(ID,Name,_,_,_,_),
+questStatus :-
+    questList(_,_),
+    findall(QID, questList(QID,_), QIDs),
+    findall(Ctr, questList(_,Ctr), Ctrs),
     write('\33\[37m\33\[1m'),flush_output,
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
     write( '┃  Monster  │ Count ┃\n'),
     write( '┠───────────┼───────┨\n'),
-    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Fix this
+    questListPrint(QIDs,Ctrs),
+    % format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
     write('\33\[37m\33\[1m'),flush_output,
-    write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
+    write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n'), !;
+    write('\33\[37\33\[1mTidak ada quest\33\[m\n'), !.
     % TODO : Non essential, Filter input 'a,b'
+
+
+questListPrint(QIDs,Ctrs) :-
+    QIDs = [], Ctrs = [];
+    QIDs = [ID|Q2],
+    Ctrs = [Ct|C2],
+    monster(ID,Name,_,_,_,_),
+    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), questListPrint(Q2,C2), !.
 
 
 sideStatus :-
@@ -859,7 +870,7 @@ sideStatusQuest :-
     write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
     write( '┠──────────────┼───────┨\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
-    format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
+    format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
     write('\33\[37m\33\[1m'),flush_output,
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
     write( '┗━━━━━━━━━━━━━━┷━━━━━━━┛\n'),
@@ -876,7 +887,6 @@ sideStatusQuest :-
 %     write('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Index]),flush_output,
 %     format('┃ \33\[31m\33\[1m%-7s\33\[m │ %5d ┃\n',[Name,Ct]).
 
-% TODO : Extra, inventory sidebar
 
 
 playerHPBar :-
@@ -1101,3 +1111,14 @@ incrementMovementTick :-
 %     retract(quest(X,Y)),
 %     prompt,
 %     (shell('clear'), !; overwriteClear, !).
+
+% questStatus :-
+%     questList(ID,Ct),
+%     monster(ID,Name,_,_,_,_),
+%     write('\33\[37m\33\[1m'),flush_output,
+%     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
+%     write( '┃  Monster  │ Count ┃\n'),
+%     write( '┠───────────┼───────┨\n'),
+%     format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
+%     write('\33\[37m\33\[1m'),flush_output,
+%     write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
