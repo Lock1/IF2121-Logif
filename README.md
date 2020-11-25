@@ -20,16 +20,8 @@
 - Kode blok **or** yang besar, digunakan indentasi dan bracket untuk memperjelas kode.
 
 ## Snapshot
-
-<!-- **Search** \ -->
-<!-- ![Search Query](/other/img/search-query.gif) \ -->
 **UI & Movement** \
 ![UI](/other/img/ui.gif)
-
-<!-- **How to Use** \
-![How to Use](/other/img/how-to-use.gif) -->
-<!-- **Main Menu** \
-![Main Menu](/src/readme/mainmenu.gif) \
 
 
 
@@ -42,7 +34,7 @@ Tanggal Selesai      | 25 November 2020
 Tanggal Pengumpulan  | 27 November 2020
 Kelas                | 2
 Dosen                | Fariska Zakhralativa Ruskanda
-Asisten              | **TBA**
+Asisten              | TBA
 Nama Kelompok        | send help
 Kelompok             | 6
 
@@ -89,7 +81,7 @@ Goal & Fail state         | :green_square:
 
 
 **Bonus** \
-**Status : **Pending** :yellow_square:
+**Status : Pending** :yellow_square:
 Spesifikasi   | Status
 -----------   | ------
 Effect Potion | :green_square:
