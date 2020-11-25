@@ -372,16 +372,16 @@ specialAttack :-
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			format('Tersisa \33\[36m\33\[1m%d\33\[m mana\n',[NewMana]),
-			attack, !, attack, !,
+			attack, !, attack, !, attack, !,
 			(
 				enemy(_,_,NewEHP,_,_,_),
 				NewEHP > 0,
 				format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n\n',[EnemyN,NewEHP]);
 				call(attackComment)
-			);
+			), enemyTurn, !;
 
 			Class = 'sorcerer',
-			SantetAtk is Atk*2+10,
+			SantetAtk is Atk*2+20,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
