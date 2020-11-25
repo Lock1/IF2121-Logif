@@ -73,7 +73,7 @@ beliPotion :-
     randomize,
     statPlayer(_,_,_,_,_,_,_,_,Gold),
     Gold >= 10,
-    findall(Nama, potion(_,Nama,_,_), L),
+    findall(Nama, potion(_,Nama,_,_), _),
     % random(1,10000,Peluang),
     % (
     %     Peluang =< 4000, Peluang > 0, nth(0, L, Nama1), !;
@@ -113,7 +113,7 @@ gacha:-
     GachaCost is 50 + CostSpread,
     Gold >= GachaCost,
     format('You spent \33\[33m%d\33\[m gold.\n', [GachaCost]),
-    findall(Y, item(_,_,_,Y,_,_), L),
+    findall(Y, item(_,_,_,Y,_,_), _),
     % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus
     % random(1, 15, Peluang), nth(Peluang, L, X),
     % (

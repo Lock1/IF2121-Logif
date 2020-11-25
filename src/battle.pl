@@ -203,7 +203,7 @@ attack :-
 			ClassType = 'archer',
 			random(1,100,CritRoll), CritRoll =< CritChance,
 			asserta(isCrit(1)),
-			AtkPlayer is BaseAtkPlayer*5 + AtkSpread, !;	% 4 x multiplier
+			AtkPlayer is BaseAtkPlayer*6 + AtkSpread, !;	% 6 x multiplier
 
 			ClassType = 'sorcerer',
 			random(1,100,CritRoll), CritRoll =< CritChance,
@@ -397,7 +397,7 @@ isEntireQuestlineCompleted :-
 		format('Heyo \33\[32m\33\[1m%s\33\[m, thanks for clearing those pest.\n',[PName]), nl,
 		sleep(1),
 		format('I managed to recovered this \33\[33m\33\[1m%s\33\[m, take it.',[LegendaryName]), nl,
-		write('Maybe it will help you obtaining \33\[33mamulet of yendor.\n33\[m'),
+		write('Maybe it will help you obtaining \33\[33mamulet of yendor.\n\33\[m'),
 		sleep(1),
 		addItem(LegendaryID), !
 	), !;

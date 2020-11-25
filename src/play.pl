@@ -24,6 +24,7 @@
 :- dynamic(critChance/1). % TODO : Extra, add crit chance status data
 :- dynamic(dodgeChance/1).
 :- dynamic(hitChance/1). % Internal "dodge" value for enemies
+:- dynamic(movementTick/1).
 
 unicode(1). % Secara default, program ditargetkan untuk mode unicode
 % Support untuk terminal gprolog diwindows telah didrop dikarenakan deadline
@@ -36,6 +37,8 @@ main :-
     unicode(IsUnicodeMode),
     setInitialMap, classInit,
     randomize,
+    asserta(movementTick(1)),
+    asserta(currentFloor(1)),
     addItem(16), addItem(16), addItem(16), addItem(16), addItem(16),
     addItem(20), addItem(20),
     random(37,11777,Rseed),
@@ -91,9 +94,9 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(6));
-            X = 'y', call(addItem(102));
-            X = 'y', call(addItem(5));
+            % X = 'y', call(addItem(6));
+            % X = 'y', call(addItem(102));
+            % X = 'y', call(addItem(5));
 
 
             % Super-obscure-feature
@@ -172,7 +175,7 @@ status :-
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
     write('┃ Gold    │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
-    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl, % TODO : Add crit dodge
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl,
     questStatus.
 
@@ -267,6 +270,21 @@ quit :-
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ----------------------- Decision branch ---------------------- */
 choose_class :-
     write('(Type class name with lowercase)\n'),
@@ -280,7 +298,7 @@ choose_class :-
 
         ClassID =:= 2,
         write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl,
-        asserta(critChance(16)), asserta(dodgeChance(15)), asserta(hitChance(90));
+        asserta(critChance(16)), asserta(dodgeChance(15)), asserta(hitChance(90)); % TODO : Non essential, complete integration of crit dodge
 
         ClassID =:= 3,
         write('You have chosen \33\[36m\33\[1mSorcerer\33\[m'), nl,
@@ -321,9 +339,9 @@ doQuest2(X,Y) :-
     random(1,1000,Rv),
     random(1,1000,Rv2),
     random(1,1000,Rv3),
-    Cnt is mod(Rv, 1) + 1, monster(Mnstr,Name,_,_,_,_),
-    Cnt2 is mod(Rv2, 1) + 1, monster(Mnstr2,Name2,_,_,_,_),
-    Cnt3 is mod(Rv3, 1) + 1, monster(Mnstr3,Name3,_,_,_,_),
+    Cnt is mod(Rv, 4) + 1, monster(Mnstr,Name,_,_,_,_),
+    Cnt2 is mod(Rv2, 4) + 1, monster(Mnstr2,Name2,_,_,_,_),
+    Cnt3 is mod(Rv3, 4) + 1, monster(Mnstr3,Name3,_,_,_,_),
     (
         QCount is 3, format('\33\[mHello, \33\[32m\33\[1m%s\33\[m! It\'s time for some adventure!\nSlain ', [Username]), !;
         QCount is 2, format('\33\[32m\33\[1m%s\33\[m! I need your help again, can you clear these annoying ', [Username]), !;
@@ -354,11 +372,12 @@ doQuest2(X,Y) :-
 manaRegen :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     class(_, IDTipe, _, MaxMana, _, _),
+    movementTick(CTick),
     Mana < MaxMana, (
-        IDTipe = 'swordsman',
+        IDTipe = 'swordsman', 0 is mod(CTick,3), % Every 3 tick, mp regen
         NewMana is Mana + 1, !;
 
-        IDTipe = 'archer',
+        IDTipe = 'archer', 0 is mod(CTick,3), % Every 3 tick, mp regen
         NewMana is Mana + 1, !;
 
         IDTipe = 'sorcerer',
@@ -373,11 +392,12 @@ manaRegen :-
 hpRegen :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     class(_, IDTipe, MaxHP, _, _, _),
+    movementTick(CTick),
     HP < MaxHP, (
         IDTipe = 'swordsman',
         NewHP is HP + 2, !;
 
-        IDTipe = 'archer',
+        IDTipe = 'archer', 0 is mod(CTick,2), % Every 2 tick, hp regen
         NewHP is HP + 1, !;
 
         IDTipe = 'sorcerer',
@@ -465,18 +485,16 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest2(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
-    teleporter(X,Y), randomTeleport(X,Y), !;
+    stair(X,Y), moveNextFloor, !;
     shop(X,Y), clear, call(shop), clear, !;
-    (
-    \+shop(X,Y);
-    \+dragon(X,Y)
-    ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
+    % ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
-randomTeleport(X,Y) :-
-    randomize, width(W), height(H),
-    random(1, W, RAbsis), random(1, H, ROrdinat),
-    setLocation(RAbsis, ROrdinat), retract(teleporter(X,Y)).
+moveNextFloor :-
+    randomize, width(W), height(H), destroyMap, incrementFloor,
+    generateMap,
+    random(1, W, RAbsis), random(1, H, ROrdinat), % TODO : Floor
+    setLocation(RAbsis, ROrdinat).%, retract(stair(X,Y)).
 
 
 randomEncounter :-
@@ -492,10 +510,10 @@ clearFightStatus :-
 % Terminal raw mode input, non-blocking mode for more fluid play
 % Press m to back to command mode
 switchMove(X) :-
-    X is 119, w, manaRegen, hpRegen;
-    X is 97, a, manaRegen, hpRegen;
-    X is 115, s, manaRegen, hpRegen;
-    X is 100, d, manaRegen, hpRegen;
+    X is 119, w, movementTickEvaluate;
+    X is 97, a, movementTickEvaluate;
+    X is 115, s, movementTickEvaluate;
+    X is 100, d, movementTickEvaluate;
     X is 105, listInventory, prompt, clear, sideStatus, \+map;
     X is 99, drinkPot, prompt, clear, sideStatus, \+map;
     X > 0, clear, sideStatus, \+map.
@@ -509,8 +527,9 @@ toggleRawMode :-
     horizontalCursorAbsolutePosition(1), write('\33\[1D'), flush_output, toggleRawMode, !).
     % Press e to break
 
-
-
+movementTickEvaluate :-
+    incrementMovementTick,
+    manaRegen, hpRegen, !.
 
 
 
@@ -646,7 +665,7 @@ classScreen(X) :-
     write('┠─────────────────────────────────────────────────────────────────────────────────────────────────────────────┨'), nl,
     write('┃                \33\[31m\33\[1mHP\33\[m    180                        \33\[31m\33\[1mHP\33\[m    120                       \33\[31m\33\[1mHP\33\[m    150                   ┃'), nl,
     write('┃                \33\[36m\33\[1mMP\33\[m     50                        \33\[36m\33\[1mMP\33\[m     60                       \33\[36m\33\[1mMP\33\[m    100                   ┃'), nl,
-    write('┃                \33\[33m\33\[1mAtk\33\[m    17                        \33\[33m\33\[1mAtk\33\[m    13                       \33\[33m\33\[1mAtk\33\[m    15                   ┃'), nl,
+    write('┃                \33\[33m\33\[1mAtk\33\[m    17                        \33\[33m\33\[1mAtk\33\[m     7                       \33\[33m\33\[1mAtk\33\[m    15                   ┃'), nl,
     write('┃                \33\[35m\33\[1mDef\33\[m     5                        \33\[35m\33\[1mDef\33\[m     4                       \33\[35m\33\[1mDef\33\[m     2                   ┃'), nl,
     write('┃                \33\[32m\33\[2mCrit\33\[m   5%                        \33\[32m\33\[2mCrit\33\[m  16%                       \33\[32m\33\[2mCrit\33\[m   8%                   ┃'), nl,
     write('┃                \33\[37m\33\[2mDodge\33\[m  5%                        \33\[37m\33\[2mDodge\33\[m 15%                       \33\[37m\33\[2mDodge\33\[m 10%                   ┃'), nl,
@@ -777,6 +796,7 @@ questStatus :- % TODO : Extra, check quest print
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, _, _, Atk, Def, Lvl, _, Gold),
+    currentFloor(Floor),
     write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
     write('\33\[37m\33\[1m'),flush_output,
     write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'),
@@ -802,6 +822,8 @@ sideStatus :-
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, % TODO : Floor
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
+    write('┃ Floor   │ '), format('\33\[37m\33\[1m%10d',[Floor]), flush_output,  write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
     call(sideStatusQuest), call(playerHPBar), call(playerMPBar), call(playerXPBar),
     write('\33\[100A\33\[1000D'),flush_output.
@@ -853,6 +875,9 @@ playerHPBar :-
 	(
 		CurrentPercent >= 0, CurrentPercent < 11,
 		innerHPBar(CurrentPercent, Remain), !;
+
+        CurrentPercent < 0,
+		write('\33\[m\33\[31m\33\[2m██████████\33\[m'), !;
 
 		write('\33\[m\33\[31m\33\[1m██████████\33\[m'), !
 	),
@@ -1021,6 +1046,13 @@ isIDValid(X) :-
 prompt :-
     write('\33\[37m\33\[1mTekan sembarang tombol untuk melanjutkan\33\[m\n'),
     get_key_no_echo(user_input,_), !.
+
+incrementMovementTick :-
+    movementTick(X),
+    Rx is X + 1,
+    retract(movementTick(X)),
+    asserta(movementTick(Rx)).
+
 
 % doQuest(X,Y) :- % Single quest add
 %     player(Username), randomize, (shell('clear'), !; overwriteClear, !),

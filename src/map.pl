@@ -8,24 +8,50 @@ height(25).
 :- dynamic(quest/2).
 :- dynamic(dragon/2).
 :- dynamic(playerLocation/2).
-:- dynamic(teleporter/2).
+:- dynamic(stair/2).
 :- dynamic(questCount/3).
+:- dynamic(currentFloor/1).
 
 /*Random dragon and shop*/
 setInitialMap :-
     randomize,
-    width(W),
-    height(H),
-    random(40,W,Absis1),
-    random(20,H,Ordinat1),
+
     random(1,5,Absis2),
     random(1,5,Ordinat2),
-    asserta(dragon(Absis1, Ordinat1)),
     asserta(playerLocation(Absis2, Ordinat2)),
-    setQuest(3),
+    setQuest(2),
     asserta(questCount(3)),
-    setShop(3),
-    setTeleporter(1).
+    setShop(1),
+    setStair(1).
+
+generateMap :-
+    currentFloor(Floor), (
+        width(W), height(H),
+        Floor is 3, random(40,W,Absis1), random(20,H,Ordinat1),
+        asserta(dragon(Absis1, Ordinat1)), !;
+
+        Floor is 2, setQuest(1), setStair(1), !
+    ),
+    setShop(1).
+
+destroyMap :-
+    retract(shop(_,_)),
+    retract(stair(_,_)),
+    retractAllQuest.
+
+retractAllQuest :-
+    quest(X,Y),
+    retract(quest(X,Y)), retractAllQuest, !;
+    !.
+
+incrementFloor :-
+    currentFloor(X),
+    Rx is X + 1,
+    retract(currentFloor(X)),
+    asserta(currentFloor(Rx)).
+
+
+
 
 setQuest(X) :-
     X is 0;
@@ -49,16 +75,16 @@ setShop(X) :-
     X2 is X-1,
     setShop(X2),!.
 
-setTeleporter(X) :-
+setStair(X) :-
     X is 0;
     randomize,
     width(W),
     height(H),
     random(1, W, Absis),
     random(1, H, Ordinat),
-    asserta(teleporter(Absis, Ordinat)),
+    asserta(stair(Absis, Ordinat)),
     X2 is X-1,
-    setTeleporter(X2),!.
+    setStair(X2),!.
 % TODO : Non essential, double buffer
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
@@ -136,12 +162,12 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    /*Draw Teleporter*/
+    /*Draw stair*/
     X > 0,
     X < W+1,
     Y > 0,
     Y < H+1,
-    teleporter(X, Y), !,
+    stair(X, Y), !,
     write('\33\[37m\33\[2mx\33\[m'),
     flush_output,
     write('\33\[37m\33\[1m'),flush_output,

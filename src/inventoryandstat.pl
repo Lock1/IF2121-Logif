@@ -269,41 +269,42 @@ checkLevelUp :-
     special_skill(IDTipe, SkillName, ManaCost, SkillModifier),
     (
         IDTipe = 'swordsman',
-        HPGain is CurrentLvl + 20,
-        ManaGain is CurrentLvl + 5,
-        AtkGain is CurrentLvl//2 + 1,
-        DefGain is CurrentLvl//3 + 2,
-        CritGain is CurrentLvl//4,
-        DodgeGain is CurrentLvl//3,
-        ManaReduction is CurrentLvl//4 + 1,
-        ModifierGain is CurrentLvl//3 + 1;
+        HPGain is CurrentLvl + 2,
+        ManaGain is CurrentLvl + 3,
+        AtkGain is 1,
+        DefGain is 2,
+        NewCrit is CurrentLvl // 2 + 5,
+        NewDodge is CurrentLvl // 3 + 5,
+        ManaReduction is 1,
+        NewModifier is CurrentLvl // 2 + 10; % Heal 10, upgrade every 2 level
 
         IDTipe = 'archer',
-        HPGain is CurrentLvl + 15,
-        ManaGain is CurrentLvl + 6,
-        AtkGain is CurrentLvl//3 + 2,
-        DefGain is CurrentLvl//2 + 1,
-        CritGain is CurrentLvl//6 + 1,
-        DodgeGain is CurrentLvl//3 + 1,
-        ManaReduction is CurrentLvl//5 + 1,
-        ModifierGain is mod(CurrentLvl,2);
+        HPGain is CurrentLvl,
+        ManaGain is CurrentLvl + 1,
+        AtkGain is 2,
+        DefGain is 1,
+        NewCrit is CritChance + 1,
+        NewDodge is CurrentLvl // 2 + 15,
+        ManaReduction is 1,
+        NewModifier is CurrentLvl // 5 + 2; % Base 2 attack, upgrade every 5 level
 
         IDTipe = 'sorcerer',
-        HPGain is CurrentLvl + 16,
-        ManaGain is CurrentLvl + 10,
-        AtkGain is CurrentLvl//2 + 1,
-        DefGain is CurrentLvl//3 + 1,
-        CritGain is CurrentLvl//3,
-        DodgeGain is CurrentLvl//5 + 1,
-        ManaReduction is CurrentLvl//6 + 1,
-        ModifierGain is mod(CurrentLvl,2)
+        HPGain is CurrentLvl + 1,
+        ManaGain is CurrentLvl + 5,
+        AtkGain is 1,
+        DefGain is 1,
+        NewCrit is CurrentLvl // 2 + 8, % TODO : Non essential, complete integration of crit dodge
+        NewDodge is CurrentLvl // 3 + 10,
+        ManaReduction is 1,
+        NewModifier is CurrentLvl // 5 + 2 % Multiplier 2, upgrade every 5 level
     ),
     NewHP is CurrentHP + HPGain,
     NewMana is CurrentMana + ManaGain,
     NewAtk is CurrentAtk + AtkGain,
     NewDef is CurrentDef + DefGain,
-    NewCrit is CritChance + CritGain,
-    NewDodge is DodgeChance + DodgeGain,
+
+    CritGain is NewCrit - CritChance,
+    DodgeGain is NewDodge - DodgeChance,
 
     retract(critChance(CritChance)),
     asserta(critChance(NewCrit)),
@@ -322,7 +323,6 @@ checkLevelUp :-
 
     retract(special_skill(IDTipe, SkillName, ManaCost, SkillModifier)),
     NewManaCost is ManaCost - ManaReduction,
-    NewModifier is SkillModifier + ModifierGain,
     asserta(special_skill(IDTipe, SkillName, NewManaCost, NewModifier)),
 
     format('\n\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]),

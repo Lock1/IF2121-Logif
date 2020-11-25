@@ -6,7 +6,7 @@
 :- dynamic(special_skill/4).
 classInit :-
     asserta(class(1, swordsman, 180, 50, 17, 5)),
-    asserta(class(2, archer, 120, 60, 13, 4)),
+    asserta(class(2, archer, 120, 60, 7, 4)),
     asserta(class(3, sorcerer, 150, 100, 15, 2)),
 
     /* Special_Skill(class_type, nama skill, manacost, modifier) //parameters could change*/
