@@ -8,20 +8,16 @@
 
 ### Tentang Program
 - Release versi **1.0** menandai bahwa release tersebut adalah **program yang dikumpulkan** ketika deadline, tanpa perubahan.
-<!-- - Direkomendasikan untuk menggunakan versi Node.js yang sama dengan Node.js yang digunakan pada proses development.
-- Aplikasi terletak pada folder **my-app**. -->
+- **Tidak disarankan untuk menjalankan program menggunakan terminal gprolog pada windows.**
+- Program ini menggunakan fitur pergerakan kursor & coloring ANSI dan Unicode box-drawing character yang hanya dapat ditampilkan pada terminal yang mensupportnya.
+- Jika menggunakan terminal yang tidak mensupportnya, **sangat disarankan** untuk mendisable semua UI yang menggunakan kedua fitur diatas.
+- Program diuji dan didevelop dengan **WSL**.
+- Jalankan linux executable play untuk mencoba permainan, good luck have fun!
 
 
-<!-- ### Instalasi dan Menjalankan Aplikasi
-- Aplikasi dapat diinstall secara manual dengan mengetikkan command **npm install** diterminal windows pada folder **my-app**
-- Setelah terinstall, dapat digunakan command **npm start** untuk dev-build atau **serve -s build** untuk production-build.
-- Atau dapat menjalankan **install.bat** dan **run.bat** -->
-
-
-<!-- ### Style kode
-- Untuk backend karena tidak terbiasa dengan syntax umum javascript, digunakan style code yang mirip dengan java.
-- Seluruh kode
-- Indentasi dan penempatan bracket dijaga konsisten. -->
+### Style kode
+- Program ini menggunakan camel-case, dikarenakan tidak mengetahui prolog menggunakan snake-case.
+- Kode blok **or** yang besar, digunakan indentasi dan bracket untuk memperjelas kode.
 
 ## Snapshot
 
@@ -35,21 +31,20 @@
 <!-- **Main Menu** \
 ![Main Menu](/src/readme/mainmenu.gif) \
 
-**Gauss-Jordan Elimination** \
-![Gauss Jordan Elimination](/src/readme/gjelimination.gif) -->
 
 
 ## Informasi Dasar
-<!-- Data                 | Isi
+Data                 | Isi
 ----                 | ---
 Tahun Ajaran         | 2021
-Tanggal Mulai        | 31 Oktober 2020
-Tanggal Selesai      | 15 November 2020
-Tanggal Pengumpulan  | 16 November 2020
+Tanggal Mulai        | 9 November 2020
+Tanggal Selesai      | 25 November 2020
+Tanggal Pengumpulan  | 27 November 2020
 Kelas                | 2
-Dosen                | Rinaldi Munir
-Asisten              | Michael Hans
-Kelompok             | 26 -->
+Dosen                | Fariska Zakhralativa Ruskanda
+Asisten              | **TBA**
+Nama Kelompok        | send help
+Kelompok             | 6
 
 
 **Anggota Kelompok**
@@ -62,47 +57,62 @@ NIM      | Nama
 
 
 **Tools yang digunakan**
-<!-- Komponen      | Menggunakan
---------      | -----------
-Node.js       | 15.0.1
-Firebase      | Cloud Database    -->
+Komponen                      | Menggunakan
+--------                      | -----------
+Windows Subsystem for Linux   | 2
+Ubuntu                        | 20.04
+GNU/Prolog                    | 1.4.5
+Ascgen2                       | 2.0.0
 
 
 **Dependencies**
-<!-- Komponen    | Menggunakan
---------    | -----------
-React       | 17.0.1
-Bootstrap   | 4.5.3
-Material-UI | 4.11
-SastrawiJS  | 1.0.3 -->
+Program ini tidak membutuhkan library eksternal.
+Seluruh program dikoding menggunakan 
+fitur standard GNU/Prolog.
 
 
 ## Spesifikasi
-<!-- **Status : Done** :green_square: \
-**9 / 9**
+**Status : Done** :green_square: \
+**10 / 10**
 Spesifikasi               | Status
 -----------               | ------
-File I/O                  | :green_square:
-Firebase GET POST Request | :green_square:
-Database processing       | :green_square:
-Stemming                  | :green_square:
-Stopwords stripping       | :green_square:
-String processing         | :green_square:
-Query processing          | :green_square:
-Front-end                 | :green_square:
-Front-end integration     | :green_square: -->
+Character & Class system  | :green_square:
+Map & Draw procedure      | :green_square:
+Inventory                 | :green_square:
+Items                     | :green_square:
+Enemy                     | :green_square:
+Quest                     | :green_square:
+Exploration Mechanism     | :green_square:
+Battle Mechanism          | :green_square:
+Store                     | :green_square:
+Goal & Fail state         | :green_square:
 
 
-<!-- **Bonus** \ -->
-<!-- **Status : Done** :green_square:
+**Bonus** \
+**Status : **Pending** :yellow_square:
 Spesifikasi   | Status
 -----------   | ------
-HTML Scrapper | :green_square: -->
+Effect Potion | :green_square:
+Monster Zone  | :yellow_square:
+Teleport      | :yellow_square:
+Save & Load   | :yellow_square:
+
+
+
+**Extras** 
+Spesifikasi           | Status
+-----------           | ------
+Raw movement mode     | :green_square:
+Basic map UI          | :green_square:
+Critical & Dodge Stat | :green_square:
+Balancing             | :orange_square:
+Equipment UI          | :yellow_square:
 
 
 ## Laporan
+**TBA**
 <!-- **Status : Done** :green_square: \
-**6 / 6**
+**0 / 6**
 Bab                   | Status
 ---                   | ------
 Deskripsi Masalah     | :green_square:
