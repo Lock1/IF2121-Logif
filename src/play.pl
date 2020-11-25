@@ -10,12 +10,11 @@
 */
 
 % Load file yang dibutuhkan
-:- include('facts.pl').
 :- include('config.pl').
 :- include('map.pl').
 :- include('battle.pl').
 :- include('shop.pl').
-:- include('infoplayer.pl').
+:- include('inventoryandstat.pl').
 
 % Inisialisasi Dynamic Predicate
 :- dynamic(questList/2).
@@ -45,7 +44,7 @@ main :-
         IsUnicodeMode is 1,
         shell('clear'),
         first_screen,
-        help(IsUnicodeMode),
+        titleHelp,
         printRandomizedTrivia,
         loadingBar(1), nl,
         gameLoop;
@@ -65,6 +64,10 @@ gameLoop :-
         X = 'help', call(help(IsUnicodeMode));
         X = 'clear', call(clear);
         X = 'quit', call(quit);
+
+        X = 'h', call(help(IsUnicodeMode));
+        X = 'c', call(clear);
+        X = 'q', call(quit);
 
         isGameStarted(_), (
             X = 'map', \+map, write('\33\[m'), flush_output;
@@ -105,6 +108,16 @@ gameLoop :-
 errorMessage :-
     write('Error : Input tidak dipahami\n'), halt.
 
+
+
+
+
+
+
+
+
+
+
 /* ------------------------- Commands -------------------------- */
 /* User accessible commands
 start.
@@ -120,13 +133,24 @@ w. a. s. d.
 
 start :-
     isGameStarted(_),
-    write('Gamenya sudah dimulai bambank!'), nl.
+    write('Gamenya sudah dimulai bambank!'), nl, !;
 
-start :-
     \+isGameStarted(_),
     asserta(isGameStarted(1)),
     username_input,
-    choose_class.
+    choose_class, !.
+
+move :-
+    clear,
+    sideStatus,
+    \+map,
+    write('Tekan e untuk command mode                  '), nl,
+
+    toggleRawMode,
+    write('\33\[m'),
+    flush_output,
+    % clear,
+    write('Telah Kembali ke command mode'), nl.
 
 status :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -149,92 +173,83 @@ status :-
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl,
     questStatus.
 
-questStatus :- % TODO : Extra, check quest print
-    questList(ID,Ct), % FIXME : Extra, status battle
-    monster(ID,Name,_,_,_,_),
-    write('\33\[37m\33\[1m'),flush_output,
-    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
-    write( '┃  Monster  │ Count ┃\n'),
-    write( '┠───────────┼───────┨\n'),
-    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
-    write('\33\[37m\33\[1m'),flush_output,
-    write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
-    % TODO : Non essential, Filter input 'a,b'
+deleteItemInventory :-
+    listInventory,
+    write('Tulis ID item yang ingin dihapus\n'),
+    write('\33\[32m\33\[1mDelete >> \33\[m'),
+    catch(read(ItemID), error(_,_), errorMessage),
+    (
+        currentWeapon(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
+        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
 
-sideStatus :-
-    statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
-    write('\33\[37m\33\[1m'),flush_output,
-    write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[1B'),flush_output,
-    write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[2B'),flush_output,
-    write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[3B'),flush_output,
-    write('┃ HP / MP │  '),
-    format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
-    write(' / '),
-    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output,
-    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
-    write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
-    write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
-    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
-    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
-    write('┃ Gold    │ '),
-    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
-    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
-    write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
-    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    call(sideStatusQuest),
-    write('\33\[100A\33\[1000D'),flush_output.
+        currentArmor(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
+        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
 
-sideStatusQuest :-
-    findall(A,questList(A,_),L),
-    length(L,_),
-    % Location is Size + 12,
-    questList(ID,Ct),
-    monster(ID,Name,_,_,_,_),
+        currentMisc(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
+        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
+        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
 
-    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Extra, Create name list
-    write('\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
-    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
-    write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
-    write( '┃  Monster  │ Count ┃\n'),
-    write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
-    write( '┠───────────┼───────┨\n'),
-    write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
-    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
-    write('\33\[37m\33\[1m'),flush_output,
-    write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
-    write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
-    write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
-    write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.');
-    % format('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Location]),flush_output,
+        delItem(ItemID)
+    ), !.
 
-    write('\33\[100A\33\[1000D\33\[62C\33\[9B'),flush_output,
-    write('Tidak ada quest').
+drinkPot :-
+    inventoryP(_,_,_,_),
+    listPotion,
+    write('Masukkan ID Potion \n\33\[32m\33\[1mDrink >> \33\[m'),
+    catch(read(X), error(_,_), errorMessage), get_key_no_echo(_),
+    usePotion(X), !;
+    write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n\n'), !.
 
-% sideStatusQuestInner(I,Size,Name,Ct) :-
-%     I is Size;
-%     Index is I + 11,
-%     write('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Index]),flush_output,
-%     format('┃ \33\[31m\33\[1m%-7s\33\[m │ %5d ┃\n',[Name,Ct]).
+equipItem :-
+    listItem,
+    write('Masukkan ID item yang akan diequip, \n\33\[32m\33\[1mEquip >> \33\[m'),
+    catch(read(X), error(_,_), errorMessage),
+    equip(X).
 
-% TODO : Extra, inventory sidebar
+listInventory :-
+    listItem,
+    listPotion.
+
+greedisgood :-
+    write('\33\[33m\33\[1mResource granted\33\[m\n'),
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewXP is XP + 1000,
+    NewGold is Gold + 1000,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
+    get_key_no_echo(_),
+    checkLevelUp, !.
+
+whosyourdaddy :-
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    Atk >= 100000,
+    NewAtk is 20,
+    NewDef is 5,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+    write('\33\[31m\33\[1mGod mode deactivated\33\[m\n'), !;
+
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    Atk < 100000,
+    NewAtk is 100000,
+    NewDef is 100000,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+    write('\33\[33m\33\[1mGod mode activated\33\[m\n'), !.
+
+hesoyam :-
+    write('\33\[37m\33\[1mCheat activated\33\[m\n'),
+    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    NewDef is 999,
+    NewHP is 999,
+    NewGold is Gold + 1000,
+    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, NewDef, Lvl, XP, NewGold)), !.
+
 clear :-
     shell('clear').
-
-overwriteClear :-
-    write('\33\[0,0H'),
-    write('\33\[200A'),
-    flush_output,
-    screenWipe(28),
-    write('\33\[200A'),
-    flush_output, !.
 
 quit :-
     \+isGameStarted(_),
@@ -242,6 +257,9 @@ quit :-
 
 quit :-
     write('Yah masa baru segini quit sih, lemah!!!!'), nl, halt.
+
+
+
 
 
 /* ----------------------- Decision branch ---------------------- */
@@ -274,9 +292,6 @@ choose_class :-
     isIDValid(ClassID),!;
     choose_class.
 
-isIDValid(X) :-
-    integer(X), X=<3.
-
 username_input :-
     unicode(IsUnicodeMode),
     write('Hello, fellow \33\[32m\33\[1nadventurer\33\[m! Welcome to our \33\[33mtavern\33\[m!'), nl,
@@ -289,27 +304,11 @@ username_input :-
     sleep(1),
     classScreen(IsUnicodeMode).
 
-% doQuest(X,Y) :- % Single quest add
-%     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
-%     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
-%     random(1,500,Rmv),
-%     Mnstr is mod(Rmv, 6) + 1,
-%     random(1,1000,Rv),
-%     Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
-%     format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
-%     (
-%         questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
-%         asserta(questList(Mnstr,Cnt)), !
-%     ),
-%     retract(quest(X,Y)),
-%     prompt,
-%     (shell('clear'), !; overwriteClear, !).
-
 doQuest2(X,Y) :-
     \+ isQuest(_),
     player(Username), randomize, clear,
     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
-    generateRandomTriplet(P),
+    generateUniqueTriplet(P),
     P = [A,B,C],
     Mnstr is A,
     Mnstr2 is B,
@@ -333,54 +332,7 @@ doQuest2(X,Y) :-
 
     clear,
     write('\33\[31m\33\[1mTidak\33\[m dapat mengambil quest, selesaikan quest berikut terlebih dahulu.\n'),
-    questStatus, prompt, clear, !.
-
-generateRandomTriplet(L) :-
-    randomize,
-    random(1,4,Rmv),
-    R2 is Rmv + 1,
-    random(R2,5,Rmv2),
-    R3 is Rmv2 + 1,
-    random(R3,6,Rmv3),
-    L = [Rmv,Rmv2,Rmv3].
-
-
-greedisgood :-
-    write('\33\[33m\33\[1mResource granted\33\[m\n'),
-    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    NewXP is XP + 1000,
-    NewGold is Gold + 1000,
-    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
-    get_key_no_echo(_),
-    checkLevelUp, !.
-
-whosyourdaddy :-
-    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    Atk >= 100000,
-    NewAtk is 20,
-    NewDef is 5,
-    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
-    write('\33\[31m\33\[1mGod mode deactivated\33\[m\n'), !;
-
-    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    Atk < 100000,
-    NewAtk is 100000,
-    NewDef is 100000,
-    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
-    write('\33\[33m\33\[1mGod mode activated\33\[m\n'), !.
-
-
-hesoyam :-
-    write('\33\[37m\33\[1mCheat activated\33\[m\n'),
-    statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    NewDef is 999,
-    NewHP is 999,
-    NewGold is Gold + 1000,
-    retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
-    asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, NewDef, Lvl, XP, NewGold)), !.
+    call(questStatus), prompt, clear, !.
 
 manaRegen :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -424,27 +376,6 @@ hpRegen :-
     asserta(statPlayer(IDTipe, Nama, NewHP, Mana, Atk, Def, Lvl, XP, Gold)), !;
     !.
 
-deleteItemInventory :-
-    listInventory,
-    write('Tulis ID item yang ingin dihapus\n'),
-    write('\33\[32m\33\[1mDelete >> \33\[m'),
-    catch(read(ItemID), error(_,_), errorMessage),
-    (
-        currentWeapon(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
-        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
-        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
-
-        currentArmor(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
-        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
-        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
-
-        currentMisc(ItemID), findall(ItemID,inventory(ItemID,_,_,_,_,_), L),
-        length(L,N), N = 1, inventory(ItemID,_,_,ItemN,_,_),
-        format('\33\[33m\33\[1m%s\33\[m masih diequip.\n', [ItemN]), !;
-
-        delItem(ItemID)
-    ), !.
-
 victory :-
     write('\33\[32m\33\[1m'), % ANSI Formatting
     flush_output,
@@ -457,7 +388,24 @@ victory :-
     flush_output, sleep(1),
     halt.
 
-% TODO : Split class level up
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* -------------------------- Movement -------------------------- */
 w :-
     playerLocation(TPX,TPY),
@@ -528,10 +476,6 @@ clearFightStatus :-
     retract(isFighting(_));
     retract(isRun(_));!.
 
-prompt :-
-    write('\33\[37m\33\[1mTekan sembarang tombol untuk melanjutkan\33\[m\n'),
-    get_key_no_echo(user_input,_), !.
-
 % Terminal raw mode input, non-blocking mode for more fluid play
 % Press m to back to command mode
 switchMove(X) :-
@@ -542,18 +486,6 @@ switchMove(X) :-
     X is 105, listInventory, prompt, clear, sideStatus, \+map;
     X > 0, clear, sideStatus, \+map.
 
-move :-
-    clear,
-    sideStatus,
-    \+map,
-    write('Tekan e untuk command mode                  '), nl,
-
-    toggleRawMode,
-    write('\33\[m'),
-    flush_output,
-    % clear,
-    write('Telah Kembali ke command mode'), nl.
-
 toggleRawMode :-
     get_key_no_echo(user_input,X),
     % overwriteClear,
@@ -562,6 +494,23 @@ toggleRawMode :-
     (X is 101, !;  switchMove(X), write('Tekan e untuk command mode                 '), nl,
     horizontalCursorAbsolutePosition(1), write('\33\[1D'), flush_output, toggleRawMode, !).
     % Press e to break
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ----------------------- Draw procedure ----------------------- */
 % Layar pertama ketika dijalankan
@@ -583,12 +532,13 @@ first_screen :-
     write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝\33\[m'), nl,
     flush_output.
 
+
 help(X) :-
     X is 1,
     write('\33\[37m\33\[1m'), % Help ANSI Formatting
     write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
     write('│   ┎─────────────────────────────────────────────┒    │ '), nl,
-    write('│   ┃  start.     : Memulai petualanganmu         ┃    │ '), nl,
+    % write('│   ┃  start.     : Memulai petualanganmu         ┃    │ '), nl,
     write('│   ┃  map.       : Menampilkan peta              ┃    │ '), nl,
     write('│   ┃  status.    : Menampilkan kondisi saat ini  ┃    │ '), nl,
     write('│   ┃  inventory. : Menampilkan barang            ┃    │ '), nl,
@@ -600,6 +550,7 @@ help(X) :-
     write('│   ┃  clear.     : Membersihkan layar            ┃    │ '), nl,
     write('│   ┖─────────────────────────────────────────────┚    │ '), nl,
     write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
+    write('Command dapat di ketik dengan inisial saja.'), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl,
     write('\33\[m');
 
@@ -617,6 +568,27 @@ help(X) :-
     write('|   +----------------------------------------------+     | '), nl,
     write('+--------------------------------------------------------+ '), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl.
+
+
+titleHelp :-
+    write('\33\[37m\33\[1m'), % Help ANSI Formatting
+    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
+    write('│   ┎─────────────────────────────────────────────┒    │ '), nl,
+    write('│   ┃  start.     : Memulai petualanganmu         ┃    │ '), nl,
+    % write('│   ┃  map.       : Menampilkan peta              ┃    │ '), nl,
+    % write('│   ┃  status.    : Menampilkan kondisi saat ini  ┃    │ '), nl,
+    % write('│   ┃  inventory. : Menampilkan barang            ┃    │ '), nl,
+    % write('│   ┃  equip.     : Menggunakan item              ┃    │ '), nl,
+    % write('│   ┃  delete.    : Menghapus barang              ┃    │ '), nl,
+    % write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
+    % write('│   ┃  move.      : Masuk ke mode movement        ┃    │ '), nl,
+    write('│   ┃  help.      : Menampilkan bantuan           ┃    │ '), nl,
+    % write('│   ┃  clear.     : Membersihkan layar            ┃    │ '), nl,
+    write('│   ┖─────────────────────────────────────────────┚    │ '), nl,
+    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
+    write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl,
+    write('\33\[m').
+
 
 classScreen(X) :-
     X is 1,
@@ -677,17 +649,7 @@ classScreen(X) :-
 
 
 
-screenWipe(X) :-
-    X is 0;
-    flush_output,
-    write('                                                       '), nl,
-    Rx is X-1, screenWipe(Rx).
 
-lineWipeAtPlayer :-
-    playerLocation(_,Y), NegY is Y * (-1),
-    format('\33\[u\33\[100A\33\[100C\33\[%dB',[NegY]), flush_output,
-    write('                                          '),
-    write('\33\[s').
 
 
 % Loading bar
@@ -775,7 +737,6 @@ horizontalCursorAbsolutePosition(X) :-
     horizontalCursorRightMove(X).
 
 
-
 % Trivia selector
 printRandomizedTrivia :-
     triviaList(TList),
@@ -785,15 +746,100 @@ printRandomizedTrivia :-
     Index is mod(RandomResult,ListSize),
     listSelect(TList,Index,Trivia),
     write(Trivia), nl.
+% UI Drawer
+questStatus :- % TODO : Extra, check quest print
+    questList(ID,Ct), % FIXME : Extra, status battle
+    monster(ID,Name,_,_,_,_),
+    write('\33\[37m\33\[1m'),flush_output,
+    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
+    write( '┃  Monster  │ Count ┃\n'),
+    write( '┠───────────┼───────┨\n'),
+    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
+    write('\33\[37m\33\[1m'),flush_output,
+    write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
+    % TODO : Non essential, Filter input 'a,b'
 
-listLength(L,R) :-
-    L = [], R is 0;
-    L = [_|Y], listLength(Y,Rx), R is Rx + 1.
+sideStatus :-
+    statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
+    write('\33\[37m\33\[1m'),flush_output,
+    write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[1B'),flush_output,
+    write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[2B'),flush_output,
+    write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[3B'),flush_output,
+    write('┃ HP / MP │  '),
+    format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
+    write(' / '),
+    format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output,
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
+    write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
+    write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
+    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
+    write('┃ Gold    │ '),
+    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
+    write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
+    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
+    call(sideStatusQuest),
+    write('\33\[100A\33\[1000D'),flush_output.
 
-listSelect(L,I,E) :-
-    L = [X], I is 0, E = X;
-    L = [Y|_], I is 0, E = Y;
-    L = [_|B], Ri is I-1, listSelect(B,Ri,Re), E = Re, !.
+sideStatusQuest :-
+    findall(A,questList(A,_),L),
+    length(L,_),
+    % Location is Size + 12,
+    questList(ID,Ct),
+    monster(ID,Name,_,_,_,_),
+
+    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Extra, Create name list
+    write('\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
+    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
+    write( '┃  Monster  │ Count ┃\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
+    write( '┠───────────┼───────┨\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
+    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
+    write('\33\[37m\33\[1m'),flush_output,
+    write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
+    write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
+    write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
+    write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.');
+    % format('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Location]),flush_output,
+
+    write('\33\[100A\33\[1000D\33\[62C\33\[9B'),flush_output,
+    write('Tidak ada quest').
+
+% sideStatusQuestInner(I,Size,Name,Ct) :-
+%     I is Size;
+%     Index is I + 11,
+%     write('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Index]),flush_output,
+%     format('┃ \33\[31m\33\[1m%-7s\33\[m │ %5d ┃\n',[Name,Ct]).
+
+% TODO : Extra, inventory sidebar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -823,3 +869,69 @@ write_on_file(File, Text) :-
     /*open(File, appen, Stream), file will not get overwritten*/
     write(Stream, Text), nl,
     close(Stream).
+
+
+
+
+
+/* ------------------ Misc side function ------------------- */
+screenWipe(X) :-
+    X is 0;
+    flush_output,
+    write('                                                       '), nl,
+    Rx is X-1, screenWipe(Rx).
+
+lineWipeAtPlayer :-
+    playerLocation(_,Y), NegY is Y * (-1),
+    format('\33\[u\33\[100A\33\[100C\33\[%dB',[NegY]), flush_output,
+    write('                                          '),
+    write('\33\[s').
+
+overwriteClear :-
+    write('\33\[0,0H'),
+    write('\33\[200A'),
+    flush_output,
+    screenWipe(28),
+    write('\33\[200A'),
+    flush_output, !.
+
+generateUniqueTriplet(L) :- % Unique triplet
+    randomize,
+    random(1,4,Rmv),
+    R2 is Rmv + 1,
+    random(R2,5,Rmv2),
+    R3 is Rmv2 + 1,
+    random(R3,6,Rmv3),
+    L = [Rmv,Rmv2,Rmv3].
+
+listLength(L,R) :-
+    L = [], R is 0;
+    L = [_|Y], listLength(Y,Rx), R is Rx + 1.
+
+listSelect(L,I,E) :-
+    L = [X], I is 0, E = X;
+    L = [Y|_], I is 0, E = Y;
+    L = [_|B], Ri is I-1, listSelect(B,Ri,Re), E = Re, !.
+
+isIDValid(X) :-
+    integer(X), X=<3.
+
+prompt :-
+    write('\33\[37m\33\[1mTekan sembarang tombol untuk melanjutkan\33\[m\n'),
+    get_key_no_echo(user_input,_), !.
+
+% doQuest(X,Y) :- % Single quest add
+%     player(Username), randomize, (shell('clear'), !; overwriteClear, !),
+%     format('Hello, \33\[32m\33\[1m%s\33\[m! \33\[33m\33\[1mIt\'s time for some adventure!\33\[m\n', [Username]),
+%     random(1,500,Rmv),
+%     Mnstr is mod(Rmv, 6) + 1,
+%     random(1,1000,Rv),
+%     Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
+%     format('You have to slain \33\[31m\33\[1m%d %s\33\[m\n',[Cnt, Name]),
+%     (
+%         questList(Mnstr,OldCt), NewCt is OldCt + Cnt, retract(questList(Mnstr,_)), asserta(questList(Mnstr,NewCt)), !;
+%         asserta(questList(Mnstr,Cnt)), !
+%     ),
+%     retract(quest(X,Y)),
+%     prompt,
+%     (shell('clear'), !; overwriteClear, !).
