@@ -105,7 +105,7 @@ run :-
 	!;
 	/*********Mau Lari tapi udah berhadapan dengan musuh******/
 	isRun(_),
-	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl. % FIXME : Extra, multiple run
+	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl.
 
 /*******************FIGHT********************/
 /********Belum ketemu musuh*********/
@@ -164,7 +164,7 @@ attackComment :-
 	checkLevelUp,
 	write('\33\[37m\33\[2mTekan sembarang tombol mengakhiri battle\33\[m\n'),
 	get_key_no_echo(_), !.
-% TODO : Extra, auto fight for qol
+% TODO : Non essential, auto fight for qol
 /********Belum ketemu musuh*********/
 normalAttack :-
 	\+ isEnemyAlive(_),
@@ -241,7 +241,6 @@ attack :-
 	% Miss branch
 	write('\33\[31m\33\[1mMiss!\33\[m\n'), !.
 
-% TODO : Player HP Cap
 
 /**********************ATTACK MUSUH***********************/
 /********Comment kalau pemain masih belum kalah********/
@@ -407,7 +406,7 @@ multipleAttack(N) :-
 	N is 0, !;
 	attack, Rn is N - 1, multipleAttack(Rn), !.
 
-specialAttack :- % FIXME : Heal Potion HP Cap
+specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
 	enemy(_,EnemyN,_,_,_,_),
@@ -415,7 +414,7 @@ specialAttack :- % FIXME : Heal Potion HP Cap
 	NewMana is Mana - SMana,
 	(
 		NewMana >= 0,
-		( % TODO : Extra, cooldown
+		( % TODO : Non essential, cooldown
 			Class = 'swordsman',
 			TotalHeal is SkillModifier,
 			class(_,Class,MaxHP,_,_,_),

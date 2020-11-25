@@ -21,7 +21,7 @@
 :- dynamic(isGameStarted/1).
 :- dynamic(player/1).
 :- dynamic(isQuest/1).
-:- dynamic(critChance/1). % TODO : Extra, add crit chance status data
+:- dynamic(critChance/1).
 :- dynamic(dodgeChance/1).
 :- dynamic(hitChance/1). % Internal "dodge" value for enemies
 :- dynamic(movementTick/1).
@@ -31,7 +31,7 @@ unicode(1). % Secara default, program ditargetkan untuk mode unicode
 
 % Inisialisasi program
 :- initialization(main).
-% TODO : Non essential, balancing
+
 /* ------------------------- Core Loop -------------------------- */
 main :-
     unicode(IsUnicodeMode),
@@ -94,9 +94,9 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            % X = 'y', call(addItem(6));
-            % X = 'y', call(addItem(102));
-            % X = 'y', call(addItem(5));
+            X = 'y', call(addItem(6));
+            X = 'y', call(addItem(102));
+            X = 'y', call(addItem(5));
 
 
             % Super-obscure-feature
@@ -160,23 +160,26 @@ move :-
 
 status :-
     statPlayer(TipeKelas, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    critChance(CritChance), dodgeChance(DodgeChance),
     write('\33\[37m\33\[1m'),flush_output,
-    write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'), nl,
-    write('┃ Name    │ '), format('%10s',[Nama]), write(' ┃'), nl,
-    write('┃ Class   │ '), format('%10s',[TipeKelas]), write(' ┃'), nl,
-    write('┃ HP / MP │  '),
+    write('┏━━━━━━━━━━┯━━━━━━━━━━━━┓'), nl,
+    write('┃ Name     │ '), format('%10s',[Nama]), write(' ┃'), nl,
+    write('┃ Class    │ '), format('%10s',[TipeKelas]), write(' ┃'), nl,
+    write('┃ HP / MP  │  '),
     format('\33\[31m\33\[1m%3d\33\[m',[HP]),flush_output,
     write(' / '),
     format('\33\[36m\33\[1m%3d\33\[m',[Mana]), flush_output,
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
-    write('┃ Attack  │ '), format('%10d',[Atk]), write(' ┃'), nl,
-    write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'), nl,
-    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
+    write('┃ Attack   │ '), format('%10d',[Atk]), write(' ┃'), nl,
+    write('┃ Defense  │ '), format('%10d',[Def]), write(' ┃'), nl,
+    write('┃ Lv / XP  │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
-    write('┃ Gold    │ '),
+    write('┃ Gold     │ '),
     format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
-    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl, % TODO : Add crit dodge
-    write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'), nl,
+    write('\33\[37m\33\[1m'),flush_output, write(' ┃'), nl,
+    write('┃ Critical │ '), format('%9d',[CritChance]), write('% ┃'), nl,
+    write('┃ Dodge    │ '), format('%9d',[DodgeChance]), write('% ┃'), nl,
+    write('┗━━━━━━━━━━┷━━━━━━━━━━━━┛\33\[m'), nl,
     questStatus.
 
 deleteItemInventory :-
@@ -294,14 +297,20 @@ choose_class :-
     (
         ClassID =:= 1,
         write('You have chosen \33\[31m\33\[1mSwordsman\33\[m'), nl,
+        asserta(currentWeapon(104)), asserta(currentArmor(107)), asserta(currentMisc(110)),
+        addItem(104), addItem(107), addItem(110),
         asserta(critChance(5)), asserta(dodgeChance(5)), asserta(hitChance(80));
 
         ClassID =:= 2,
         write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl,
+        asserta(currentWeapon(105)), asserta(currentArmor(108)), asserta(currentMisc(111)),
+        addItem(105), addItem(106), addItem(111),
         asserta(critChance(16)), asserta(dodgeChance(15)), asserta(hitChance(90)); % TODO : Non essential, complete integration of crit dodge
 
         ClassID =:= 3,
         write('You have chosen \33\[36m\33\[1mSorcerer\33\[m'), nl,
+        asserta(currentWeapon(106)), asserta(currentArmor(109)), asserta(currentMisc(112)),
+        addItem(106), addItem(109), addItem(112),
         asserta(critChance(8)), asserta(dodgeChance(10)), asserta(hitChance(85))
 
     ) -> (write('\nYou may begin your journey.\n'),\+map, write('\33\[m'), flush_output,
@@ -573,7 +582,6 @@ first_screen :-
     write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝\33\[m'), nl,
     flush_output.
 % TODO : Non essential, Add class color at sidebar
-% TODO : Extra, Add equipment or something on sidebar for more boxy
 
 help(X) :-
     X is 1,
@@ -827,13 +835,13 @@ sideStatus :-
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
     write('┃ Gold    │ '),
-    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, % TODO : Floor
+    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
     write('┃ Floor   │ '), format('\33\[37m\33\[1m%10d',[Floor]), flush_output,  write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    call(sideStatusQuest), call(playerHPBar), call(playerMPBar), call(playerXPBar),
+    call(sideStatusQuest), call(playerHPBar), call(playerMPBar), call(playerXPBar), call(inventoryUI),
     write('\33\[100A\33\[1000D'),flush_output.
 
 sideStatusQuest :-
@@ -843,7 +851,7 @@ sideStatusQuest :-
     questList(ID,Ct),
     monster(ID,Name,_,_,_,_),
 
-    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Extra, Create name list
+    % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P),
     write('\33\[37m\33\[1m\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
     write( '┏━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
@@ -856,7 +864,7 @@ sideStatusQuest :-
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
     write( '┗━━━━━━━━━━━━━━┷━━━━━━━┛\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
-    write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.'), !;
+    write('\33\[mCek \33\[33mstatus.\33\[m untuk quest lengkap.'), !;
     % format('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Location]),flush_output,
 
     write('\33\[100A\33\[1000D\33\[62C\33\[9B'),flush_output,
@@ -897,8 +905,8 @@ playerHPBar :-
 	),
     write('\33\[100A\33\[100D\33\[69C\33\[2B'), flush_output,
 	write('\33\[37m\33\[1m╚════╩════════════╩═══════════╝\n').
-% TODO : XP Bar
-% TODO : Max Cap system
+
+
 playerMPBar :-
 	statPlayer(TipeKelas, _,_, CurrentMana, _, _, _, _, _),
 	class(_, TipeKelas, _, DefaultMaxMana, _, _),
@@ -966,8 +974,24 @@ innerXPBar(C,M) :-
 	!.
 
 
-
-
+inventoryUI :-
+    currentWeapon(WeID), currentArmor(ArID), currentMisc(MiID),
+    item(WeID, _, _, WeName, _, _),
+    item(ArID, _, _, ArName, _, _),
+    item(MiID, _, _, MiName, _, _),
+    write('\33\[1000A\33\[1000D\33\[86C\33\[9B'), flush_output,
+    write('\33\[37m\33\[1m╔════════╦════════════════════╗'),
+    write('\33\[1000A\33\[1000D\33\[86C\33\[10B'), flush_output,
+    (
+        WeID > 100, WeID < 104, write('║ Weapon ║ '), format('\33\[33m\33\[1m%18s\33\[m \33\[37\33\[1m║',[WeName]), !;
+        write('║ Weapon ║ '), format('%18s ║',[WeName]), !
+    ),
+    write('\33\[1000A\33\[1000D\33\[86C\33\[11B'), flush_output,
+    write('║ Armor  ║ '), format('%18s ║',[ArName]),
+    write('\33\[1000A\33\[1000D\33\[86C\33\[12B'), flush_output,
+    write('║ Misc   ║ '), format('%18s ║',[MiName]),
+    write('\33\[1000A\33\[1000D\33\[86C\33\[13B'), flush_output,
+    write('╚════════╩════════════════════╝').
 
 
 

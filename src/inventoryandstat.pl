@@ -57,7 +57,7 @@ delItem(ItemID) :-
 
 
 % --- Equip and using potion ----
-equip(ItemID) :- % TODO : Extra, Inv sidebar
+equip(ItemID) :-
     currentWeapon(A),
     (ItemID =< 9, ItemID > 0, !; ItemID > 100, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
@@ -97,10 +97,9 @@ equip(ItemID) :- % TODO : Extra, Inv sidebar
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID, Tipe, _, Name, WAtk, ADef),
     inventory(C,_,_,OldName,OldAtk,OldDef),
-    ( % TODO : Power pot
-    % TODO : Layer mode
-    % TODO : Equipment awal
-        retract(currentMisc(C)), % TODO : Inventory bar
+    (
+    % TODO : Extra, Power pot
+        retract(currentMisc(C)),
         asserta(currentMisc(ItemID)),
         NewAtk is Atk - OldAtk + WAtk,
         NewDef is Def - OldDef + ADef,
@@ -269,7 +268,7 @@ checkLevelUp :-
     special_skill(IDTipe, SkillName, ManaCost, SkillModifier),
     (
         IDTipe = 'swordsman',
-        HPGain is CurrentLvl + 2,
+        HPGain is CurrentLvl + 16,
         ManaGain is CurrentLvl + 3,
         AtkGain is 1,
         DefGain is 2,
@@ -279,7 +278,7 @@ checkLevelUp :-
         NewModifier is CurrentLvl // 2 + 10; % Heal 10, upgrade every 2 level
 
         IDTipe = 'archer',
-        HPGain is CurrentLvl,
+        HPGain is CurrentLvl + 10,
         ManaGain is CurrentLvl + 1,
         AtkGain is 2,
         DefGain is 1,
@@ -289,7 +288,7 @@ checkLevelUp :-
         NewModifier is CurrentLvl // 5 + 2; % Base 2 attack, upgrade every 5 level
 
         IDTipe = 'sorcerer',
-        HPGain is CurrentLvl + 1,
+        HPGain is CurrentLvl + 13,
         ManaGain is CurrentLvl + 5,
         AtkGain is 1,
         DefGain is 1,

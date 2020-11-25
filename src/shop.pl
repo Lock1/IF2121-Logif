@@ -129,7 +129,7 @@ gacha:-
     %     Peluang =< 7000, Peluang > 5500,
     %     nth(3, L, X);
     %
-    %     Peluang < 10000, Peluang > 7000, % FIXME : Taking Quest but back to command mode causing some problem
+    %     Peluang < 10000, Peluang > 7000,
     %     nth(4, L, X);
     %
     %

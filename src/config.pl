@@ -31,7 +31,6 @@ monster(99, 'duragon', 999, 45, 25, 2000).
 item(1, swordsman, sword, 'True-Excalibur KW1', 10, 0).
 item(2, swordsman, sword, 'Samehadawibu', 12, 0).
 item(3, swordsman, sword, 'Pedang Zabuza', 17, 0).
-% TODO : Extra, all quest then legendary weapon
 
 item(4, archer, bow, 'Wooden Bow', 5, 0).
 item(5, archer, bow, 'Daedalus Stormbow', 15, 0).
@@ -45,6 +44,19 @@ item(101, swordsman, sword, 'Zenith', 80, 0).
 item(102, archer, bow, 'S.D.M.G.', 60, 0).
 item(103, sorcerer, wand, 'Lunar Flare', 50, 0).
 
+
+% Starting equipment
+item(104, swordsman, sword, 'Tongkat baseball', 0, 0).
+item(105, archer, bow, 'Batu', 0, 0).
+item(106, sorcerer, wand, 'Sapu', 0, 0).
+
+item(107, swordsman, armor, 'Cosplay', 0, 0).
+item(108, archer, armor, 'Tracksuit', 0, 0).
+item(109, sorcerer, armor, 'Kaos weeb', 0, 0).
+
+item(110, swordsman, statup, 'Helm motor', 0, 0).
+item(111, archer, statup, 'Dewi tidak guna', 0, 0).
+item(112, sorcerer, statup, 'Jenggot palsu', 0, 0).
 
 
 

@@ -1,6 +1,5 @@
 # Tugas Besar - Logika Komputasional - IF2121
 <!-- FAQ Link https://docs.google.com/spreadsheets/d/1QkNJaG0cs0F3fyr8cIbdDV4myj_dXvvyGqcqPybjT2A/edit#gid=0 -->
-<!-- TODO : Add information -->
 **TBA**
 ### Release
 <!-- [v1.0](https://github.com/Lock1/Algeo02-19146/releases/tag/v1.0) -->
@@ -59,7 +58,7 @@ Ascgen2                       | 2.0.0
 
 **Dependencies** \
 Program ini tidak membutuhkan library eksternal \
-Seluruh program dikoding menggunakan 
+Seluruh program dikoding menggunakan
 fitur standard GNU/Prolog.
 
 
@@ -91,7 +90,7 @@ Save & Load   | :yellow_square:
 
 
 
-**Extras** 
+**Extras**
 Spesifikasi           | Status
 -----------           | ------
 Raw movement mode     | :green_square:
