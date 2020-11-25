@@ -36,6 +36,7 @@ encounterDragon(_) :-
 	% asserta(enemy(99, tubesDuragon, 999, 99, 99, 1000)),
 	monster(99, Name, HP, Atk, Def, XPGain),
 	asserta(enemy(99, Name, HP, Atk, Def, XPGain)),
+	asserta(turnCount(1)),
 	write('\33\[31m\33\[1m'),
 	write(' ░░       ░░░▒▒▒▒░░                                                     '),nl,
 	write('░░▒▒▒▒▒▒░      ░▒▒▒▒▒▒░                                                 '),nl,
@@ -66,6 +67,7 @@ encounterDragon(_) :-
 	write('        ██─██▀██─▀─██▄▄▄▄─███─██████─▄████─██─██▄─█─▄─███─███'),nl,
 	write('        ▀▄▄▄▄▄▀▄▄▀▄▄▀▄▄▄▄▄▀▀▄▄▄▀▀▀▀▄▄▄▀▀▀▄▄▄▀▄▄▄▄▄▀▄▀▄▀▀▄▄▄▀▀'),nl,
 	write('\33\[31m\33\[1m\33\[m'),
+	battleStartHelp,
 	% TODO : Non essential, Special UI
 	random(1, 10, P1),
 	asserta(peluangLari(P1)),
@@ -238,7 +240,7 @@ attack :-
 	% Miss branch
 	write('\33\[31m\33\[1mMiss!\33\[m\n'), !.
 
-
+% TODO : Player HP Cap
 
 /**********************ATTACK MUSUH***********************/
 /********Comment kalau pemain masih belum kalah********/
@@ -249,6 +251,8 @@ enemyAttackComment :-
 	statPlayer(_,_,HPPlayer,_,_,_,_,_,_),
 	HPPlayer =< 0,
 	sleep(0.3),
+	write('\33\[100A\33\[100D\33\[22B'), flush_output,
+	battleUIDraw,
 	write('\33\[100A\33\[100D\33\[22B'), flush_output,
 	write('\33\[31m\33\[1m'),
 	flush_output,

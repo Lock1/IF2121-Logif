@@ -343,7 +343,7 @@ manaRegen :-
         NewMana is Mana + 1, !;
 
         IDTipe = 'archer',
-        Mana < 30,
+        Mana < 60,
         NewMana is Mana + 1, !;
 
         IDTipe = 'sorcerer',
@@ -360,15 +360,15 @@ hpRegen :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     (
         IDTipe = 'swordsman',
-        HP < 149,
+        HP < 179,
         NewHP is HP + 2, !;
 
         IDTipe = 'archer',
-        HP < 60,
+        HP < 120,
         NewHP is HP + 1, !;
 
         IDTipe = 'sorcerer',
-        HP < 100,
+        HP < 150,
         NewHP is HP + 1, !;
 
         NewHP is HP, !
@@ -485,6 +485,7 @@ switchMove(X) :-
     X is 115, s;
     X is 100, d;
     X is 105, listInventory, prompt, clear, sideStatus, \+map;
+    X is 99, drinkPot, prompt, clear, sideStatus, \+map;
     X > 0, clear, sideStatus, \+map.
 
 toggleRawMode :-
