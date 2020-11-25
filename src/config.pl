@@ -58,8 +58,10 @@ special_skill(swordsman, 'baliho', 15).
 special_skill(archer, 'rapid fire', 10).
 special_skill(sorcerer, 'santet', 30).
 
-
-
+% Linear scaling
+levelUpXPRequirement(CurrentLvl, R) :-
+    Calculate is CurrentLvl*30 + 90,
+    R is Calculate.
 
 
 

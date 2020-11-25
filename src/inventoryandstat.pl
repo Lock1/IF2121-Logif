@@ -242,9 +242,9 @@ checkLevelUp :-
     statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold),
     dodgeChance(DodgeChance), critChance(CritChance), % Intentionally obscure stat
 
-    XPToLvlUp is CurrentLvl*30 + 90,
-    XPToLvlUp =< CurrentXP,
-    NewXP is CurrentXP - XPToLvlUp, LvlUp is CurrentLvl + 1,
+    levelUpXPRequirement(CurrentLvl,XPRequirement),
+    XPRequirement =< CurrentXP,
+    NewXP is CurrentXP - XPRequirement, LvlUp is CurrentLvl + 1,
     (
         IDTipe = 'swordsman',
         HPGain is CurrentLvl*5 + 40,

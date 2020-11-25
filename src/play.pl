@@ -760,7 +760,7 @@ questStatus :- % TODO : Extra, check quest print
     % TODO : Non essential, Filter input 'a,b'
 
 sideStatus :-
-    statPlayer(TipeKelas, Nama, _, _, Atk, Def, Lvl, XP, Gold),
+    statPlayer(TipeKelas, Nama, _, _, Atk, Def, Lvl, _, Gold),
     write('\33\[100A\33\[1000D\33\[62C\33\[1m'),flush_output,
     write('\33\[37m\33\[1m'),flush_output,
     write('┏━━━━━━━━━┯━━━━━━━━━━━━┓'),
@@ -779,7 +779,7 @@ sideStatus :-
     write('\33\[100A\33\[1000D\33\[62C\33\[4B'),flush_output,
     write('┃ Defense │ '), format('%10d',[Def]), write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[5B'),flush_output,
-    write('┃ Lv / XP │   '), format('%2d / \33\[32m\33\[1m%3d\33\[m',[Lvl,XP]),
+    write('┃ Level   │ '), format('%10d',[Lvl]),
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
     write('┃ Gold    │ '),
@@ -787,7 +787,7 @@ sideStatus :-
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    call(sideStatusQuest), call(playerHPBar), call(playerMPBar),
+    call(sideStatusQuest), call(playerHPBar), call(playerMPBar), call(playerXPBar),
     write('\33\[100A\33\[1000D'),flush_output.
 
 sideStatusQuest :-
@@ -848,7 +848,8 @@ playerHPBar :-
 	),
     write('\33\[100A\33\[100D\33\[69C\33\[2B'), flush_output,
 	write('\33\[37m\33\[1m╚════╩════════════╩═══════════╝\n').
-
+% TODO : XP Bar
+% TODO : Max Cap system
 playerMPBar :-
 	statPlayer(TipeKelas, _,_, CurrentMana, _, _, _, _, _),
 	class(_, TipeKelas, _, DefaultMaxMana, _, _),
@@ -875,7 +876,45 @@ playerMPBar :-
 
 
 
+playerXPBar :-
+	statPlayer(_, _, _, _, _, _, CurrentLvl, XP, _),
+    levelUpXPRequirement(CurrentLvl, XPRequirement),
+    write('\33\[100A\33\[100D\33\[86C\33\[6B'), flush_output,
+	write('\33\[37m\33\[1m╔════╦════════════╦═══════════╗'),
+    write('\33\[100A\33\[100D\33\[69C\33\[7B'), flush_output,
+	write('\33\[37m\33\[1m║ \33\[32m\33\[1mXP\33\[m \33\[37m\33\[1m║ '),
+	CurrentPercent is (XP*10) // XPRequirement,
+	Remain is 10 - CurrentPercent,
+	(
+		CurrentPercent >= 0, CurrentPercent < 11,
+		innerXPBar(CurrentPercent, Remain), !;
 
+		write('\33\[m\33\[32m\33\[2m██████████\33\[m'), !
+	),
+	(
+		XP >= 0,
+		format(' \33\[37m\33\[1m║ %3d / %3d ║',[XP,XPRequirement]), !;
+
+		format(' \33\[37m\33\[1m║ %3d / %3d ║',[0,XPRequirement]), !
+	),
+    write('\33\[100A\33\[100D\33\[69C\33\[8B'), flush_output,
+	write('\33\[37m\33\[1m╚════╩════════════╩═══════════╝\n').
+
+
+
+
+innerXPBar(C,M) :-
+	C > 0,
+	write('\33\[m\33\[32m\33\[1m█\33\[m'),
+	Cr is C - 1,
+	innerXPBar(Cr,M), !;
+
+	M > 0,
+	write('\33\[m\33\[32m\33\[2m█\33\[m'),
+	Mr is M - 1,
+	innerXPBar(C,Mr), !;
+
+	!.
 
 
 
