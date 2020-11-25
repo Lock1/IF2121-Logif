@@ -2,9 +2,18 @@
 
 % ------------ Konfigurasi Gameplay -------------
 /* Class(ID_pilihan, class_type, HP, mana, attack, def) //parameters could change*/
-class(1, swordsman, 180, 50, 17, 5).
-class(2, archer, 120, 60, 13, 4).
-class(3, sorcerer, 150, 100, 15, 2).
+:- dynamic(class/6).
+:- dynamic(special_skill/4).
+classInit :-
+    asserta(class(1, swordsman, 180, 50, 17, 5)),
+    asserta(class(2, archer, 120, 60, 13, 4)),
+    asserta(class(3, sorcerer, 150, 100, 15, 2)),
+
+    /* Special_Skill(class_type, nama skill, manacost, modifier) //parameters could change*/
+    asserta(special_skill(swordsman, 'baliho', 15, 10)),
+    asserta(special_skill(archer, 'rapid fire', 10, 2)),
+    asserta(special_skill(sorcerer, 'santet', 30, 2)).
+
 
 /* Monster(ID, name, HP, atk, def, exp_drop) //parameters could change*/
 /* Tipe monster sesuai dengan spek */
@@ -53,10 +62,7 @@ potion(23, 'okultisme', 0, 60).
 
 % TODO : Extra, boost potion
 
-/* Special_Skill(class_type, nama skill, manacost) //parameters could change*/
-special_skill(swordsman, 'baliho', 15).
-special_skill(archer, 'rapid fire', 10).
-special_skill(sorcerer, 'santet', 30).
+
 
 % Linear scaling
 levelUpXPRequirement(CurrentLvl, R) :-

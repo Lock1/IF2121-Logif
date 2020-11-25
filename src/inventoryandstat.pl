@@ -245,30 +245,37 @@ checkLevelUp :-
     levelUpXPRequirement(CurrentLvl,XPRequirement),
     XPRequirement =< CurrentXP,
     NewXP is CurrentXP - XPRequirement, LvlUp is CurrentLvl + 1,
+    special_skill(IDTipe, SkillName, ManaCost, SkillModifier),
     (
         IDTipe = 'swordsman',
-        HPGain is CurrentLvl*5 + 40,
-        ManaGain is CurrentLvl*3 + 45,
+        HPGain is CurrentLvl + 20,
+        ManaGain is CurrentLvl + 5,
         AtkGain is CurrentLvl//2 + 1,
         DefGain is CurrentLvl//3 + 2,
         CritGain is CurrentLvl//4,
-        DodgeGain is CurrentLvl//3;
+        DodgeGain is CurrentLvl//3,
+        ManaReduction is CurrentLvl//4 + 1,
+        ModifierGain is CurrentLvl//3 + 1;
 
         IDTipe = 'archer',
-        HPGain is CurrentLvl*5 + 20,
-        ManaGain is CurrentLvl*2 + 10,
-        AtkGain is CurrentLvl//2 + 2,
-        DefGain is CurrentLvl//3 + 1,
-        CritGain is CurrentLvl//2,
-        DodgeGain is CurrentLvl//2 + 1;
+        HPGain is CurrentLvl + 15,
+        ManaGain is CurrentLvl + 6,
+        AtkGain is CurrentLvl//3 + 2,
+        DefGain is CurrentLvl//2 + 1,
+        CritGain is CurrentLvl//6 + 1,
+        DodgeGain is CurrentLvl//3 + 1,
+        ManaReduction is CurrentLvl//5 + 1,
+        ModifierGain is mod(CurrentLvl,2);
 
         IDTipe = 'sorcerer',
-        HPGain is CurrentLvl*5 + 40,
-        ManaGain is CurrentLvl*4 + 60,
+        HPGain is CurrentLvl + 16,
+        ManaGain is CurrentLvl + 10,
         AtkGain is CurrentLvl//2 + 1,
         DefGain is CurrentLvl//3 + 1,
         CritGain is CurrentLvl//3,
-        DodgeGain is CurrentLvl//5 + 1
+        DodgeGain is CurrentLvl//5 + 1,
+        ManaReduction is CurrentLvl//6 + 1,
+        ModifierGain is mod(CurrentLvl,2)
     ),
     NewHP is CurrentHP + HPGain,
     NewMana is CurrentMana + ManaGain,
@@ -285,6 +292,18 @@ checkLevelUp :-
 
     retract(statPlayer(IDTipe, Nama, CurrentHP, CurrentMana, CurrentAtk, CurrentDef, CurrentLvl, CurrentXP, Gold)),
     asserta(statPlayer(IDTipe, Nama, NewHP, NewMana, NewAtk, NewDef, LvlUp, NewXP, Gold)),
+
+    class(ClassID, IDTipe, MaxHP, MaxMP, DefaultAtk, DefaultDef),
+    NewMaxHP is MaxHP + HPGain,
+    NewMaxMP is MaxMP + ManaGain,
+    retract(class(ClassID, IDTipe, MaxHP, MaxMP, DefaultAtk, DefaultDef)),
+    asserta(class(ClassID, IDTipe, NewMaxHP, NewMaxMP, DefaultAtk, DefaultDef)),
+
+    retract(special_skill(IDTipe, SkillName, ManaCost, SkillModifier)),
+    NewManaCost is ManaCost - ManaReduction,
+    NewModifier is SkillModifier + ModifierGain,
+    asserta(special_skill(IDTipe, SkillName, NewManaCost, NewModifier)),
+
     format('\n\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]),
     write('\33\[1m\33\[37m'), flush_output,
     write('┏━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━┓\n'),

@@ -317,7 +317,7 @@ battleLoop :-
 		get_key(X),
 		(
 	    % % catch(read(X), error(_,_), errorMessage), (
-	        X = 102, call(fight), clear, battleUIDraw, battleLoop, !; % f key
+	        X = 102, nl, call(fight), clear, battleUIDraw, battleLoop, !; % f key
 	        X = 114, clear, battleUIDraw, call(run), clear, battleUIDraw, battleLoop, !; % r key
 	        X = 120, nl, \+status, battleLoop, !; % x key
 
@@ -381,19 +381,21 @@ isAllQuestComplete :-
 		format('Kamu mendapatkan \33\[32m\33\[1m%d XP\33\[m dan \33\[33m\33\[1m%d gold\33\[m!\n',[XPBounty,GoldBounty])
 	), !; !.
 
+multipleAttack(N) :-
+	N is 0, !;
+	attack, Rn is N - 1, multipleAttack(Rn), !.
 
-specialAttack :-
+specialAttack :- % FIXME : Heal Potion HP Cap
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
 	enemy(_,EnemyN,_,_,_,_),
-	special_skill(Class, SName, SMana),
+	special_skill(Class, SName, SMana, SkillModifier),
 	NewMana is Mana - SMana,
 	(
 		NewMana >= 0,
 		( % TODO : Extra, cooldown
 			Class = 'swordsman',
-			HealScaling is Lvl*2,
-			TotalHeal is HealScaling + 8,
+			TotalHeal is SkillModifier,
 			NewHP is HP + TotalHeal, incrementTurnCounter,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
@@ -406,7 +408,7 @@ specialAttack :-
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
-			attack, !, attack, !, attack, !,
+			multipleAttack(SkillModifier),
 			(
 				enemy(_,_,NewEHP,_,_,_),
 				NewEHP > 0, incrementTurnCounter, enemyTurn;
@@ -414,7 +416,7 @@ specialAttack :-
 			), !;
 
 			Class = 'sorcerer',
-			SantetAtk is Atk*2+20,
+			SantetAtk is Atk*SkillModifier+20,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),

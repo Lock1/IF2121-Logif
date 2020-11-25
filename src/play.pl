@@ -34,7 +34,7 @@ unicode(1). % Secara default, program ditargetkan untuk mode unicode
 /* ------------------------- Core Loop -------------------------- */
 main :-
     unicode(IsUnicodeMode),
-    setInitialMap,
+    setInitialMap, classInit,
     randomize,
     addItem(16), addItem(16), addItem(16), addItem(16), addItem(16),
     addItem(20), addItem(20),
@@ -531,7 +531,8 @@ first_screen :-
     write('░░░██║░░░██║░░██║╚██████╔╝╚█████╔╝██║░╚██╗░░░░░░██║░╚██╗╚██████╔╝██║░╚███║  ██╗'), nl,
     write('░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░░╚════╝░╚═╝░░╚═╝░░░░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚══╝  ╚═╝\33\[m'), nl,
     flush_output.
-
+% TODO : Non essential, Add class color at sidebar
+% TODO : Extra, Add equipment or something on sidebar for more boxy
 
 help(X) :-
     X is 1,
@@ -832,13 +833,13 @@ playerHPBar :-
 	write('\33\[37m\33\[1m╔════╦════════════╦═══════════╗'),
     write('\33\[100A\33\[100D\33\[69C\33\[1B'), flush_output,
 	write('\33\[37m\33\[1m║ \33\[31m\33\[1mHP\33\[m \33\[37m\33\[1m║ '),
-	CurrentPercent is (CurrentHP*10) //DefaultMaxHP,
+	CurrentPercent is (CurrentHP*10) // DefaultMaxHP,
 	Remain is 10 - CurrentPercent,
 	(
 		CurrentPercent >= 0, CurrentPercent < 11,
 		innerHPBar(CurrentPercent, Remain), !;
 
-		write('\33\[m\33\[31m\33\[2m██████████\33\[m'), !
+		write('\33\[m\33\[31m\33\[1m██████████\33\[m'), !
 	),
 	(
 		CurrentHP >= 0,
