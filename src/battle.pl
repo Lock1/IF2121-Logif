@@ -14,7 +14,8 @@ encounterEnemy(_) :-
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
 	write('\33\[m'), sideStatus, write('\33\[1000A\33\[1000D'), flush_output,
 	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
-	format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m\33\[1m%d\33\[m\n',[Nama,HP]),
+	enemyHPBar,
+	% format('Darah \33\[31m\33\[1m%s\33\[m sebanyak \33\[31m\33\[1m%d\33\[m\n',[Nama,HP]),
 	sleep(0.2),
 	write('Apa yang akan \33\[36m\33\[1mkamu\33\[m lakukan?'), nl,
 	write('• fight (\33\[31m\33\[1mf\33\[m)'), flush_output, nl,
@@ -132,12 +133,14 @@ fight :-
 attackComment :-
 	enemy(_, NamaEnemy, HPEnemy, _, _, _),
 	HPEnemy > 0,
-	format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n',[NamaEnemy,HPEnemy]),
+	enemyHPBar,
+	% format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n',[NamaEnemy,HPEnemy]),
 	enemyTurn,
 	!;
 	/********Comment kalau musuh sudah kalah********/
 	enemy(EnemyID, NamaEnemy, HPEnemy, _, _, XPDrop),
 	HPEnemy =< 0,
+	enemyHPBar,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
 	statPlayer(_,_,_,_,_,_,_,XPPlayer,GoldPlayer),
 	MaxGoldDrop is 25+XPDrop//2,
@@ -214,6 +217,7 @@ attack :-
 		write('Serangan dengan \33\[33m\33\[1m0\33\[m damage!'), nl,
 		NewHPEnemy is HPEnemy, !
 		),
+
 		retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
 		asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop))
 	), !;
@@ -372,7 +376,7 @@ specialAttack :-
 			(
 				enemy(_,_,NewEHP,_,_,_),
 				NewEHP > 0,
-				format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n\n',[EnemyN,NewEHP]);
+				enemyHPBar;
 				call(attackComment)
 			);
 
@@ -387,7 +391,7 @@ specialAttack :-
 			(
 				enemy(_,_,NewEHP,_,_,_),
 				NewEHP > 0,
-				format('Darah \33\[31m\33\[1m%s\33\[m tersisa \33\[31m%d\33\[m\n\n',[EnemyN,NewEHP]),
+				enemyHPBar,
 				enemyTurn, !;
 				call(attackComment), !
 			)
@@ -398,4 +402,49 @@ specialAttack :-
 	).
 	% NewMana is Mana - SMana,
 
-	%
+
+
+
+
+
+% Misc
+% healthBarDraw :-
+
+
+% playerHPBar :-
+
+enemyHPBar :-
+	monster(ID, Nama, MaxHP, _, _, _),
+	enemy(ID, Nama, CurrentHP, _, _, _),
+	write('\33\[37m\33\[1m╔═══════════╦════════════╦═══════════╗\n'),
+	format('\33\[37m\33\[1m║ \33\[31m\33\[1m%9s\33\[m \33\[37m\33\[1m║ ', [Nama]),
+	CurrentPercent is (CurrentHP*10)//MaxHP,
+	Remain is 10 - CurrentPercent,
+	(
+		CurrentPercent >= 0,
+		innerHPBar(CurrentPercent, Remain), !;
+
+		write('\33\[m\33\[31m\33\[2m██████████\33\[m'), !
+	),
+	(
+		CurrentHP >= 0,
+		format(' \33\[37m\33\[1m║ %3d / %3d ║\n',[CurrentHP,MaxHP]), !;
+
+		format(' \33\[37m\33\[1m║ %3d / %3d ║\n',[0,MaxHP]), !
+	),
+	write('\33\[37m\33\[1m╚═══════════╩════════════╩═══════════╝\n').
+
+innerHPBar(C,M) :-
+	C > 0,
+	write('\33\[m\33\[31m\33\[1m█\33\[m'),
+	Cr is C - 1,
+	innerHPBar(Cr,M), !;
+
+	M > 0,
+	write('\33\[m\33\[31m\33\[2m█\33\[m'),
+	Mr is M - 1,
+	innerHPBar(C,Mr), !;
+
+	!.
+
+/* ---------------------------------------------------------------------------------------- */
