@@ -321,21 +321,20 @@ doQuest2(X,Y) :-
     random(1,1000,Rv),
     random(1,1000,Rv2),
     random(1,1000,Rv3),
-    Cnt is mod(Rv, 6) + 1, monster(Mnstr,Name,_,_,_,_),
-    Cnt2 is mod(Rv2, 6) + 1, monster(Mnstr2,Name2,_,_,_,_),
-    Cnt3 is mod(Rv3, 6) + 1, monster(Mnstr3,Name3,_,_,_,_),
+    Cnt is mod(Rv, 1) + 1, monster(Mnstr,Name,_,_,_,_),
+    Cnt2 is mod(Rv2, 1) + 1, monster(Mnstr2,Name2,_,_,_,_),
+    Cnt3 is mod(Rv3, 1) + 1, monster(Mnstr3,Name3,_,_,_,_),
     (
-        QCount is 3, format('Hello, \33\[32m\33\[1m%s\33\[m! It\'s time for some adventure!\nSlain ', [Username]), !;
+        QCount is 3, format('\33\[mHello, \33\[32m\33\[1m%s\33\[m! It\'s time for some adventure!\nSlain ', [Username]), !;
         QCount is 2, format('\33\[32m\33\[1m%s\33\[m! I need your help again, can you clear these annoying ', [Username]), !;
-        QCount is 1, format('Hey \33\[32m\33\[1m%s\33\[m! I think I found something interesting down here, but these ', [Username]), !
+        QCount is 1, format('Hey \33\[32m\33\[1m%s\33\[m! I think I found something interesting down here, \nbut these ', [Username]), !
 
     ),
     format('\33\[31m\33\[1m%d %s\33\[m, \33\[31m\33\[1m%d %s\33\[m, \33\[31m\33\[1m%d %s\33\[m ',[Cnt, Name, Cnt2, Name2, Cnt3, Name3]),
     (
         QCount is 3, write('for me and I\'ll give you some rewards.\n'), !;
         QCount is 2, write('for me?\n'), !;
-        QCount is 1, write('always guarding the area, can you clean it for me? I\'ll give you some \33\[33m\33\[1minteresing\33\[m too in return.\n'), !
-
+        QCount is 1, write('always guarding the area, can you clean it for me? \nI\'ll give you some \33\[33m\33\[1minteresing\33\[m too in return.\n'), !
     ),
 
 
@@ -770,10 +769,11 @@ questStatus :- % TODO : Extra, check quest print
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
     write( '┃  Monster  │ Count ┃\n'),
     write( '┠───────────┼───────┨\n'),
-    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
+    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Fix this
     write('\33\[37m\33\[1m'),flush_output,
     write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n').
     % TODO : Non essential, Filter input 'a,b'
+
 
 sideStatus :-
     statPlayer(TipeKelas, Nama, _, _, Atk, Def, Lvl, _, Gold),
@@ -799,7 +799,7 @@ sideStatus :-
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[6B'),flush_output,
     write('┃ Gold    │ '),
-    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output,
+    format('\33\[33m\33\[1m%10d\33\[m',[Gold]), flush_output, % TODO : Floor
     write('\33\[37m\33\[1m'),flush_output, write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[7B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
@@ -815,16 +815,16 @@ sideStatusQuest :-
 
     % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P), % TODO : Extra, Create name list
     write('\33\[37m\33\[1m\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
-    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
+    write( '┏━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
-    write( '┃  Monster  │ Count ┃\n'),
+    write( '┃    Monster   │ Count ┃\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
-    write( '┠───────────┼───────┨\n'),
+    write( '┠──────────────┼───────┨\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
-    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
+    format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), % TODO : Extra, Fix by print all quest
     write('\33\[37m\33\[1m'),flush_output,
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
-    write( '┗━━━━━━━━━━━┷━━━━━━━┛\n'),
+    write( '┗━━━━━━━━━━━━━━┷━━━━━━━┛\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,
     write('\33\[mCek \33\[33mstatus.\33\[m untuk info quest lengkap.'), !;
     % format('\33\[1000A\33\[1000D\33\[62C\33\[%dB',[Location]),flush_output,

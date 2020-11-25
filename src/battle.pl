@@ -160,7 +160,7 @@ attackComment :-
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	asserta(isBattleDone(done)),
 	isQuestDone(EnemyID),
-	isAllQuestComplete,
+	isQuestCompleted,
 	checkLevelUp,
 	write('\33\[37m\33\[2mTekan sembarang tombol mengakhiri battle\33\[m\n'),
 	get_key_no_echo(_), !.
@@ -367,7 +367,7 @@ isQuestDone(EnemyID) :-
 	!.
 
 
-isAllQuestComplete :-
+isQuestCompleted :-
 	\+questList(_,_),
 	(
 		retract(isQuest(_)),
@@ -378,8 +378,30 @@ isAllQuestComplete :-
 		retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
 		asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
 		write('\n\33\[33m\33\[1mQuest sudah selesai!\33\[m\n'),
+		questCount(X),
+		retract(questCount(X)),
+		Rx is X - 1,
+		asserta(questCount(Rx)),
 		format('Kamu mendapatkan \33\[32m\33\[1m%d XP\33\[m dan \33\[33m\33\[1m%d gold\33\[m!\n',[XPBounty,GoldBounty])
-	), !; !.
+	), isEntireQuestlineCompleted, !; !.
+
+isEntireQuestlineCompleted :-
+	questCount(X),
+	X is 0, statPlayer(IDTipe, PName, _, _, _, _, _, _, _), (
+		nl, (
+			IDTipe = 'swordsman', LegendaryID is 101, !;
+			IDTipe = 'archer', LegendaryID is 102, !;
+			IDTipe = 'sorcerer', LegendaryID is 103, !
+		),
+		item(LegendaryID, _, _, LegendaryName, _, _),
+		format('Heyo \33\[32m\33\[1m%s\33\[m, thanks for clearing those pest.\n',[PName]), nl,
+		sleep(1),
+		format('I managed to recovered this \33\[33m\33\[1m%s\33\[m, take it.',[LegendaryName]), nl,
+		write('Maybe it will help you obtaining \33\[33mamulet of yendor.\n33\[m'),
+		sleep(1),
+		addItem(LegendaryID), !
+	), !;
+	!.
 
 multipleAttack(N) :-
 	N is 0, !;
