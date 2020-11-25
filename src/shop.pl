@@ -1,5 +1,8 @@
-/*harga potion berapa? anggap 10 gold*/
-/*harga gacha berapa? anggap 50 gold*/
+
+/* ------------------------------------- Shop Section -------------------------------------
+13519170 / La Ode Rajuh Emoko
+harga potion berapa? anggap 10 gold
+harga gacha berapa? anggap 50 gold*/
 
 
 shop:-
@@ -152,4 +155,6 @@ gacha:-
 
 /*gagal, shop ga pada tempatnya*/
 shopError:-
-    write('gabisa beli disini woy, gaada yang jualan. Pergi ketempat shop sono!').
+    write('\33\[31m\33\[1mgabisa beli disini woy, gaada yang jualan. Pergi ketempat shop sono!\33\[m\n').
+
+/* ---------------------------------------------------------------------------------------- */
