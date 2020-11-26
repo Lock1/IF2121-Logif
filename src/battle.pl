@@ -2,7 +2,7 @@
 13519178 / Akeyla Pradia Naufal
 13519214 / Tanur Rizaldi Rahardjo
 */
-:- dynamic(enemy/6).
+:- dynamic(enemy/7).
 :- dynamic(statPlayer/9).
 :- dynamic(isEnemyAlive/1).
 :- dynamic(isFighting/1).
@@ -17,8 +17,8 @@
 encounterEnemy(_) :-
 	random(1, 7, ID),
 	asserta(turnCount(1)),
-	monster(ID, Nama, HP, Atk, Def, XP),
-	asserta(enemy(ID, Nama, HP, Atk, Def, XP)),
+	monster(ID, Nama, HP, Atk, Def, XP, Gold),
+	asserta(enemy(ID, Nama, HP, Atk, Def, XP, Gold)),
 	write('\33\[m'), sideStatus, write('\33\[1000A\33\[1000D'), flush_output,
 	enemyHPBar,
 	format('\33\[36m\33\[1mKamu\33\[m ketemu \33\[31m\33\[1m%s\33\[m !!!\n',[Nama]),
@@ -34,8 +34,8 @@ encounterEnemy(_) :-
 
 encounterDragon(_) :-
 	% asserta(enemy(99, tubesDuragon, 999, 99, 99, 1000)),
-	monster(99, Name, HP, Atk, Def, XPGain),
-	asserta(enemy(99, Name, HP, Atk, Def, XPGain)),
+	monster(99, Name, HP, Atk, Def, XPGain, Gold),
+	asserta(enemy(99, Name, HP, Atk, Def, XPGain, Gold)),
 	asserta(turnCount(1)),
 	write('\33\[31m\33\[1m'),
 	write(' ░░       ░░░▒▒▒▒░░                                                     '),nl,
@@ -97,15 +97,15 @@ run :-
 	P > 4,
 	retract(peluangLari(P)),
 	retract(isEnemyAlive(_)),
-	retract(enemy(_, _, _, _, _, _)),
+	retract(enemy(_, _, _, _, _, _, _)),
 	asserta(isBattleDone(1)),
 	flush_output,
 	write('\33\[36m\33\[1mKamu\33\[m \33\[32m\33\[1mberhasil\33\[m kabur'), nl,
 	prompt,
 	!;
 	/*********Mau Lari tapi udah berhadapan dengan musuh******/
-	isRun(_),
-	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl.
+	% isRun(_),
+	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl, !.
 
 /*******************FIGHT********************/
 /********Belum ketemu musuh*********/
@@ -117,19 +117,20 @@ fight :-
 	\+ isFighting(_),
 	% asserta(isRun(1)),
 	asserta(isFighting(1)),
-	isEnemyAlive(_);
+	isEnemyAlive(_), !;
 	% enemy(_, NamaEnemy, _, _, _, _),
 	% format('\33\[36m\33\[1mKamu\33\[m mencoba melawan \33\[31m\33\[1m%s\33\[m\n', [NamaEnemy]),
 	% attackHelp;
 	/********Sudah ketemu musuh tapi fight lagi*******/
 	isFighting(_), \+ isRun(_),
 	isEnemyAlive(_),
-	write('\33\[36m\33\[1mKamu\33\[m sedang melawan musuh loh'), nl, nl.
+	write('\33\[36m\33\[1mKamu\33\[m sedang melawan musuh loh'), nl, nl, !;
+	write('\33\[36m\33\[1mKamu\33\[m udah gagal run lho, jangan lari lagi'), nl, nl, !.
 
 /******************ATTACK**********************/
 /********Comment kalau musuh masih belum kalah********/
 attackComment :-
-	enemy(_, NamaEnemy, HPEnemy, _, _, _),
+	enemy(_, NamaEnemy, HPEnemy, _, _, _, _),
 	HPEnemy > 0,
 	% enemyHPBar,
 	incrementTurnCounter,
@@ -137,26 +138,27 @@ attackComment :-
 	enemyTurn,
 	!;
 	/********Comment kalau musuh sudah kalah********/
-	enemy(EnemyID, NamaEnemy, HPEnemy, _, _, XPDrop),
+	enemy(EnemyID, NamaEnemy, HPEnemy, _, _, XPDrop, GoldDrop),
 	HPEnemy =< 0,
 	% clear, battleUIDraw,
 	format('\33\[31m\33\[1m%s\33\[m telah kalah!\n',[NamaEnemy]),
 	statPlayer(_,_,_,_,_,_,_,XPPlayer,GoldPlayer),
-	MaxGoldDrop is 25+XPDrop//2,
-	random(5,MaxGoldDrop,GoldDrop),
+	random(-2,4,GoldDropSpread),
 	random(-5,5,XPSpread),
-	NewXP is (XPPlayer + XPDrop + XPSpread),
-	NewGold is (GoldPlayer + GoldDrop),
+	TotalXPDrop is XPDrop + XPSpread,
+	TotalGoldDrop is GoldDrop + GoldDropSpread,
+	NewXP is XPPlayer + TotalXPDrop,
+	NewGold is GoldPlayer + TotalGoldDrop,
 	write('\33\[100A\33\[100D'), battleUIDraw,
-	retract(enemy(_,_,_,_,_,_)),
+	retract(enemy(_,_,_,_,_,_,_)),
 	% retract(isRun(_)),
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
 	retract(turnCount(_)),
 	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, _)),
 	write('\33\[100A\33\[100D\33\[18B'),
-	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[XPDrop]),
-	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[GoldDrop]),
+	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[TotalXPDrop]),
+	format('\33\[36m\33\[1mKamu\33\[m dapat \33\[33m\33\[1m%d Gold\33\[m!\n\n',[TotalGoldDrop]),
 	asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
 	asserta(isBattleDone(done)),
 	isQuestDone(EnemyID),
@@ -182,7 +184,7 @@ normalAttack :-
 attack :-
 	isEnemyAlive(_),
 	statPlayer(ClassType,_,_,_,BaseAtkPlayer,_,_,_,_),
-	enemy(_, _, HPEnemy, _, DefEnemy, _),
+	enemy(_, _, HPEnemy, _, DefEnemy, _, _),
 	randomize,
 	random(-2,2,AtkSpread),
 	random(-5,5,ChanceSpread),
@@ -235,8 +237,8 @@ attack :-
 			), !
 		),
 
-		retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop)),
-		asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop))
+		retract(enemy(IDenemy, NamaEnemy, HPEnemy, AtkEnemy, DefEnemy, XPDrop, GoldDrop)),
+		asserta(enemy(IDenemy, NamaEnemy, NewHPEnemy, AtkEnemy, DefEnemy, XPDrop, GoldDrop))
 	), !;
 	% Miss branch
 	write('\33\[31m\33\[1mMiss!\33\[m\n'), !.
@@ -271,7 +273,7 @@ enemyAttackComment :-
 
 /*********Serangan dari musuh****************/
 enemyTurn :-
-	enemy(_, NamaEnemy, _, AtkEnemy,_, _),
+	enemy(_, NamaEnemy, _, AtkEnemy,_, _,_),
 	statPlayer(_,_,HPPlayer,_,_,DefPlayer,_,_,_),
 	random(-3,4,AtkSpread),
 	random(-2,2,DodgeSpread),
@@ -355,7 +357,7 @@ isQuestDone(EnemyID) :-
 		NewXP is CurrentXP + XPBounty, NewGold is CurrentGold + GoldBounty,
 		retract(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, CurrentXP, CurrentGold)),
 		asserta(statPlayer(IDTipe, Nama, HP, MP, Atk, Def, Lvl, NewXP, NewGold)),
-		monster(EnemyID, EnemyName, _, _, _, _),
+		monster(EnemyID, EnemyName, _, _, _, _, _),
 		format('\33\[33mBagian quest %s sudah selesai!\33\[m\n',[EnemyName]),
 		format('Kamu mendapatkan \33\[32m\33\[1m%d XP\33\[m dan \33\[33m\33\[1m%d gold\33\[m!\n',[XPBounty,GoldBounty]);
 
@@ -409,7 +411,7 @@ multipleAttack(N) :-
 specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
-	enemy(_,EnemyN,_,_,_,_),
+	enemy(_,EnemyN,_,_,_,_,_),
 	special_skill(Class, SName, SMana, SkillModifier),
 	NewMana is Mana - SMana,
 	(
@@ -437,7 +439,7 @@ specialAttack :-
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			multipleAttack(SkillModifier),
 			(
-				enemy(_,_,NewEHP,_,_,_),
+				enemy(_,_,NewEHP,_,_,_,_),
 				NewEHP > 0, incrementTurnCounter, enemyTurn;
 				call(attackComment)
 			), !;
@@ -451,7 +453,7 @@ specialAttack :-
 			retract(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			(
-				enemy(_,_,NewEHP,_,_,_),
+				enemy(_,_,NewEHP,_,_,_,_),
 				NewEHP > 0, incrementTurnCounter,
 				enemyTurn, !;
 				call(attackComment), !
@@ -493,10 +495,10 @@ battleUIDraw :-
 % playerHPBar :-
 
 enemyHPBar :-
-	monster(ID, Nama, MaxHP, _, _, _),
-	enemy(ID, Nama, CurrentHP, _, _, _),
-	write('\33\[37m\33\[1m╔═══════════╦════════════╦═══════════╗\n'),
-	format('\33\[37m\33\[1m║ \33\[31m\33\[1m%9s\33\[m \33\[37m\33\[1m║ ', [Nama]),
+	monster(ID, Nama, MaxHP, _, _, _, _),
+	enemy(ID, Nama, CurrentHP, _, _, _, _),
+	write('\33\[37m\33\[1m╔═════════════════════╦════════════╦═══════════╗\n'),
+	format('\33\[37m\33\[1m║ \33\[31m\33\[1m%-19s\33\[m \33\[37m\33\[1m║ ', [Nama]),
 	CurrentPercent is (CurrentHP*10)//MaxHP,
 	Remain is 10 - CurrentPercent,
 	(
@@ -511,7 +513,7 @@ enemyHPBar :-
 
 		format(' \33\[37m\33\[1m║ %3d / %3d ║\n',[0,MaxHP]), !
 	),
-	write('\33\[37m\33\[1m╚═══════════╩════════════╩═══════════╝\n').
+	write('\33\[37m\33\[1m╚═════════════════════╩════════════╩═══════════╝\n').
 
 innerHPBar(C,M) :-
 	C > 0,

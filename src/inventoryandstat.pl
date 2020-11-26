@@ -15,21 +15,25 @@ addItem(ItemID) :-
     length(List, Length),
     findall(PotionName, inventoryP(_,PotionName,_,_), ListP),
     length(ListP, LengthP),
-    Res is Length+LengthP,
+    Res is Length + LengthP,
     Res >= 100,
     write('Inventory Is Full'),
     !,fail;
 
     /*bisa ga ya kira2*/
-    ItemID>15, ItemID =< 100,
+    ItemID > 15, ItemID =< 100,
     potion(ItemID, PotionName, PlusHP, PlusMana),
     asserta(inventoryP(ItemID, PotionName, PlusHP, PlusMana)),!;
 
-    ItemID=<15,
+    ItemID =< 15,
     item(ItemID, Class, Category, ItemName, Attack, Def),
     asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!;
 
-    ItemID > 100,
+    ItemID > 103,
+    item(ItemID, Class, Category, ItemName, Attack, Def),
+    asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!;
+
+    ItemID > 100, ItemID < 104,
     item(ItemID, Class, Category, ItemName, Attack, Def),
     write('\33\[33m\33\[1mLegendary granted\33\[m\n'),
     asserta(inventory(ItemID, Class, Category, ItemName, Attack, Def)),!
@@ -74,7 +78,7 @@ delItem(ItemID) :-
 % --- Equip and using potion ----
 equip(ItemID) :-
     currentWeapon(A),
-    (ItemID =< 9, ItemID > 0, !; ItemID > 100, !),
+    (ItemID =< 9, ItemID > 0, !; ItemID > 100, ItemID < 107, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID,Tipe,_,Name,WAtk,_),
     inventory(A,_,_,OldName,OldAtk,_),
@@ -91,7 +95,7 @@ equip(ItemID) :-
     );
 
     currentArmor(B),
-    ItemID > 9, ItemID < 13,
+    (ItemID > 9, ItemID < 13, !; ItemID > 106, ItemID < 110, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID, Tipe, _, Name, _,ADef),
     inventory(B,_,_,OldName,_,OldDef),
@@ -108,7 +112,7 @@ equip(ItemID) :-
     );
 
     currentMisc(C),
-    ItemID > 12, ItemID =< 15,
+    (ItemID > 12, ItemID =< 15, !; ItemID > 109, ItemID < 113, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID, Tipe, _, Name, WAtk, ADef),
     inventory(C,_,_,OldName,OldAtk,OldDef),
@@ -129,7 +133,7 @@ equip(ItemID) :-
 
 
     % Equip new item
-    (ItemID =< 9, ItemID > 0, !; ItemID > 100, !),
+    (ItemID =< 9, ItemID > 0, !; ItemID > 100, ItemID < 107, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID,Tipe,_,Name,WAtk,_),
     (
@@ -142,9 +146,12 @@ equip(ItemID) :-
         !
     );
 
-    ItemID > 9, ItemID <13,
+
+
+
+    (ItemID > 9, ItemID < 13, !; ItemID > 106, ItemID < 110, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
-    inventory(ItemID, Tipe, _, Name, _,ADef),
+    inventory(ItemID, Tipe, _, Name, _, ADef),
     (
         asserta(currentArmor(ItemID)),
         NewDef is ADef+Def,
@@ -155,7 +162,7 @@ equip(ItemID) :-
         !
     );
 
-    ItemID > 12, ItemID =< 15,
+    (ItemID > 12, ItemID =< 15, !; ItemID > 109, ItemID < 113, !),
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     inventory(ItemID, Tipe, _, Name, WAtk, ADef),
     (
@@ -239,9 +246,9 @@ listingPotion(ListID, List1, List2, List3):-
     [C1|C2]=List3,
     (
         I1 > 15, I1 < 20,
-        format('┃ %2d \33\[37m\33\[1m│ \33\[31m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[I1,A1,B1,C1]), !;
+        format('┃ %2d \33\[37m\33\[1m│ \33\[31m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[I1,A1,B1,C1]), !;
 
-        format('┃ %2d \33\[37m\33\[1m│ \33\[36m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[I1,A1,B1,C1]), !
+        format('┃ %2d \33\[37m\33\[1m│ \33\[36m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[I1,A1,B1,C1]), !
     ),
     % format('┃ ID            │ %19d  ┃',[I1]), nl,
     % format('┃ Name          │ %19s  ┃',[A1]), nl,
@@ -257,14 +264,14 @@ listPotion :-
     findall(PlusHP, inventoryP(_,_,PlusHP,_), HPs),
     findall(PlusMana, inventoryP(_,_,_,PlusMana), ManaS),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
-    write('┃                  Potion                   ┃'), nl,
-    write('┠────┬──────────────────────────┬─────┬─────┨'), nl,
-    write('┃ ID │ Nama                     │ HP  │ MP  ┃'), nl,
-    write('┠────┼──────────────────────────┼─────┼─────┨'), nl,
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃                   Potion                   ┃'), nl,
+    write('┠────┬───────────────────────────┬─────┬─────┨'), nl,
+    write('┃ ID │ Nama                      │ HP  │ MP  ┃'), nl,
+    write('┠────┼───────────────────────────┼─────┼─────┨'), nl,
     listingPotion(PIDs, PNames, HPs, ManaS),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┗━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
+    write('┗━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
     write('\33\[m'), flush_output, !;
     write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n'), !.
 

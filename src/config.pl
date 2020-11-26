@@ -4,6 +4,7 @@
 /* Class(ID_pilihan, class_type, HP, mana, attack, def) //parameters could change*/
 :- dynamic(class/6).
 :- dynamic(special_skill/4).
+:- dynamic(monster/7).
 classInit :-
     asserta(class(1, swordsman, 180, 50, 17, 5)),
     asserta(class(2, archer, 120, 60, 7, 4)),
@@ -15,15 +16,16 @@ classInit :-
     asserta(special_skill(sorcerer, 'santet', 30, 2)).
 
 
-/* Monster(ID, name, HP, atk, def, exp_drop) //parameters could change*/
+/* Monster(ID, name, HP, atk, def, exp_drop, golddrop) //parameters could change*/
 /* Tipe monster sesuai dengan spek */
-monster(1, 'Slime', 60, 6, 2, 30).
-monster(2, 'Goblin', 80, 10, 4, 45).
-monster(3, 'Wolf', 90, 12, 3, 55).
-monster(4, 'Skeleton', 100, 15, 3, 42).
-monster(5, 'Zombie', 65, 20, 2, 32).
-monster(6, 'Bomber', 25, 45, 1, 48).
-monster(99, 'duragon', 999, 45, 25, 2000).
+monsterInit :-                  /* HP ATK DEF XP GOLD */
+    asserta(monster(1, 'Slime',    30,  6, 2, 5,  2)),
+    asserta(monster(2, 'Goblin',   50,  8, 3, 13, 4)),
+    asserta(monster(3, 'Wolf',     60,  7, 4, 16, 3)),
+    asserta(monster(4, 'Skeleton', 60,  5, 5, 19, 4)),
+    asserta(monster(5, 'Zombie',   65,  9, 2, 23, 4)),
+    asserta(monster(6, 'Bomber',   15, 14, 1, 16, 2)),
+    asserta(monster(99, 'duragon', 999,45,25, 2000, 999)).
 
 /* Item(item_id, class_type, category, item_name, attack, def) possibly dont need gold since gacha anyway //parameters could change*/
 /* Item terbagi sesuai dengan jenis class dan category */

@@ -90,7 +90,7 @@ beliPotion :-
     % random(0,9,Rx), % TODO : Non essential, non uniform random distribution
     % nth(Rx, L, Nama1),
 
-    random(0,8,PotionID),
+    random(16,23,PotionID),
     potion(PotionID,Nama1,_,_),
     addItem(PotionID),
     format('You get \33\[33m\33\[1m%s\33\[m!\n',[Nama1]),

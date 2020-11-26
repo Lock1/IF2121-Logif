@@ -35,7 +35,7 @@ unicode(1). % Secara default, program ditargetkan untuk mode unicode
 /* ------------------------- Core Loop -------------------------- */
 main :-
     unicode(IsUnicodeMode),
-    setInitialMap, classInit,
+    setInitialMap, classInit, monsterInit,
     randomize,
     asserta(movementTick(1)),
     asserta(currentFloor(1)),
@@ -94,9 +94,9 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            % X = 'y', call(addItem(6));
-            % X = 'y', call(addItem(102));
-            % X = 'y', call(addItem(5));
+            X = 'y', call(addItem(6));
+            X = 'y', call(addItem(102));
+            X = 'y', call(addItem(5));
 
 
             % Super-obscure-feature
@@ -348,9 +348,9 @@ doQuest2(X,Y) :-
     random(1,1000,Rv),
     random(1,1000,Rv2),
     random(1,1000,Rv3),
-    Cnt is mod(Rv, 4) + 1, monster(Mnstr,Name,_,_,_,_),
-    Cnt2 is mod(Rv2, 4) + 1, monster(Mnstr2,Name2,_,_,_,_),
-    Cnt3 is mod(Rv3, 4) + 1, monster(Mnstr3,Name3,_,_,_,_),
+    Cnt is mod(Rv, 4) + 1, monster(Mnstr,Name,_,_,_,_,_),
+    Cnt2 is mod(Rv2, 4) + 1, monster(Mnstr2,Name2,_,_,_,_,_),
+    Cnt3 is mod(Rv3, 4) + 1, monster(Mnstr3,Name3,_,_,_,_,_),
     (
         QCount is 3, format('\33\[mHello, \33\[32m\33\[1m%s\33\[m! It\'s time for some adventure!\nSlain ', [Username]), !;
         QCount is 2, format('\33\[32m\33\[1m%s\33\[m! I need your help again, can you clear these annoying ', [Username]), !;
@@ -494,7 +494,7 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest2(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
-    stair(X,Y), moveNextFloor, !;
+    stair(X,Y), moveNextFloor, scaleEnemy, !;
     shop(X,Y), clear, call(shop), clear, !;
     ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
@@ -817,7 +817,7 @@ questListPrint(QIDs,Ctrs) :-
     QIDs = [], Ctrs = [];
     QIDs = [ID|Q2],
     Ctrs = [Ct|C2],
-    monster(ID,Name,_,_,_,_),
+    monster(ID,Name,_,_,_,_,_),
     format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), questListPrint(Q2,C2), !.
 
 
@@ -860,18 +860,29 @@ sideStatusQuest :-
     length(L,_),
     % Location is Size + 12,
     questList(ID,Ct),
-    monster(ID,Name,_,_,_,_),
+    monster(ID,Name,_,_,_,_,_),
 
     % findall(questList(ID,_),monster(ID,Name,_,_,_,_),P),
     write('\33\[37m\33\[1m\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
     write( '┏━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
-    write( '┃    Monster   │ Count ┃\n'),
+    write( '┃    Monster   │ Count ┃\n'), % TODO : Fix level up sorcerer
     write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
     write( '┠──────────────┼───────┨\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
-    format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
-    write('\33\[37m\33\[1m'),flush_output,
+
+    atom_length(Name,NameLength),
+    (
+        NameLength > 11,
+        sub_atom(Name, 10, 10, 0, SplitString),
+        format('┃ \33\[31m\33\[1m%-12s..\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Split,Ct]),
+        write('\33\[37m\33\[1m'),flush_output, !;
+
+        format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
+        write('\33\[37m\33\[1m'),flush_output, !
+    ),
+
+
     write('\33\[1000A\33\[1000D\33\[62C\33\[13B'),flush_output,
     write( '┗━━━━━━━━━━━━━━┷━━━━━━━┛\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[14B'),flush_output,

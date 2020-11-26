@@ -1,4 +1,4 @@
-/* ----------------------- Map Section ---------------------------
+/* ----------------------- Map Section ---------------------------fd
 13519146 / Fadel Ananda Dotty
 */
 width(51).
@@ -9,7 +9,7 @@ height(25).
 :- dynamic(dragon/2).
 :- dynamic(playerLocation/2).
 :- dynamic(stair/2).
-:- dynamic(questCount/3).
+:- dynamic(questCount/1).
 :- dynamic(currentFloor/1).
 
 /*Random dragon and shop*/
@@ -43,6 +43,34 @@ retractAllQuest :-
     quest(X,Y),
     retract(quest(X,Y)), retractAllQuest, !;
     !.
+
+scaleEnemy :-
+    deleteEnemy,
+    currentFloor(Floor), (
+        Floor is 3,
+        asserta(monster(1, 'Queen Slime',     90, 15, 4,  9, 4)),
+        asserta(monster(2, 'Goblin Thief',   120, 20, 6, 30,11)),
+        asserta(monster(3, 'Demon Familliar',120, 22, 6, 37, 9)),
+        asserta(monster(4, 'Fossil Skeleton',130, 14,10, 41, 9)),
+        asserta(monster(5, 'Mummy',          130, 24, 6, 45,10)),
+        asserta(monster(6, 'Death Reaper',   40, 60, 5, 37, 6)), !;
+
+        Floor is 2,
+        asserta(monster(1, 'Pinky',              60,  9, 3, 8,  3)),
+        asserta(monster(2, 'Goblin Spy',         80, 12, 4, 18, 6)),
+        asserta(monster(3, 'Rabid Wolf',         90, 11, 4, 17, 5)),
+        asserta(monster(4, 'Hardened Skeleton', 100,  7, 7, 23, 6)),
+        asserta(monster(5, 'Drowned',            90, 14, 3, 30, 7)),
+        asserta(monster(6, 'Moss Hornet',        25, 30, 2, 21, 4)), !
+    ), !.
+
+deleteEnemy :-
+    retract(monster(1, _, _, _, _, _, _)),
+    retract(monster(2, _, _, _, _, _, _)),
+    retract(monster(3, _, _, _, _, _, _)),
+    retract(monster(4, _, _, _, _, _, _)),
+    retract(monster(5, _, _, _, _, _, _)),
+    retract(monster(6, _, _, _, _, _, _)), !.
 
 incrementFloor :-
     currentFloor(X),
