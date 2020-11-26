@@ -103,9 +103,7 @@ gameLoop :-
             X = 'greedisgood', call(greedisgood);
             X = 'whosyourdaddy', call(whosyourdaddy);
             X = 'hesoyam', call(hesoyam);
-            X = 'hidden', hidden;
-            X = 'hidden2', hidden2;
-            X = 'thankyou', yoga
+            X = 'hidden', hidden
         )
         % TODO : Non essential, Handler message
 
@@ -505,7 +503,10 @@ moveNextFloor :-
     write('Lanjutkan ke lantai selanjutnya? (y/n)\n'),
     get_key_no_echo(X),
     (
-        X = 121,
+        X = 121, isQuest(1),
+        write('\33\[31m\33\[1mSelesaikan quest terlebih dahulu\33\[m\n'), prompt, clear, !;
+
+        X = 121, % Cant next floor if quest active
         randomize, width(W), height(H), destroyMap, incrementFloor, generateMap,
         random(1, W, RAbsis), random(1, H, ROrdinat),
         setLocation(RAbsis, ROrdinat), clear, !;
@@ -804,23 +805,23 @@ questStatus :-
     findall(QID, questList(QID,_), QIDs),
     findall(Ctr, questList(_,Ctr), Ctrs),
     write('\33\[37m\33\[1m'),flush_output,
-    write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
-    write( '┃  Monster  │ Count ┃\n'), % TODO : Formatting
-    write( '┠───────────┼───────┨\n'),
+    write( '┏━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
+    write( '┃       Monster       │ Count ┃\n'), % TODO : Formatting
+    write( '┠─────────────────────┼───────┨\n'),
     questListPrint(QIDs,Ctrs),
     % format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
     write('\33\[37m\33\[1m'),flush_output,
-    write( '┗━━━━━━━━━━━┷━━━━━━━┛\33\[m\n'), !;
+    write( '┗━━━━━━━━━━━━━━━━━━━━━┷━━━━━━━┛\33\[m\n'), !;
     write('\33\[37\33\[1mTidak ada quest\33\[m\n'), !.
     % TODO : Non essential, Filter input 'a,b'
 
 
-questListPrint(QIDs,Ctrs) :-
+questListPrint(QIDs,Ctrs) :- % TODO : Extra, fast move fix
     QIDs = [], Ctrs = [];
     QIDs = [ID|Q2],
     Ctrs = [Ct|C2],
     monster(ID,Name,_,_,_,_,_),
-    format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), questListPrint(Q2,C2), !.
+    format('┃ \33\[31m\33\[1m%-19s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]), questListPrint(Q2,C2), !.
 
 
 sideStatus :-

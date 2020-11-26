@@ -201,8 +201,8 @@ usePotion(PID) :-
 
 
 % -------------- Show Inventory --------------
-listing([],[],[],[]).
-listing(ListID, List1, List2, List3) :-
+listing([],[],[],[],_).
+listing(ListID, List1, List2, List3, Ctr) :-
     [I1|I2]=ListID,
     [W1|W2]=List1,
     [X1|X2]=List2,
@@ -212,13 +212,14 @@ listing(ListID, List1, List2, List3) :-
     % format('┃ Attack │ %26d  ┃',[X1]), nl,
     % format('┃ Def    │ %26d  ┃',[Y1]), nl,
     (
-        I1 > 100, I1 < 104, % TODO : Add numbering
-        format('\33\[37m\33\[1m┃ %3d │ \33\[33m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl, !;
+        I1 > 100, I1 < 104,
+        format('\33\[37m\33\[1m┃ %3d │ %3d │ \33\[33m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[Ctr,I1,W1,X1,Y1]), nl, !;
 
-        format('\33\[37m\33\[1m┃ %3d │ \33\[37m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl, !
+        format('\33\[37m\33\[1m┃ %3d │ %3d │ \33\[37m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[Ctr,I1,W1,X1,Y1]), nl, !
     ),
     % write('┠────────┴────────────────────────────┨'),nl,
-    listing(I2, W2, X2, Y2).
+    Nctr is Ctr + 1,
+    listing(I2, W2, X2, Y2, Nctr).
 
 listItem :-
     inventory(_,_,_,_,_,_),
@@ -227,35 +228,36 @@ listItem :-
     findall(Attack, inventory(_,_,_,_,Attack,_), Attacks),
     findall(Def, inventory(_,_,_,_,_,Def), Defs),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
-    write('┃                   Weapon                   ┃'), nl,
-    write('┠─────┬──────────────────────────┬─────┬─────┨'), nl,
-    write('┃ ID  │ Nama                     │ Atk │ Def ┃'), nl,
-    write('┠─────┼──────────────────────────┼─────┼─────┨'), nl,
-    listing(IDs, Names, Attacks, Defs),
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃                      Weapon                      ┃'), nl,
+    write('┠─────┬─────┬──────────────────────────┬─────┬─────┨'), nl,
+    write('┃ No  │ ID  │ Nama                     │ Atk │ Def ┃'), nl,
+    write('┠─────┼─────┼──────────────────────────┼─────┼─────┨'), nl,
+    listing(IDs, Names, Attacks, Defs, 1),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┗━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
+    write('┗━━━━━┷━━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
     write('\33\[m'), flush_output, !;
     write('\33\[37m\33\[1mKamu tidak memiliki item\33\[m\n'), !.
 
-listingPotion([],[],[],[]).
-listingPotion(ListID, List1, List2, List3):-
+listingPotion([],[],[],[],_).
+listingPotion(ListID, List1, List2, List3, Ctr):-
     [I1|I2]=ListID,
     [A1|A2]=List1,
     [B1|B2]=List2,
     [C1|C2]=List3,
     (
         I1 > 15, I1 < 20,
-        format('┃ %2d \33\[37m\33\[1m│ \33\[31m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[I1,A1,B1,C1]), !;
+        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[31m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,B1,C1]), !;
 
-        format('┃ %2d \33\[37m\33\[1m│ \33\[36m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[I1,A1,B1,C1]), !
+        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[36m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,B1,C1]), !
     ),
     % format('┃ ID            │ %19d  ┃',[I1]), nl,
     % format('┃ Name          │ %19s  ┃',[A1]), nl,
     % format('┃ HP Restored   │ %19d  ┃',[B1]), nl,
     % format('┃ Mana Restored │ %19d  ┃',[C1]), nl,
     % write('┃                                      ┃'),nl,
-    listingPotion(I2, A2, B2, C2).
+    Nctr is Ctr + 1,
+    listingPotion(I2, A2, B2, C2, Nctr).
 
 listPotion :-
     inventoryP(_,_,_,_),
@@ -264,14 +266,14 @@ listPotion :-
     findall(PlusHP, inventoryP(_,_,PlusHP,_), HPs),
     findall(PlusMana, inventoryP(_,_,_,PlusMana), ManaS),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
-    write('┃                   Potion                   ┃'), nl,
-    write('┠────┬───────────────────────────┬─────┬─────┨'), nl,
-    write('┃ ID │ Nama                      │ HP  │ MP  ┃'), nl,
-    write('┠────┼───────────────────────────┼─────┼─────┨'), nl,
-    listingPotion(PIDs, PNames, HPs, ManaS),
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
+    write('┃                      Potion                      ┃'), nl,
+    write('┠─────┬────┬───────────────────────────┬─────┬─────┨'), nl,
+    write('┃ No  │ ID │ Nama                      │ HP  │ MP  ┃'), nl,
+    write('┠─────┼────┼───────────────────────────┼─────┼─────┨'), nl,
+    listingPotion(PIDs, PNames, HPs, ManaS, 1),
     write('\33\[37m\33\[1m'), flush_output,
-    write('┗━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
+    write('┗━━━━━┷━━━━┷━━━━━━━━━━━━━━━━━━━━━━━━━━━┷━━━━━┷━━━━━┛'), nl,
     write('\33\[m'), flush_output, !;
     write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n'), !.
 
