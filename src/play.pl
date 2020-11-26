@@ -589,21 +589,22 @@ first_screen :-
 help(X) :-
     X is 1,
     write('\33\[37m\33\[1m'), % Help ANSI Formatting
-    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
-    write('│   ┎─────────────────────────────────────────────┒    │ '), nl,
+    write('╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ '), nl,
+    write('│   ┎─────────────────────────────────────────────────┒    │ '), nl,
     % write('│   ┃  start.     : Memulai petualanganmu         ┃    │ '), nl,
-    write('│   ┃  map.       : Menampilkan peta              ┃    │ '), nl,
-    write('│   ┃  status.    : Menampilkan kondisi saat ini  ┃    │ '), nl,
-    write('│   ┃  inventory. : Menampilkan barang            ┃    │ '), nl,
-    write('│   ┃  equip.     : Menggunakan item              ┃    │ '), nl,
-    write('│   ┃  delete.    : Menghapus barang              ┃    │ '), nl,
+    write('│   ┃  map. (m)       : Menampilkan peta              ┃    │ '), nl,
+    write('│   ┃  status. (s)    : Menampilkan kondisi saat ini  ┃    │ '), nl,
+    write('│   ┃  inventory. (i) : Menampilkan barang            ┃    │ '), nl,
+    write('│   ┃  equip. (e)     : Menggunakan item              ┃    │ '), nl,
+    write('│   ┃  drink. (d)     : Minum potion                  ┃    │ '), nl,
+    write('│   ┃  delete. (x)    : Menghapus barang              ┃    │ '), nl,
     % write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
-    write('│   ┃  move.      : Masuk ke mode movement        ┃    │ '), nl,
-    write('│   ┃  help.      : Menampilkan bantuan           ┃    │ '), nl,
-    write('│   ┃  clear.     : Membersihkan layar            ┃    │ '), nl,
-    write('│   ┖─────────────────────────────────────────────┚    │ '), nl,
-    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
-    write('Command dapat di ketik dengan inisial saja.'), nl,
+    write('│   ┃  move. (m)      : Masuk ke mode movement        ┃    │ '), nl,
+    write('│   ┃  help. (h)      : Menampilkan bantuan           ┃    │ '), nl,
+    write('│   ┃  clear. (c)     : Membersihkan layar            ┃    │ '), nl,
+    write('│   ┖─────────────────────────────────────────────────┚    │ '), nl,
+    write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
+    write('Command dapat di ketik dengan inisial dan titik.'), nl,
     write('Jangan lupa mengakhiri command dengan titik sebelum enter.'), nl, nl,
     write('\33\[m');
 
@@ -806,7 +807,7 @@ questStatus :-
     findall(Ctr, questList(_,Ctr), Ctrs),
     write('\33\[37m\33\[1m'),flush_output,
     write( '┏━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
-    write( '┃       Monster       │ Count ┃\n'), % TODO : Formatting
+    write( '┃       Monster       │ Count ┃\n'),
     write( '┠─────────────────────┼───────┨\n'),
     questListPrint(QIDs,Ctrs),
     % format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
@@ -878,7 +879,7 @@ sideStatusQuest :-
     (
         NameLength > 11,
         % sub_atom(Name, 10, 10, 0, SplitString),
-        format('┃ \33\[32m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',['...',Ct]), % TODO : Fix length
+        format('┃ \33\[32m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',['...',Ct]),
         write('\33\[37m\33\[1m'),flush_output, !;
 
         format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
