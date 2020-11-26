@@ -540,6 +540,7 @@ switchMove(X) :-
     X > 0, clear, sideStatus, \+map.
 
 toggleRawMode :-
+
     get_key_no_echo(user_input,X),
     % overwriteClear,
     % lineWipeAtPlayer,

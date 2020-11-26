@@ -19,8 +19,12 @@
 - Kode blok **or** yang besar, digunakan indentasi dan bracket untuk memperjelas kode.
 
 ## Snapshot
+**Now Loading** \
+![UI](/other/img/loading.gif) \
+
 **UI & Movement** \
-![UI](/other/img/ui.gif)
+![UI](/other/img/movement.gif)
+
 
 
 

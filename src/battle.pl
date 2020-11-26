@@ -318,12 +318,12 @@ battleLoop :-
 		get_key(X),
 		(
 	    % % catch(read(X), error(_,_), errorMessage), (
-	        X = 102, nl, call(fight), clear, battleUIDraw, battleLoop, !; % f key
+	        X = 102, nl, call(fight), selectiveFightClear, battleUIDraw, battleLoop, !; % f key
 	        X = 114, clear, battleUIDraw, call(run), clear, battleUIDraw, battleLoop, !; % r key
 	        X = 120, nl, \+status, battleLoop, !; % x key
 
 	        X = 41, call(quit), !; % 1 key
-			isFighting(_), clear, battleUIDraw, write('\33\[32m\33\[1mBattle >> \33\[m\n'), (
+			isFighting(_), selectiveBattleClear, battleUIDraw, write('\33\[32m\33\[1mBattle >> \33\[m\n'), (
 				X = 97,  call(normalAttack), battleLoop, !; % a key
 		 		X = 101, call(drinkPot), incrementTurnCounter, enemyTurn, battleLoop, !; % e key, Not Skyrim mode
 				X = 99, call(specialAttack), battleLoop, ! % c
@@ -485,6 +485,36 @@ attackHelp :-
 
 % Misc
 % healthBarDraw :-
+selectiveBattleClear :-
+	write('\33\[100A\33\[100D\33\[9B'), flush_output,
+	write('                                                            '), nl, % Default -> 8 line
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('\33\[100A\33\[100D\33\[9B\33\[10C'), flush_output.
+
+selectiveFightClear :-
+	write('\33\[100A\33\[100D\33\[3B'), flush_output,
+	write('                                                            '), nl, % Default -> 8 line
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('                                                            '), nl,
+	write('\33\[100A\33\[100D\33\[9B\33\[10C'), flush_output.
+
 
 battleUIDraw :-
 	sideStatus,
