@@ -1,8 +1,9 @@
 # Tugas Besar - Logika Komputasional - IF2121
 <!-- FAQ Link https://docs.google.com/spreadsheets/d/1QkNJaG0cs0F3fyr8cIbdDV4myj_dXvvyGqcqPybjT2A/edit#gid=0 -->
-**TBA**
+
 ### Release
-<!-- [v1.0](https://github.com/Lock1/Algeo02-19146/releases/tag/v1.0) -->
+**TBA**
+[v1.0](https://github.com/Lock1/Logif-IF2121/releases/tag/v1.0)
 
 
 ### Tentang Program
@@ -91,13 +92,13 @@ Goal & Fail state         | :green_square:
 
 
 **Bonus** \
-**Status : Pending** :yellow_square:
+**Status : Dropped** :yellow_square:
 Spesifikasi   | Status
 -----------   | ------
-Effect Potion | :green_square:
+Effect Potion | :red_square:
 Monster Zone  | :green_square:
-Teleport      | :yellow_square:
-Save & Load   | :yellow_square:
+Teleport      | :red_square:
+Save & Load   | :red_square:
 
 
 
@@ -108,21 +109,18 @@ Raw movement mode     | :green_square:
 Basic map UI          | :green_square:
 Critical & Dodge Stat | :green_square:
 Balancing             | :green_square:
+Floor system          | :green_square:
 Equipment UI          | :green_square:
 
 
 ## Laporan
-**TBA**
-<!-- **Status : Done** :green_square: \
-**0 / 6**
+**Status : Pending** :yellow_square: \
+**? / ?**
 Bab                   | Status
 ---                   | ------
-Deskripsi Masalah     | :green_square:
-Landasan Teori        | :green_square:
-Implementasi Program  | :green_square:
-Eksperimen            | :green_square:
-Kesimpulan            | :green_square:
-Daftar Pustaka        | :green_square: -->
+Penjelasan Command    | :green_square:
+Skenario Penggunaan   | :green_square:
+???    | ???
 
 
 ### Fun Fact

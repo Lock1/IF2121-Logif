@@ -288,7 +288,7 @@ checkLevelUp :-
     levelUpXPRequirement(CurrentLvl,XPRequirement),
     XPRequirement =< CurrentXP,
     NewXP is CurrentXP - XPRequirement, LvlUp is CurrentLvl + 1,
-    special_skill(IDTipe, SkillName, ManaCost, SkillModifier),
+    special_skill(IDTipe, SkillName, ManaCost, SkillModifier, Cooldown), % TODO : Add scale
     (
         IDTipe = 'swordsman',
         HPGain is CurrentLvl + 16,
@@ -370,9 +370,9 @@ checkLevelUp :-
     retract(class(ClassID, IDTipe, MaxHP, MaxMP, DefaultAtk, DefaultDef)),
     asserta(class(ClassID, IDTipe, NewMaxHP, NewMaxMP, DefaultAtk, DefaultDef)),
 
-    retract(special_skill(IDTipe, SkillName, ManaCost, SkillModifier)),
+    retract(special_skill(IDTipe, SkillName, ManaCost, SkillModifier, Cooldown)),
     NewManaCost is ManaCost - ManaReduction,
-    asserta(special_skill(IDTipe, SkillName, NewManaCost, NewModifier)),
+    asserta(special_skill(IDTipe, SkillName, NewManaCost, NewModifier, Cooldown)),
 
     format('\n\33\[33m\33\[1mSelamat kamu naik ke level %d!\33\[m\n',[LvlUp]),
     write('\33\[1m\33\[37m'), flush_output,

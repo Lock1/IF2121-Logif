@@ -3,17 +3,17 @@
 % ------------ Konfigurasi Gameplay -------------
 /* Class(ID_pilihan, class_type, HP, mana, attack, def) //parameters could change*/
 :- dynamic(class/6).
-:- dynamic(special_skill/4).
+:- dynamic(special_skill/5).
 :- dynamic(monster/7).
 classInit :-
     asserta(class(1, swordsman, 180, 50, 17, 5)),
     asserta(class(2, archer, 120, 60, 7, 4)),
     asserta(class(3, sorcerer, 150, 100, 15, 2)),
 
-    /* Special_Skill(class_type, nama skill, manacost, modifier) //parameters could change*/
-    asserta(special_skill(swordsman, 'baliho', 15, 10)),
-    asserta(special_skill(archer, 'rapid fire', 10, 2)),
-    asserta(special_skill(sorcerer, 'santet', 30, 2)).
+    /* Special_Skill(class_type, nama skill, manacost, modifier, cooldown) //parameters could change*/
+    asserta(special_skill(swordsman, 'baliho', 15, 10, 4)), % Cooldown always + 1, because special attack always decrease by 1
+    asserta(special_skill(archer, 'rapid fire', 10, 2, 3)), % TODO : Extra, Level up cooldown scale
+    asserta(special_skill(sorcerer, 'santet', 30, 3, 5)).
 
 
 /* Monster(ID, name, HP, atk, def, exp_drop, golddrop) //parameters could change*/
@@ -358,9 +358,9 @@ hidden2 :-
     write('▓▒░▒▓▓▓▓▒▒░ ▒▓▓▓▓▒▓▓▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓█▓▓▓▓▓▓▓▓██████████▓▓▓▓▓▓▓█▓▓██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▓▒░ ▒▓                                  ░         ▓▓▓████▓▓▓▓▓▓▓██                                                                                                                                        '),nl,
     write('▒▒▓▓▒▒▒▓▓▓▒░░▒▓▒  ▓█▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▓▓▓▓▓▓██▓▓▓█████▓▓▓▓▓▓▓████▓▓█████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▒ ▒                                             ▓▓▓██████████▓▓                                                                                                                                         '),nl.
 
-yoga :-     
+yoga :-
     clear, flush_output,
-    write('\33\[30m\33\[1m\33\[47m\33\[1m'),                                                                                                                                                                                      
+    write('\33\[30m\33\[1m\33\[47m\33\[1m'),
     write('                                                                                         ▒▓▓▓██▓▓▓▓▒▒░                                                                                                  '), nl,
     write('                                                                                   ░▒▓▓█████████████████▓▒▒▒░                                                                                           '), nl,
     write('                                                                               ░▒▓█████████████████████████████▒░                                                                                       '), nl,
@@ -454,5 +454,3 @@ yoga :-
     write('▓▓▓▓██▓▒▒▒▓█████▓▓█████████████▓▒░░░░▒▓█████▓▒░▒▒▒▒██▓▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓██▓██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▓▓▓██▓▓▓████▓▓▓███▓▓▓▓█'), nl,
     write('▓▓█▓▓█▓▓██████▓▒▒▓▓▒▒░░▒▒░▒▓█▓▒░░▓▓▒░░▒▒▒▓██▓▓▒░▒▒▒▒███▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▓▒▓▓░▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█▓▓▓▓▓█▓▓▓▓████▓▓▓▓█▓▓▓▓▓█'), nl.
 % l t t     s t o r e      . c o m
-
-

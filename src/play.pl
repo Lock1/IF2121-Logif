@@ -404,7 +404,7 @@ hpRegen :-
     movementTick(CTick),
     HP < MaxHP, (
         IDTipe = 'swordsman',
-        NewHP is HP + 2, !;
+        NewHP is HP + 2, !; % TODO : Extra, Special edge case 181
 
         IDTipe = 'archer', 0 is mod(CTick,2), % Every 2 tick, hp regen
         NewHP is HP + 1, !;
@@ -819,7 +819,7 @@ questStatus :-
     % TODO : Non essential, Filter input 'a,b'
 
 
-questListPrint(QIDs,Ctrs) :- % TODO : Extra, fast move fix
+questListPrint(QIDs,Ctrs) :-
     QIDs = [], Ctrs = [];
     QIDs = [ID|Q2],
     Ctrs = [Ct|C2],
@@ -908,8 +908,8 @@ sideStatusQuest :-
 
 playerHPBar :-
 	statPlayer(TipeKelas, _, CurrentHP, _, _, _, _, _, _), % TODO : Extra, animation
-	class(_, TipeKelas, DefaultMaxHP, _, _, _),            % TODO : Extra, flicker down
-    write('\33\[100A\33\[100D\33\[86C'), flush_output,     % TODO : Extra, item
+	class(_, TipeKelas, DefaultMaxHP, _, _, _),
+    write('\33\[100A\33\[100D\33\[86C'), flush_output,     % TODO : Extra, new item
 	write('\33\[37m\33\[1m╔════╦════════════╦═══════════╗'),
     write('\33\[100A\33\[100D\33\[69C\33\[1B'), flush_output,
 	write('\33\[37m\33\[1m║ \33\[31m\33\[1mHP\33\[m \33\[37m\33\[1m║ '),

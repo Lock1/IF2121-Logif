@@ -11,12 +11,13 @@
 :- dynamic(isBattleDone/1).
 :- dynamic(isCrit/1).
 :- dynamic(turnCount/1).
+:- dynamic(onCooldown/1).
 
 /********Ketemu Musuh*********/
 % TODO : Non essential, gameloop for legacy version
 encounterEnemy(_) :-
 	random(1, 7, ID),
-	asserta(turnCount(1)),
+	asserta(turnCount(1)), asserta(onCooldown(0)),
 	monster(ID, Nama, HP, Atk, Def, XP, Gold),
 	asserta(enemy(ID, Nama, HP, Atk, Def, XP, Gold)),
 	write('\33\[m'), sideStatus, write('\33\[1000A\33\[1000D'), flush_output,
@@ -36,7 +37,7 @@ encounterDragon(_) :-
 	% asserta(enemy(99, tubesDuragon, 999, 99, 99, 1000)),
 	monster(99, Name, HP, Atk, Def, XPGain, Gold),
 	asserta(enemy(99, Name, HP, Atk, Def, XPGain, Gold)),
-	asserta(turnCount(1)),
+	asserta(turnCount(1)), asserta(onCooldown(0)),
 	write('\33\[31m\33\[1m'),
 	write('                           ░░       ░░░▒▒▒▒░░                                                     '),nl,
 	write('                          ░░▒▒▒▒▒▒░      ░▒▒▒▒▒▒░                                                 '),nl,
@@ -155,6 +156,7 @@ attackComment :-
 	retract(isEnemyAlive(_)),
 	retract(isFighting(_)),
 	retract(turnCount(_)),
+	retract(onCooldown(_)),
 	retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, _, _)),
 	write('\33\[100A\33\[100D\33\[18B'),
 	format('\n\33\[36m\33\[1mKamu\33\[m dapat \33\[32m\33\[1m%d XP\33\[m!\n',[TotalXPDrop]),
@@ -298,7 +300,7 @@ enemyTurn :-
 
 
 
-% -------------------- Battle Loop --------------------
+% ------------------------------------- Battle Loop --------------------------------------------
 
 battleLoop :-
 	isBattleDone(O), retract(isBattleDone(O)), !;
@@ -320,23 +322,38 @@ battleLoop :-
 	    % % catch(read(X), error(_,_), errorMessage), (
 	        X = 102, nl, call(fight), selectiveFightClear, battleUIDraw, battleLoop, !; % f key
 	        X = 114, clear, battleUIDraw, call(run), clear, battleUIDraw, battleLoop, !; % r key
-	        X = 120, nl, \+status, battleLoop, !; % x key
+	        X = 120, nl, status, prompt, clear, battleLoop, !; % x key
 
 	        X = 41, call(quit), !; % 1 key
 			isFighting(_), selectiveBattleClear, battleUIDraw, write('\33\[32m\33\[1mBattle >> \33\[m\n'), (
 				X = 97,  call(normalAttack), battleLoop, !; % a key
-		 		X = 101, call(drinkPot), incrementTurnCounter, enemyTurn, battleLoop, !; % e key, Not Skyrim mode
+		 		X = 101, call(drinkPot), incrementTurnCounter, enemyTurn, prompt, clear, battleLoop, !; % e key, Not Skyrim mode
 				X = 99, call(specialAttack), battleLoop, ! % c
 			), !;
-			write('\nTombol tidak diketahui\n\n'), battleLoop, !
+			selectiveBattleClear, nl, battleLoop, !
 	    ), !
 	).
+
+
+
+% ----------------------------------------------------------------------------------------------
+
+
+
 
 incrementTurnCounter :-
 	turnCount(X),
 	retract(turnCount(X)),
 	Nx is X + 1,
-	asserta(turnCount(Nx)), !.
+	asserta(turnCount(Nx)),
+	decreaseCooldown, !.
+
+decreaseCooldown :-
+	onCooldown(X), X > 0, Rx is X - 1,
+	retract(onCooldown(X)),
+	asserta(onCooldown(Rx)), !;
+	!.
+
 
 
 /***********************KALAH********************************/
@@ -412,12 +429,12 @@ specialAttack :-
 	isEnemyAlive(_),
 	statPlayer(Class,Nama,HP,Mana,Atk,Def,Lvl,XP,Gold),
 	enemy(_,EnemyN,_,_,_,_,_),
-	special_skill(Class, SName, SMana, SkillModifier),
+	special_skill(Class, SName, SMana, SkillModifier, Cooldown),
 	NewMana is Mana - SMana,
 	(
 		NewMana >= 0,
-		( % TODO : Non essential, cooldown
-			Class = 'swordsman',
+		(
+			Class = 'swordsman', onCooldown(0),
 			TotalHeal is SkillModifier,
 			class(_,Class,MaxHP,_,_,_),
 			HealedHP is HP + TotalHeal, (
@@ -428,28 +445,34 @@ specialAttack :-
 			incrementTurnCounter,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
+			retract(onCooldown(0)),
+			asserta(onCooldown(Cooldown)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			format('\33\[37m\33\[1mSerangan\33\[m \33\[31m\33\[1m%s\33\[m \33\[37m\33\[1mterblock!\33\[m\n',[EnemyN]),
 			format('\33\[33m\33\[1m%s\33\[m menyembuhkan HP sebanyak \33\[31m\33\[1m%d\33\[m\n',[SName,TotalHeal]),
 			format('Darah \33\[36m\33\[1mkamu\33\[m menjadi \33\[31m\33\[1m%d\33\[m\n\n',[NewHP,NewMana]), !;
 
-			Class = 'archer',
+			Class = 'archer', onCooldown(0),
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			multipleAttack(SkillModifier),
+			retract(onCooldown(0)),
+			asserta(onCooldown(Cooldown)),
 			(
 				enemy(_,_,NewEHP,_,_,_,_),
 				NewEHP > 0, incrementTurnCounter, enemyTurn;
 				call(attackComment)
 			), !;
 
-			Class = 'sorcerer',
+			Class = 'sorcerer', onCooldown(0),
 			SantetAtk is Atk*SkillModifier+20,
 			retract(statPlayer(Class, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			format('\33\[36m\33\[1mKamu\33\[m menggunakan \33\[33m\33\[1m%s\33\[m!\n',[SName]),
 			attack,
+			retract(onCooldown(0)),
+			asserta(onCooldown(Cooldown)),
 			retract(statPlayer(Class, Nama, HP, NewMana, SantetAtk, Def, Lvl, XP, Gold)),
 			asserta(statPlayer(Class, Nama, HP, NewMana, Atk, Def, Lvl, XP, Gold)),
 			(
@@ -459,9 +482,14 @@ specialAttack :-
 				call(attackComment), !
 			)
 		), !;
+		% Failure casting will cause enemy turn
+		onCooldown(CurrentCooldown), CurrentCooldown > 0,
+		format('Kurang \33\[31m\33\[1m%d \33\[mturn untuk \33\[33m\33\[1m%s\33\[m\n', [CurrentCooldown,SName]),
+		enemyTurn, incrementTurnCounter, !;
+
 		ManaNeeded is (-1)*NewMana,
 		format('Kurang \33\[36m\33\[1m%d mana\33\[m untuk \33\[33m\33\[1m%s\33\[m\n', [ManaNeeded,SName]),
-		enemyTurn, !
+		enemyTurn, incrementTurnCounter, !
 	).
 	% NewMana is Mana - SMana,
 
@@ -526,8 +554,49 @@ turnUI :-
 	write('\33\[100A\33\[100D\33\[48C\33\[2B'), flush_output,
 	write('╚══════╩═════╝').
 
+cooldownUI :-
+	onCooldown(CurrentCooldown),
+	statPlayer(IDTipe, _, _, _, _, _, _, _, _),
+	special_skill(IDTipe, _, _, _, Cooldown),
+	write('\33\[100A\33\[100D\33\[35C\33\[3B'), flush_output,
+	write('\33\[37m\33\[1m╔═══════╦═══════════╦════╗'),
+	write('\33\[100A\33\[100D\33\[35C\33\[4B'), flush_output,
+	write('║ Skill ║ '),
+	CurrentPercent is ((Cooldown - CurrentCooldown)*9) // Cooldown,
+	Remain is 9 - CurrentPercent, % Not percent tho, its 90-cent
+	(
+		CurrentPercent >= 0, CurrentPercent < 11,
+		cooldownBar(CurrentPercent, Remain), !;
+
+		write('\33\[m\33\[34m\33\[2m████a████\33\[m'), !
+	), % TODO : Extra, Sorcerer early balance
+
+	write('\33\[m\33\[1m\33\[37m ║'),
+	(
+		format('\33\[37m\33\[1m %2d ║',[CurrentCooldown]), !
+	),
+
+	write('\33\[100A\33\[100D\33\[35C\33\[5B'), flush_output,
+	write('╚═══════╩═══════════╩════╝').
+
+
+% ╩═══════════╝╚══════╩═════╝ cooldownBar,
+cooldownBar(C,M) :-
+	C > 0,
+	write('\33\[m\33\[34m\33\[1m█\33\[m'),
+	Cr is C - 1,
+	cooldownBar(Cr,M), !;
+
+	M > 0,
+	write('\33\[m\33\[34m\33\[2m█\33\[m'),
+	Mr is M - 1,
+	cooldownBar(C,Mr), !;
+
+	!.
+
+
 battleUIDraw :-
-	turnUI,
+	turnUI, cooldownUI,
 	sideStatus,
 	enemyHPBar,
 	attackHelp,
