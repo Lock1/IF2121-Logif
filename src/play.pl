@@ -94,7 +94,7 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(6));
+            X = 'y', call(addItem(11));
             X = 'y', call(addItem(102));
             X = 'y', call(addItem(5));
 
@@ -304,7 +304,7 @@ choose_class :-
         ClassID =:= 2,
         write('You have chosen \33\[32m\33\[1mArcher\33\[m'), nl,
         asserta(currentWeapon(105)), asserta(currentArmor(108)), asserta(currentMisc(111)),
-        addItem(105), addItem(106), addItem(111),
+        addItem(105), addItem(108), addItem(111),
         asserta(critChance(16)), asserta(dodgeChance(15)), asserta(hitChance(90)); % TODO : Non essential, complete integration of crit dodge
 
         ClassID =:= 3,
@@ -901,9 +901,9 @@ sideStatusQuest :-
 
 
 playerHPBar :-
-	statPlayer(TipeKelas, _, CurrentHP, _, _, _, _, _, _),
-	class(_, TipeKelas, DefaultMaxHP, _, _, _),
-    write('\33\[100A\33\[100D\33\[86C'), flush_output,
+	statPlayer(TipeKelas, _, CurrentHP, _, _, _, _, _, _), % TODO : Extra, animation
+	class(_, TipeKelas, DefaultMaxHP, _, _, _),            % TODO : Extra, flicker down
+    write('\33\[100A\33\[100D\33\[86C'), flush_output,     % TODO : Extra, item
 	write('\33\[37m\33\[1m╔════╦════════════╦═══════════╗'),
     write('\33\[100A\33\[100D\33\[69C\33\[1B'), flush_output,
 	write('\33\[37m\33\[1m║ \33\[31m\33\[1mHP\33\[m \33\[37m\33\[1m║ '),

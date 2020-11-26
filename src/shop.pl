@@ -111,7 +111,7 @@ gacha:-
     item(_,Tipe,_,_,_,_),
     random(-10,20,CostSpread),
     GachaCost is 50 + CostSpread,
-    Gold >= GachaCost,
+    Gold >= 40,
     format('You spent \33\[33m%d\33\[m gold.\n', [GachaCost]),
     findall(Y, item(_,_,_,Y,_,_), _),
     % sekarang baru ada 5 item per masing masing kategori, disusun ngurut dari yang menurut kita paling bagus

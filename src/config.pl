@@ -25,7 +25,7 @@ monsterInit :-                  /* HP ATK DEF XP GOLD */
     asserta(monster(4, 'Skeleton', 60,  5, 5, 19, 4)),
     asserta(monster(5, 'Zombie',   65,  9, 2, 23, 4)),
     asserta(monster(6, 'Bomber',   15, 14, 1, 16, 2)),
-    asserta(monster(99, 'duragon', 999,45,25, 2000, 999)).
+    asserta(monster(99, 'Duragonballz', 999,45,25, 2000, 999)).
 
 /* Item(item_id, class_type, category, item_name, attack, def) possibly dont need gold since gacha anyway //parameters could change*/
 /* Item terbagi sesuai dengan jenis class dan category */

@@ -50,7 +50,7 @@ delItem(ItemID) :-
         write('There is no specified item to delete\n'), !
     ), !;
     ItemID > 103, (
-        retract(inventoryP(ItemID,ItemN,_,_)),
+        retract(inventory(ItemID,_,_,ItemN,_,_)),
         format('\33\[33m\33\[1m%s\33\[37m telah dihapus.\33\[m\n',[ItemN]), !;
 
         \+inventory(ItemID,_,_,_,_,_),
@@ -58,7 +58,7 @@ delItem(ItemID) :-
     ), !;
 
     ItemID > 100, ItemID < 104, (
-        retract(inventoryP(ItemID,ItemN,_,_)),
+        retract(inventory(ItemID,_,_,ItemN,_,_)),
         format('\33\[31m\33\[1m%s telah dihapus.\33\[m\n',[ItemN]), !;
 
         \+inventory(ItemID,_,_,_,_,_),
