@@ -18,13 +18,16 @@
 - Program ini menggunakan camel-case, dikarenakan tidak mengetahui prolog menggunakan snake-case.
 - Kode blok **or** yang besar, digunakan indentasi dan bracket untuk memperjelas kode.
 
+
+<!-- put some random isekai'd human and amulet of yendor here -->
+
+
 ## Snapshot
 **Now Loading** \
 ![UI](/other/img/loading.gif) \
 
 **UI & Movement** \
 ![UI](/other/img/movement.gif)
-
 
 
 
@@ -60,10 +63,11 @@ GNU/Prolog                    | 1.4.5
 Ascgen2                       | 2.0.0
 
 
-**Dependencies** \
+**Dependencies**
 Komponen | Menggunakan
 -------- | -----------
 GLIBC    | 2.29
+
 Program ini tidak membutuhkan library eksternal \
 Seluruh program dikoding menggunakan
 fitur standard GNU/Prolog.
@@ -119,3 +123,9 @@ Implementasi Program  | :green_square:
 Eksperimen            | :green_square:
 Kesimpulan            | :green_square:
 Daftar Pustaka        | :green_square: -->
+
+
+### Fun Fact
+- Program ini juga berisi cheat dari beberapa game yang cukup terkenal.
+- Banyak hal diprogram ini dibuat dengan referensi game ataupun anime, cobalah temukan referensi tersebut :)
+###### Ya, game ini merupakan direct reference untuk rogue. (Dengan mix-max spesifikasi tentunya)
