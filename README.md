@@ -11,8 +11,8 @@
 - Program ini menggunakan fitur pergerakan kursor & coloring ANSI dan Unicode box-drawing character yang hanya dapat ditampilkan pada terminal yang mensupportnya.
 - Jika menggunakan terminal yang tidak mensupportnya, **sangat disarankan** untuk mendisable semua UI yang menggunakan kedua fitur diatas.
 - Program diuji dan didevelop dengan **WSL**.
-- Jalankan linux executable play untuk mencoba permainan, good luck have fun!
-
+- Pastikan Distro menggunakan GLIBC versi **2.29** keatas (Untuk Ubuntu, 20.04+).
+- Jalankan linux executable play untuk mencoba permainan, **good luck have fun!**
 
 ### Style kode
 - Program ini menggunakan camel-case, dikarenakan tidak mengetahui prolog menggunakan snake-case.
@@ -61,6 +61,9 @@ Ascgen2                       | 2.0.0
 
 
 **Dependencies** \
+Komponen | Menggunakan
+-------- | -----------
+GLIBC    | 2.29
 Program ini tidak membutuhkan library eksternal \
 Seluruh program dikoding menggunakan
 fitur standard GNU/Prolog.
@@ -88,7 +91,7 @@ Goal & Fail state         | :green_square:
 Spesifikasi   | Status
 -----------   | ------
 Effect Potion | :green_square:
-Monster Zone  | :yellow_square:
+Monster Zone  | :green_square:
 Teleport      | :yellow_square:
 Save & Load   | :yellow_square:
 
@@ -100,8 +103,8 @@ Spesifikasi           | Status
 Raw movement mode     | :green_square:
 Basic map UI          | :green_square:
 Critical & Dodge Stat | :green_square:
-Balancing             | :orange_square:
-Equipment UI          | :yellow_square:
+Balancing             | :green_square:
+Equipment UI          | :green_square:
 
 
 ## Laporan
