@@ -103,7 +103,9 @@ gameLoop :-
             X = 'greedisgood', call(greedisgood);
             X = 'whosyourdaddy', call(whosyourdaddy);
             X = 'hesoyam', call(hesoyam);
-            X = 'hidden', hidden
+            X = 'hidden', hidden;
+            X = 'hidden2', hidden2;
+            X = 'thankyou', yoga
         )
         % TODO : Non essential, Handler message
 
