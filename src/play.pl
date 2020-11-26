@@ -94,9 +94,9 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(11));
-            X = 'y', call(addItem(102));
-            X = 'y', call(addItem(5));
+            % X = 'y', call(addItem(11));
+            % X = 'y', call(addItem(102));
+            % X = 'y', call(addItem(5));
 
 
             % Super-obscure-feature
@@ -805,7 +805,7 @@ questStatus :-
     findall(Ctr, questList(_,Ctr), Ctrs),
     write('\33\[37m\33\[1m'),flush_output,
     write( '┏━━━━━━━━━━━┯━━━━━━━┓\n'),
-    write( '┃  Monster  │ Count ┃\n'),
+    write( '┃  Monster  │ Count ┃\n'), % TODO : Formatting
     write( '┠───────────┼───────┨\n'),
     questListPrint(QIDs,Ctrs),
     % format('┃ \33\[31m\33\[1m%-9s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
@@ -877,7 +877,7 @@ sideStatusQuest :-
     (
         NameLength > 11,
         % sub_atom(Name, 10, 10, 0, SplitString),
-        format('┃ \33\[32m\33\[1m...\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Ct]), % TODO : Fix length
+        format('┃ \33\[32m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',['...',Ct]), % TODO : Fix length
         write('\33\[37m\33\[1m'),flush_output, !;
 
         format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),

@@ -17,8 +17,8 @@ addItem(ItemID) :-
     length(ListP, LengthP),
     Res is Length + LengthP,
     Res >= 100,
-    write('Inventory Is Full'),
-    !,fail;
+    write('\33\[31m\33\[1mInventory Is Full\33\[m'), nl,
+    !;
 
     /*bisa ga ya kira2*/
     ItemID > 15, ItemID =< 100,
@@ -212,7 +212,7 @@ listing(ListID, List1, List2, List3) :-
     % format('┃ Attack │ %26d  ┃',[X1]), nl,
     % format('┃ Def    │ %26d  ┃',[Y1]), nl,
     (
-        I1 > 100, I1 < 104,
+        I1 > 100, I1 < 104, % TODO : Add numbering
         format('\33\[37m\33\[1m┃ %3d │ \33\[33m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl, !;
 
         format('\33\[37m\33\[1m┃ %3d │ \33\[37m\33\[1m%-24s\33\[m \33\[37m\33\[1m│ %3d │ %3d ┃',[I1,W1,X1,Y1]), nl, !
