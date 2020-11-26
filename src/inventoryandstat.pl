@@ -332,7 +332,7 @@ checkLevelUp :-
         AtkGain is 1,
         DefGain is 1,
         (
-            CritChance < 99, NewCrit is CurrentLvl // 2 + 8, % TODO : Non essential, complete integration of crit dodge
+            CritChance < 99, NewCrit is CurrentLvl // 2 + 8, !; % TODO : Non essential, complete integration of crit dodge
             NewCrit is 100, !
         ),
         (

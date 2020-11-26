@@ -866,7 +866,7 @@ sideStatusQuest :-
     write('\33\[37m\33\[1m\33\[1000A\33\[1000D\33\[62C\33\[9B'),flush_output,
     write( '┏━━━━━━━━━━━━━━┯━━━━━━━┓\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[10B'),flush_output,
-    write( '┃    Monster   │ Count ┃\n'), % TODO : Fix level up sorcerer
+    write( '┃    Monster   │ Count ┃\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[11B'),flush_output,
     write( '┠──────────────┼───────┨\n'),
     write('\33\[1000A\33\[1000D\33\[62C\33\[12B'),flush_output,
@@ -874,8 +874,8 @@ sideStatusQuest :-
     atom_length(Name,NameLength),
     (
         NameLength > 11,
-        sub_atom(Name, 10, 10, 0, SplitString),
-        format('┃ \33\[31m\33\[1m%-12s..\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Split,Ct]),
+        % sub_atom(Name, 10, 10, 0, SplitString),
+        format('┃ \33\[32m\33\[1m...\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Ct]), % TODO : Fix length
         write('\33\[37m\33\[1m'),flush_output, !;
 
         format('┃ \33\[31m\33\[1m%-12s\33\[m\33\[37m\33\[1m │ %5d ┃\n',[Name,Ct]),
