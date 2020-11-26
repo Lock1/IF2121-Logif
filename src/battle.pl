@@ -516,7 +516,18 @@ selectiveFightClear :-
 	write('\33\[100A\33\[100D\33\[9B\33\[10C'), flush_output.
 
 
+
+turnUI :-
+	turnCount(CurrentCount),
+	write('\33\[100A\33\[100D\33\[48C'), flush_output,
+	write('\33\[37m\33\[1m╔══════╦═════╗'),
+	write('\33\[100A\33\[100D\33\[48C\33\[1B'), flush_output,
+	format('║ Turn ║ %3d ║',[CurrentCount]),
+	write('\33\[100A\33\[100D\33\[48C\33\[2B'), flush_output,
+	write('╚══════╩═════╝').
+
 battleUIDraw :-
+	turnUI,
 	sideStatus,
 	enemyHPBar,
 	attackHelp,
