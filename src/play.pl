@@ -494,7 +494,7 @@ setLocation(X,Y) :-
 collisionCheck(X,Y) :-
     quest(X,Y), doQuest2(X,Y), !;
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
-    stair(X,Y), moveNextFloor, scaleEnemy, !;
+    stair(X,Y), moveNextFloor, !;
     shop(X,Y), clear, call(shop), clear, !;
     ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
@@ -508,13 +508,14 @@ moveNextFloor :-
 
         X = 121, % Cant next floor if quest active
         randomize, width(W), height(H), destroyMap, incrementFloor, generateMap,
-        random(1, W, RAbsis), random(1, H, ROrdinat),
+        random(1, W, RAbsis), random(1, H, ROrdinat), scaleEnemy,
         setLocation(RAbsis, ROrdinat), clear, !;
 
         X = 110, clear, !;
 
         write('Input tidak diketahui\n\n'), moveNextFloor, !
-    ).%, retract(stair(X,Y)).
+
+    ); !.%, retract(stair(X,Y)).
 
 
 randomEncounter :-
