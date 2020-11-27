@@ -103,7 +103,7 @@ Spesifikasi   | Status
 -----------   | ------
 Effect Potion | :red_square:
 Monster Zone  | :green_square:
-Teleport      | :red_square:
+Teleport      | :green_square:
 Save & Load   | :red_square:
 
 
