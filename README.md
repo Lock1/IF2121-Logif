@@ -101,7 +101,7 @@ Goal & Fail state         | :green_square:
 **Status : Dropped** :yellow_square:
 Spesifikasi   | Status
 -----------   | ------
-Effect Potion | :red_square:
+Effect Potion | :green_square:
 Monster Zone  | :green_square:
 Teleport      | :green_square:
 Save & Load   | :red_square:

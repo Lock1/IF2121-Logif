@@ -94,11 +94,11 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            X = 'y', call(addItem(24));
-            X = 'y', call(addItem(25));
-            X = 'y', call(addItem(26));
-            X = 'y', call(addItem(27));
-            X = 'y', call(addItem(28));
+            % X = 'y', call(addItem(24));
+            % X = 'y', call(addItem(25));
+            % X = 'y', call(addItem(26));
+            % X = 'y', call(addItem(27));
+            % X = 'y', call(addItem(28));
 
 
             % Super-obscure-feature
