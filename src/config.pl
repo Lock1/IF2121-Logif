@@ -6,9 +6,9 @@
 :- dynamic(special_skill/5).
 :- dynamic(monster/7).
 classInit :-
-    asserta(class(1, swordsman, 180, 50, 17, 5)),
+    asserta(class(1, swordsman, 180, 50, 13, 5)),
     asserta(class(2, archer, 120, 60, 7, 4)),
-    asserta(class(3, sorcerer, 150, 100, 15, 2)),
+    asserta(class(3, sorcerer, 150, 100, 11, 2)),
 
     /* Special_Skill(class_type, nama skill, manacost, modifier, cooldown) //parameters could change*/
     asserta(special_skill(swordsman, 'baliho', 15, 10, 4)), % Cooldown always + 1, because special attack always decrease by 1
@@ -52,11 +52,11 @@ item(104, swordsman, sword, 'Tongkat baseball', 0, 0).
 item(105, archer, bow, 'Batu', 0, 0).
 item(106, sorcerer, wand, 'Sapu', 0, 0).
 
-item(107, swordsman, armor, 'Cosplay', 0, 0).
+item(107, swordsman, armor, 'Kaos putih', 0, 0).
 item(108, archer, armor, 'Tracksuit', 0, 0).
 item(109, sorcerer, armor, 'Kaos weeb', 0, 0).
 
-item(110, swordsman, statup, 'Helm motor', 0, 0).
+item(110, swordsman, statup, 'Wig panjang', 0, 0).
 item(111, archer, statup, 'Dewi tidak guna', 0, 0).
 item(112, sorcerer, statup, 'Jenggot palsu', 0, 0).
 
@@ -81,7 +81,12 @@ potion(21, 'Mana Potion', 0, 20).
 potion(22, 'Greater Mana Potion', 0, 30).
 potion(23, 'okultisme', 0, 60).
 
-% TODO : Extra, boost potion
+% ID, Name, Effect ID, Effect Strength
+effectPotion(24, 'Strength Potion', 3, 3).
+effectPotion(25, 'Hardskin Potion', 4, 2).
+effectPotion(26, 'Accuracy Potion', 5, 3).
+effectPotion(27, 'Sharpshooter Potion', 6, 4).
+effectPotion(28, 'Agility Potion', 7, 4).
 
 
 
@@ -112,6 +117,7 @@ triviaList(['ayam goreng enak, kalo ditraktir',
             'fun fact++++ : curhatan seorang dev, tubes ini banyak fitur daripada roguelike yang sebelumnya :(',
             'Also try Minecraft!',
             'Also try Terraria!',
+            'FUS RO DAH!!!',
             'Tsunami > Phantasm :(',
             'Sayang tidak ada waktu buat procedural generation :(',
             'Ceci n\'est pas une trivia screen!',

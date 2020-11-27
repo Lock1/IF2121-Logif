@@ -21,9 +21,13 @@ addItem(ItemID) :-
     !;
 
     /*bisa ga ya kira2*/
-    ItemID > 15, ItemID =< 100,
+    ItemID > 15, ItemID =< 23,
     potion(ItemID, PotionName, PlusHP, PlusMana),
     asserta(inventoryP(ItemID, PotionName, PlusHP, PlusMana)),!;
+
+    ItemID > 23, ItemID =< 100,
+    effectPotion(ItemID, PotionName, EffectID, EffectModifier),
+    asserta(inventoryP(ItemID, PotionName, EffectID, EffectModifier)),!;
 
     ItemID =< 15,
     item(ItemID, Class, Category, ItemName, Attack, Def),
@@ -41,13 +45,13 @@ addItem(ItemID) :-
 
 
 delItem(ItemID) :-
-    ItemID>15,
+    ItemID>15, ItemID =< 100,
     (
         retract(inventoryP(ItemID,ItemN,_,_)),
         format('\33\[33m\33\[1m%s\33\[37m telah dihapus.\33\[m\n',[ItemN]), !;
 
-        \+inventory(ItemID,_,_,_,_,_),
-        write('There is no specified item to delete\n'), !
+        \+inventoryP(ItemID,_,_,_),
+        write('There is no specified potion to delete\n'), !
     ), !;
     ItemID > 103, (
         retract(inventory(ItemID,_,_,ItemN,_,_)),
@@ -70,8 +74,8 @@ delItem(ItemID) :-
         retract(inventory(ItemID,_,_,ItemN,_,_)),
         format('\33\[33m\33\[1m%s\33\[37m telah dihapus.\33\[m\n',[ItemN]), !;
 
-        \+inventoryP(ItemID,_,_,_),
-        write('There is no specified potion to delete\n'), !
+        \+inventory(ItemID,_,_,_,_,_),
+        write('There is no specified item to delete\n'), !
     ), !.
 
 
@@ -181,24 +185,97 @@ equip(ItemID) :-
 
 usePotion(PID) :-
     inventoryP(PID, Name, PlusHP, PlusMana),
+    PID < 24,
     statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     class(_,Tipe, MaxHP, MaxMP,_,_),
     RestoredHP is HP+PlusHP,
     RestoredMana is Mana+PlusMana,
     (
-        RestoredHP > MaxHP, NewHP is MaxHP, !;
-        NewHP is RestoredHP, !
-    ),
-    (
-        RestoredMana > MaxMP, NewMana is MaxMP, !;
-        NewMana is RestoredMana, !
+        PID > 15, PID < 20,
+        RestoredHP > MaxHP, NewHP is MaxHP, Delta is NewHP - HP, NewMana is Mana,
+        format('\33\[37m\33\[1mHealth  \33\[31m\33\[2m%d \33\[m→ \33\[33m\33\[1m%d \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[HP,MaxHP,Delta]), !;
+
+        PID > 15, PID < 20,
+        NewHP is RestoredHP, Delta is RestoredHP, NewMana is Mana,
+        format('\33\[37m\33\[1mHealth  \33\[31m\33\[2m%d \33\[m→ \33\[33m\33\[1m%d \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[HP,RestoredHP,Delta]), !;
+
+        PID > 19, PID < 24,
+        RestoredMana > MaxMP, NewMana is MaxMP, Delta is NewMana - Mana, NewHP is HP,
+        format('\33\[37m\33\[1mMana  \33\[36m\33\[2m%d \33\[m→ \33\[33m\33\[1m%d \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[Mana,MaxMP,Delta]), !;
+
+        PID > 19, PID < 24,
+        NewMana is RestoredMana, Delta is RestoredMana, NewHP is HP,
+        format('\33\[37m\33\[1mMana  \33\[36m\33\[2m%d \33\[m→ \33\[33m\33\[1m%d \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[Mana,RestoredMana,Delta]), !
     ),
     retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(Tipe, Nama, NewHP, NewMana, Atk, Def, Lvl, XP, Gold)),
     retract(inventoryP(PID, Name, PlusHP, PlusMana)),
-    format('\33\[33m\33\[1m%s\33\[m telah diminum\n',[Name]),!;
-    write('Potion tidak ditemukan\n').
+    format('\33\[33m\33\[1m%s\33\[m telah diminum\n',[Name]), !;
 
+    inventoryP(PID, Name, EffectID, EffectModifier),
+    PID > 23, PID =< 100,
+    statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
+    (
+        EffectID is 3, NewAtk is Atk + EffectModifier, NewDef is Def, Delta is EffectModifier,
+        format('\33\[37m\33\[1mAttack  \33\[m\33\[2m%d\33\[m → \33\[33m\33\[1m%d\33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[Atk,NewAtk,EffectModifier]),
+        write('\33\[33m\33\[1mAttack '), !;
+
+        EffectID is 4, NewDef is Def + EffectModifier, NewAtk is Atk, Delta is EffectModifier,
+        format('\33\[37m\33\[1mDefense  \33\[m\33\[2m%d\33\[m → \33\[33m\33\[1m%d\33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[Def,NewDef,EffectModifier]),
+        write('\33\[33m\33\[1mDefense '), !;
+
+        EffectID is 5, hitChance(OldAcc), addAccuracy(EffectModifier), hitChance(NewAcc), NewAtk is Atk, NewDef is Def, Delta is NewAcc - OldAcc,
+        format('\33\[37m\33\[1mAccuracy  \33\[m\33\[2m%d %s \33\[m→ \33\[33m\33\[1m%d %s \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[OldAcc,'%',NewAcc,'%',Delta]),
+        write('\33\[33m\33\[1mAccuracy '), !;
+
+        EffectID is 6, critChance(OldCrit), addCrit(EffectModifier), critChance(NewCrit), NewAtk is Atk, NewDef is Def, Delta is NewCrit - OldCrit,
+        format('\33\[37m\33\[1mCritical  \33\[m\33\[2m%d %s \33\[m→ \33\[33m\33\[1m%d %s \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[OldCrit,'%',NewCrit,'%',Delta]),
+        write('\33\[33m\33\[1mCritical '), !;
+
+        EffectID is 7, dodgeChance(OldDodge), addDodge(EffectModifier), dodgeChance(NewDodge), NewAtk is Atk, NewDef is Def, Delta is NewDodge - OldDodge,
+        format('\33\[37m\33\[1mDodge  \33\[m\33\[2m%d %s \33\[m→ \33\[33m\33\[1m%d %s \33\[m         \33\[32m\33\[1m↑\33\[m \33\[33m\33\[1m%d\33\[m\n',[OldDodge,'%',NewDodge,'%',Delta]),
+        write('\33\[33m\33\[1mDodge '), !
+    ),
+    format('bertambah sebanyak %d!\33\[m\n',[Delta]),
+    retract(statPlayer(Tipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
+    asserta(statPlayer(Tipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
+    retract(inventoryP(PID, Name, EffectID, EffectModifier)),
+    !;
+    write('Potion tidak ditemukan\n'), !.
+
+
+addAccuracy(EffectModifier) :-
+    hitChance(LastAcc),
+    (
+        NewAcc is LastAcc + EffectModifier,
+        NewAcc =< 100, !;
+
+        NewAcc is 100, !
+    ),
+    retract(hitChance(LastAcc)),
+    asserta(hitChance(NewAcc)), !.
+
+addCrit(EffectModifier) :-
+    critChance(LastCrit),
+    (
+        NewCrit is LastCrit + EffectModifier,
+        NewCrit =< 100, !;
+
+        NewCrit is 100, !
+    ),
+    retract(critChance(LastCrit)),
+    asserta(critChance(NewCrit)), !.
+
+addDodge(EffectModifier) :-
+    dodgeChance(LastDodge),
+    (
+        NewDodge is LastDodge + EffectModifier,
+        NewDodge =< 100, !;
+
+        NewDodge is 100, !
+    ),
+    retract(dodgeChance(LastDodge)),
+    asserta(dodgeChance(NewDodge)), !.
 
 % -------------- Show Inventory --------------
 listing([],[],[],[],_).
@@ -247,9 +324,12 @@ listingPotion(ListID, List1, List2, List3, Ctr):-
     [C1|C2]=List3,
     (
         I1 > 15, I1 < 20,
-        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[31m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,B1,C1]), !;
+        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[31m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[31m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,1,C1]), !;
 
-        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[36m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,B1,C1]), !
+        I1 > 19, I1 < 24,
+        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[36m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[36m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,2,C1]), !;
+
+        format('\33\[37m\33\[1m┃ %3d │ %2d │ \33\[33m\33\[1m%-25s\33\[m \33\[37m\33\[1m│ \33\[33m\33\[1m%3d\33\[m \33\[37m\33\[1m│ \33\[33m\33\[1m%3d\33\[m \33\[37m\33\[1m┃\n',[Ctr,I1,A1,B1,C1]), !
     ),
     % format('┃ ID            │ %19d  ┃',[I1]), nl,
     % format('┃ Name          │ %19s  ┃',[A1]), nl,
@@ -269,7 +349,7 @@ listPotion :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'), nl,
     write('┃                      Potion                      ┃'), nl,
     write('┠─────┬────┬───────────────────────────┬─────┬─────┨'), nl,
-    write('┃ No  │ ID │ Nama                      │ HP  │ MP  ┃'), nl,
+    write('┃ No  │ ID │ Nama                      │ EID │ Mod ┃'), nl,
     write('┠─────┼────┼───────────────────────────┼─────┼─────┨'), nl,
     listingPotion(PIDs, PNames, HPs, ManaS, 1),
     write('\33\[37m\33\[1m'), flush_output,

@@ -30,17 +30,19 @@ setInitialMap :-
 
 generateMap :-
     currentFloor(Floor), (
-        width(W), height(H), setPortal1(1), setPortal2(1),
-        Floor is 3, random(40,W,Absis1), random(20,H,Ordinat1),
+        width(W), height(H),
+        Floor is 3, setPortal1(1), setPortal2(1), random(40,W,Absis1), random(20,H,Ordinat1),
         asserta(dragon(Absis1, Ordinat1)), !;
 
-        Floor is 2, setQuest(1), setStair(1), setPortal1(1), setPortal1(1), !
+        Floor is 2, setQuest(1), setStair(1), setPortal1(1), setPortal2(1), !
     ),
     setShop(1).
 
 destroyMap :-
-    retract(portal1(_,_)),
-    retract(portal2(_,_)),
+    portal1(X,Y),
+    portal2(W,Z),
+    retract(portal1(X,Y)),
+    retract(portal2(W,Z)),
     retract(shop(_,_)),
     retract(stair(_,_)),
     retractAllQuest.
@@ -121,7 +123,7 @@ setStair(X) :-
     setStair(X2),!.
 
 setPortal1(X) :-
-    X is 0;
+    X is 0, !;
     randomize,
     width(W),
     height(H),
@@ -132,7 +134,7 @@ setPortal1(X) :-
     setPortal1(X2), !.
 
 setPortal2(X) :-
-    X is 0;
+    X is 0, !;
     randomize,
     width(W),
     height(H),
