@@ -1,18 +1,19 @@
-PlayerPosition 2 4
+PlayerPosition 9 8
 CurrentFloor 1
-QuestCount 0
+QuestCount endquest
 GlobalQuestCount 3
-BluePortal 41 9
-OrangePortal 31 15
-ShopLocation 48 15
-StairLocation 46 23
-PlayerStat 3 sorcerer 150 100 11 2
-CurrentStat swordsman ads 180 50 13 5 1 0 0
-CurrentWeapon 104
-CurrentArmor 107
-CurrentMisc 110
-SpecialSkill swordsman baliho 15 10 4
-HitChance 80
-CritChance 5
-DodgeChance 5
-Inventory 110 107 104 20 20 16 16 16 16 16 endinv
+BluePortal 7 20
+OrangePortal 20 10
+ShopLocation 11 18
+StairLocation 13 1
+PlayerStat 2 archer 120 60 7 4
+CurrentStat archer asda 67 30 7 4 1 15 3
+CurrentWeapon 105
+CurrentArmor 108
+CurrentMisc 111
+SpecialSkill archer multishot 10 2 3
+HitChance 90
+CritChance 16
+DodgeChance 15
+Inventory 105 108 111 16 16 16 16 16 20 20 endinv
+QuestLocation 22 17 27 16  endloc

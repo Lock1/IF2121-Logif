@@ -877,7 +877,11 @@ sideStatus :-
     write('┃ Floor   │ '), format('\33\[37m\33\[1m%10d',[Floor]), flush_output,  write(' ┃'),
     write('\33\[100A\33\[1000D\33\[62C\33\[8B'),flush_output,
     write('┗━━━━━━━━━┷━━━━━━━━━━━━┛'),
-    call(sideStatusQuest), call(playerHPBar), call(playerMPBar), call(playerXPBar), call(inventoryUI),
+    call(sideStatusQuest),
+    call(playerHPBar),
+    call(playerMPBar),
+    call(playerXPBar),
+    call(inventoryUI),
     write('\33\[100A\33\[1000D'),flush_output.
 
 sideStatusQuest :-
@@ -1051,6 +1055,7 @@ inventoryUI :-
 /* -------------------- File input / output --------------------- */
 /* Untuk save dan load */
 /*read from file*/
+:- dynamic(loadRemainingQuest/1).
 read_from_file(File) :-
     \+ isGameStarted(_),
     open(File, read, FileStream),
@@ -1070,16 +1075,19 @@ read_from_file(File) :-
     % FIXME : Currently random location quest
     % FIXME : Cant keep track current quest
     read_token(FileStream, _),
-    read_token(FileStream, _), % TODO : Maybe cleanup?
+    loadQuest(FileStream),
+
+
 
     read_token(FileStream, _),
     read_token(FileStream, GlobalQCount),
     asserta(questCount(GlobalQCount)), (
-        Floor is 1, GlobalQCount is 3, setQuest(2), !;
+        Floor is 1, GlobalQCount is 3, asserta(loadRemainingQuest(1)), !;
 
-        Floor is 1, GlobalQCount is 2, setQuest(1), !;
+        Floor is 1, GlobalQCount is 2, questList(_,_), !;
 
-        Floor is 2, GlobalQCount is 1, setQuest(1), !;
+        Floor is 2, GlobalQCount is 1, questList(_,_), !;
+        Floor is 2, GlobalQCount is 1, asserta(loadRemainingQuest(1)), !;
 
         !
     ),
@@ -1118,7 +1126,7 @@ read_from_file(File) :-
     asserta(class(IDClass,Class,MaxHP,MaxMP,BaseAtk,BaseDef)),
 
     read_token(FileStream, _),
-    read_token(FileStream, CIDClass),
+    read_token(FileStream, _),
     read_token(FileStream, CName),
     read_token(FileStream, CHP),
     read_token(FileStream, CMP),
@@ -1127,7 +1135,7 @@ read_from_file(File) :-
     read_token(FileStream, CLevel),
     read_token(FileStream, CXP),
     read_token(FileStream, CGold),
-    asserta(statPlayer(CIDClass,CName,CHP,CMP,CAtk,CDef,CLevel,CXP,CGold)),
+    asserta(statPlayer(Class,CName,CHP,CMP,CAtk,CDef,CLevel,CXP,CGold)),
 
     read_token(FileStream, _),
     read_token(FileStream, CWeapon),
@@ -1142,12 +1150,12 @@ read_from_file(File) :-
     asserta(currentMisc(CMisc)),
 
     read_token(FileStream, _),
-    read_token(FileStream, CSkill),
+    read_token(FileStream, _),
     read_token(FileStream, CSName),
     read_token(FileStream, CMPCost),
     read_token(FileStream, CMod),
     read_token(FileStream, CCool),
-    asserta(special_skill(CSkill,CSName,CMPCost,CMod,CCool)),
+    asserta(special_skill(Class,CSName,CMPCost,CMod,CCool)),
 
     read_token(FileStream, _),
     read_token(FileStream, CHit),
@@ -1163,6 +1171,12 @@ read_from_file(File) :-
 
     read_token(FileStream, _),
     loadInventory(FileStream),
+
+    read_token(FileStream, _), (
+        loadRemainingQuest(1), loadQuestLocation(FileStream), !;
+
+        !
+    ),
 
 
     scaleEnemy,
@@ -1189,6 +1203,26 @@ loadInventory(FileStream) :-
         addItem(CurrentID), loadInventory(FileStream), !
     ), !.
 
+loadQuest(FileStream) :-
+    read_token(FileStream,CurrentID),
+    (
+        CurrentID = 'endquest', !;
+
+        read_token(FileStream,CurrentCt),
+        asserta(questList(CurrentID,CurrentCt)),
+        loadQuest(FileStream), !
+    ), !.
+
+loadQuestLocation(FileStream) :-
+    read_token(FileStream,CurrentX),
+    (
+        CurrentX = 'endloc', !;
+
+        read_token(FileStream,CurrentY),
+        asserta(quest(CurrentX,CurrentY)),
+        loadQuestLocation(FileStream), !
+    ), !.
+
 
 
 /*write to file*/
@@ -1212,12 +1246,20 @@ write_on_file(File) :-
     write(FileStream, CFloor),
     write(FileStream, '\n'),
 
-    questCount(QCount),
+
     write(FileStream, 'QuestCount '),
-    QLeft is 3 - QCount,
-    write(FileStream, QLeft), % TODO : Extra fix this
+    (
+        isQuest(1),
+        findall(ID,questList(ID,_),IDList),
+        findall(Ctr,questList(_,Ctr),CtrList),
+        writeQuest(FileStream,IDList,CtrList),
+        write(FileStream,'endquest'), !;
+
+        write(FileStream,'endquest'), !
+    ),
     write(FileStream, '\n'),
 
+    questCount(QCount),
     write(FileStream, 'GlobalQuestCount '),
     write(FileStream, QCount),
     write(FileStream, '\n'),
@@ -1253,12 +1295,12 @@ write_on_file(File) :-
     write(FileStream, StY),
     write(FileStream, '\n'),
 
-    %
-    class(IDClass,Class,MaxHP,MaxMP,BaseAtk,BaseDef),
+    statPlayer(KClass,_,_,_,_,_,_,_,_),
+    class(IDClass,KClass,MaxHP,MaxMP,BaseAtk,BaseDef),
     write(FileStream, 'PlayerStat '),
     write(FileStream, IDClass),
     write(FileStream, ' '),
-    write(FileStream, Class),
+    write(FileStream, KClass),
     write(FileStream, ' '),
     write(FileStream, MaxHP),
     write(FileStream, ' '),
@@ -1341,11 +1383,45 @@ write_on_file(File) :-
     writeInventory(FileStream,PIDs),
     write(FileStream, 'endinv\n'),
 
+    write(FileStream,'QuestLocation '),
+    (
+        quest(_,_),
+        findall(RemX,quest(RemX,_),RemXs),
+        findall(RemY,quest(_,RemY),RemYs),
+        writeQuestLocation(FileStream,RemXs,RemYs), !;
+
+        write(FileStream, 0),
+        write(FileStream, ' '),
+        write(FileStream, 0),
+        write(FileStream, ' '), !
+    ),
+    write(FileStream,' endloc'),
+    write(FileStream,'\n'),
+
     close(FileStream),
 
     write('\33\[33m\33\[1mFile telah disave!\33\[m\n'), !;
     write('\33\[31m\33\[1mGagal dalam proses save.\33\[m\n'), !.
 
+writeQuestLocation(FileStream,PosX,PosY) :-
+    PosX = [], PosY = [], !;
+    PosX = [HPosX|TPosX], PosY = [HPosY|TPosY],
+    write(FileStream,HPosX),
+    write(FileStream,' '),
+    write(FileStream,HPosY),
+    write(FileStream,' '),
+    writeQuestLocation(FileStream,TPosX,TPosY), !.
+
+writeQuest(FileStream,ID,CT) :-
+    ID = [], CT = [], !;
+
+    ID = [IDH|IDT], CT = [CTH|CTT],
+
+    write(FileStream,IDH),
+    write(FileStream, ' '),
+    write(FileStream,CTH),
+    write(FileStream, ' '),
+    writeQuest(FileStream,IDT,CTT), !.
 
 writeInventory(FileStream,IDS) :-
     IDS = [], !;

@@ -1,17 +1,19 @@
-PlayerPosition 4 7
+PlayerPosition 28 22
 CurrentFloor 1
-QuestCount 0
+QuestCount 1 1 5 2 endquest
 GlobalQuestCount 3
-BluePortal 35 21
-OrangePortal 19 10
-ShopLocation 42 5
-StairLocation 39 4
-PlayerStat 3 sorcerer 290 176 11 2
-CurrentStat sorcerer lala 290 176 19 10 9 239 2008
-CurrentWeapon 106
-CurrentArmor 109
-CurrentMisc 112
-SpecialSkill sorcerer santet 22 3 5
-HitChance 85
-CritChance 12
-DodgeChance 12
+BluePortal 18 12
+OrangePortal 16 24
+ShopLocation 8 12
+StairLocation 23 24
+PlayerStat 3 sorcerer 179 113 11 2
+CurrentStat sorcerer sad 179 113 100009 100006 3 31 117
+CurrentWeapon 105
+CurrentArmor 108
+CurrentMisc 111
+SpecialSkill sorcerer multishot 8 2 3
+HitChance 90
+CritChance 9
+DodgeChance 10
+Inventory 105 108 111 16 16 16 16 16 20 20 endinv
+QuestLocation 30 21  endloc
