@@ -496,6 +496,8 @@ collisionCheck(X,Y) :-
     dragon(X,Y), clear, encounterDragon(_), clearFightStatus, clear, sleep(1), victory, !;
     stair(X,Y), moveNextFloor, !;
     shop(X,Y), clear, call(shop), clear, !;
+    portal1(X,Y), portalMove(X,Y), !;
+    portal2(X,Y), portalMove(X,Y), !;
     ( \+shop(X,Y); \+dragon(X,Y) ),randomEncounter, clear, encounterEnemy(_), clearFightStatus, clear,  !;
     setLocation(X,Y).
 
@@ -540,7 +542,6 @@ switchMove(X) :-
     X > 0, clear, sideStatus, \+map.
 
 toggleRawMode :-
-
     get_key_no_echo(user_input,X),
     % overwriteClear,
     % lineWipeAtPlayer,
@@ -553,6 +554,14 @@ movementTickEvaluate :-
     incrementMovementTick,
     manaRegen, hpRegen, !.
 
+portalMove(X,Y) :-
+    portal1(X,Y),
+    portal2(TargetX,TargetY),
+    setLocation(TargetX,TargetY), !;
+
+    portal2(X,Y),
+    portal1(TargetX,TargetY),
+    setLocation(TargetX,TargetY), !.
 
 
 

@@ -28,7 +28,13 @@
 ![UI](/other/img/loading.gif) \
 
 **UI & Movement** \
-![UI](/other/img/movement.gif)
+![UI](/other/img/movement.gif) \
+
+**Battle** \
+![UI](/other/img/battle.gif) \
+
+**I think I see it somewhere...** :thinking: \
+![UI](/other/img/portal.gif)
 
 
 
@@ -114,13 +120,13 @@ Equipment UI          | :green_square:
 
 
 ## Laporan
-**Status : Pending** :yellow_square: \
-**? / ?**
+**Status : Done** :green_square: \
+**3 / 3**
 Bab                   | Status
 ---                   | ------
 Penjelasan Command    | :green_square:
 Skenario Penggunaan   | :green_square:
-???    | ???
+Snapshot              | :green_square:
 
 
 ### Fun Fact

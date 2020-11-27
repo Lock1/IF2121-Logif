@@ -9,6 +9,8 @@ height(25).
 :- dynamic(dragon/2).
 :- dynamic(playerLocation/2).
 :- dynamic(stair/2).
+:- dynamic(portal1/2).
+:- dynamic(portal2/2).
 :- dynamic(questCount/1).
 :- dynamic(currentFloor/1).
 
@@ -20,21 +22,25 @@ setInitialMap :-
     random(1,5,Ordinat2),
     asserta(playerLocation(Absis2, Ordinat2)),
     setQuest(2),
+    setPortal1(1),
+    setPortal2(1),
     asserta(questCount(3)),
     setShop(1),
     setStair(1).
 
 generateMap :-
     currentFloor(Floor), (
-        width(W), height(H),
+        width(W), height(H), setPortal1(1), setPortal2(1),
         Floor is 3, random(40,W,Absis1), random(20,H,Ordinat1),
         asserta(dragon(Absis1, Ordinat1)), !;
 
-        Floor is 2, setQuest(1), setStair(1), !
+        Floor is 2, setQuest(1), setStair(1), setPortal1(1), setPortal1(1), !
     ),
     setShop(1).
 
 destroyMap :-
+    retract(portal1(_,_)),
+    retract(portal2(_,_)),
     retract(shop(_,_)),
     retract(stair(_,_)),
     retractAllQuest.
@@ -113,6 +119,29 @@ setStair(X) :-
     asserta(stair(Absis, Ordinat)),
     X2 is X-1,
     setStair(X2),!.
+
+setPortal1(X) :-
+    X is 0;
+    randomize,
+    width(W),
+    height(H),
+    random(1, W, Absis),
+    random(1, H, Ordinat),
+    asserta(portal1(Absis, Ordinat)),
+    X2 is X-1,
+    setPortal1(X2), !.
+
+setPortal2(X) :-
+    X is 0;
+    randomize,
+    width(W),
+    height(H),
+    random(1, W, Absis),
+    random(1, H, Ordinat),
+    asserta(portal2(Absis, Ordinat)),
+    X2 is X-1,
+    setPortal2(X2), !.
+
 % TODO : Non essential, double buffer
 setMap(X,Y) :- /*Draw Right Border*/
     height(H),
@@ -166,6 +195,18 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
+    /*Draw Player*/
+    X > 0,
+    X < W+1,
+    Y > 0,
+    Y < H+1,
+    playerLocation(X, Y), !,
+    write('\33\[32m\33\[1m@\33\[m'),
+    flush_output,
+    write('\33\[37m\33\[1m'),flush_output,
+    X2 is X+1,
+    setMap(X2, Y),!;
+
     /*Draw Dragon*/
     X > 0,
     X < W+1,
@@ -202,6 +243,30 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
+    /*Draw portal 1*/
+    X > 0,
+    X < W+1,
+    Y > 0,
+    Y < H+1,
+    portal1(X, Y), !,
+    write('\33\[m\33\[38;2;20;75;230mO\33\[m'),
+    flush_output,
+    write('\33\[37m\33\[1m'),flush_output,
+    X2 is X+1,
+    setMap(X2, Y),!;
+
+    /*Draw portal 2*/
+    X > 0,
+    X < W+1,
+    Y > 0,
+    Y < H+1,
+    portal2(X, Y), !,
+    write('\33\[m\33\[38;2;252;127;0mO\33\[m'),
+    flush_output,
+    write('\33\[37m\33\[1m'),flush_output,
+    X2 is X+1,
+    setMap(X2, Y),!;
+
     /*Draw shop*/
     X > 0,
     X < W+1,
@@ -214,17 +279,6 @@ setMap(X,Y) :- /*Draw Right Border*/
     X2 is X+1,
     setMap(X2, Y),!;
 
-    /*Draw Player*/
-    X > 0,
-    X < W+1,
-    Y > 0,
-    Y < H+1,
-    playerLocation(X, Y), !,
-    write('\33\[32m\33\[1m@\33\[m'),
-    flush_output,
-    write('\33\[37m\33\[1m'),flush_output,
-    X2 is X+1,
-    setMap(X2, Y),!;
 
     /*Draw Empty*/
     X > 0,
