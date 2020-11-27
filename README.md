@@ -2,7 +2,6 @@
 <!-- FAQ Link https://docs.google.com/spreadsheets/d/1QkNJaG0cs0F3fyr8cIbdDV4myj_dXvvyGqcqPybjT2A/edit#gid=0 -->
 
 ### Release
-**TBA**
 [v1.0](https://github.com/Lock1/Logif-IF2121/releases/tag/v1.0)
 
 

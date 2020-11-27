@@ -1,19 +1,19 @@
-PlayerPosition 28 22
+PlayerPosition 9 8
 CurrentFloor 1
-QuestCount 1 1 5 2 endquest
+QuestCount endquest
 GlobalQuestCount 3
-BluePortal 18 12
-OrangePortal 16 24
-ShopLocation 8 12
-StairLocation 23 24
-PlayerStat 3 sorcerer 179 113 11 2
-CurrentStat sorcerer sad 179 113 100009 100006 3 31 117
+BluePortal 7 20
+OrangePortal 20 10
+ShopLocation 11 18
+StairLocation 13 1
+PlayerStat 2 archer 120 60 7 4
+CurrentStat archer asda 67 30 7 4 1 15 3
 CurrentWeapon 105
 CurrentArmor 108
 CurrentMisc 111
-SpecialSkill sorcerer multishot 8 2 3
+SpecialSkill archer multishot 10 2 3
 HitChance 90
-CritChance 9
-DodgeChance 10
+CritChance 16
+DodgeChance 15
 Inventory 105 108 111 16 16 16 16 16 20 20 endinv
-QuestLocation 30 21  endloc
+QuestLocation 22 17 27 16  endloc
