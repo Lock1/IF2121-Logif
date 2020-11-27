@@ -1,0 +1,18 @@
+PlayerPosition 2 4
+CurrentFloor 1
+QuestCount 0
+GlobalQuestCount 3
+BluePortal 41 9
+OrangePortal 31 15
+ShopLocation 48 15
+StairLocation 46 23
+PlayerStat 3 sorcerer 150 100 11 2
+CurrentStat swordsman ads 180 50 13 5 1 0 0
+CurrentWeapon 104
+CurrentArmor 107
+CurrentMisc 110
+SpecialSkill swordsman baliho 15 10 4
+HitChance 80
+CritChance 5
+DodgeChance 5
+Inventory 110 107 104 20 20 16 16 16 16 16 endinv

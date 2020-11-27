@@ -12,7 +12,7 @@ classInit :-
 
     /* Special_Skill(class_type, nama skill, manacost, modifier, cooldown) //parameters could change*/
     asserta(special_skill(swordsman, 'baliho', 15, 10, 4)), % Cooldown always + 1, because special attack always decrease by 1
-    asserta(special_skill(archer, 'rapid fire', 10, 2, 3)), % TODO : Extra, Level up cooldown scale
+    asserta(special_skill(archer, 'multishot', 10, 2, 3)), % TODO : Extra, Level up cooldown scale
     asserta(special_skill(sorcerer, 'santet', 30, 3, 5)).
 
 

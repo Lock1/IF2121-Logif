@@ -72,7 +72,7 @@ gameLoop :-
         X = 'quit', call(quit);
         X = 'save', call(write_on_file('save'));
 
-        X = 's', call(write_on_file('save'));
+        X = 'sv', call(write_on_file('save'));
         X = 'l', call(read_from_file('save')); % TODO : Extra, anywhere save / load
         X = 'h', call(help(IsUnicodeMode));
         X = 'c', call(clear);
@@ -1069,14 +1069,20 @@ read_from_file(File) :-
     % Quest
     % FIXME : Currently random location quest
     % FIXME : Cant keep track current quest
-    % FIXME : Cant load inventory
     read_token(FileStream, _),
-    read_token(FileStream, QCount),
-    setQuest(QCount),
+    read_token(FileStream, _), % TODO : Maybe cleanup?
 
     read_token(FileStream, _),
     read_token(FileStream, GlobalQCount),
-    asserta(questCount(GlobalQCount)),
+    asserta(questCount(GlobalQCount)), (
+        Floor is 1, GlobalQCount is 3, setQuest(2), !;
+
+        Floor is 1, GlobalQCount is 2, setQuest(1), !;
+
+        Floor is 2, GlobalQCount is 1, setQuest(1), !;
+
+        !
+    ),
 
     % Portal
     read_token(FileStream, _),
@@ -1126,17 +1132,14 @@ read_from_file(File) :-
     read_token(FileStream, _),
     read_token(FileStream, CWeapon),
     asserta(currentWeapon(CWeapon)),
-    addItem(CWeapon),
 
     read_token(FileStream, _),
     read_token(FileStream, CArmor),
     asserta(currentArmor(CArmor)),
-    addItem(CArmor),
 
     read_token(FileStream, _),
     read_token(FileStream, CMisc),
     asserta(currentMisc(CMisc)),
-    addItem(CMisc),
 
     read_token(FileStream, _),
     read_token(FileStream, CSkill),
@@ -1158,8 +1161,8 @@ read_from_file(File) :-
     read_token(FileStream, CDodge),
     asserta(dodgeChance(CDodge)),
 
-
-
+    read_token(FileStream, _),
+    loadInventory(FileStream),
 
 
     scaleEnemy,
@@ -1177,6 +1180,15 @@ read_from_file(File) :-
     write('\33\[31m\33\[1mGame sudah dimulai\33\[m\n'), !;
 
     write('\33\[31m\33\[1mLoad gagal.\33\[m \n'), !.
+
+loadInventory(FileStream) :-
+    read_token(FileStream, CurrentID),
+    (
+        CurrentID = 'endinv', !;
+
+        addItem(CurrentID), loadInventory(FileStream), !
+    ), !.
+
 
 
 /*write to file*/
@@ -1320,15 +1332,27 @@ write_on_file(File) :-
     write(FileStream, 'DodgeChance '),
     write(FileStream, CDodge),
     write(FileStream, '\n'),
+
+    findall(PotionID, inventoryP(PotionID,_,_,_), PIDs),
+    findall(ItemID, inventory(ItemID,_,_,_,_,_), IDs),
+
+    write(FileStream, 'Inventory '),
+    writeInventory(FileStream,IDs),
+    writeInventory(FileStream,PIDs),
+    write(FileStream, 'endinv\n'),
+
     close(FileStream),
 
     write('\33\[33m\33\[1mFile telah disave!\33\[m\n'), !;
     write('\33\[31m\33\[1mGagal dalam proses save.\33\[m\n'), !.
 
 
-    % close(FileStream).
-
-
+writeInventory(FileStream,IDS) :-
+    IDS = [], !;
+    IDS = [ID|Tail],
+    write(FileStream,ID),
+    write(FileStream,' '),
+    writeInventory(FileStream,Tail), !.
 
 
 
