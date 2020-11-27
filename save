@@ -1,0 +1,17 @@
+PlayerPosition 4 7
+CurrentFloor 1
+QuestCount 0
+GlobalQuestCount 3
+BluePortal 35 21
+OrangePortal 19 10
+ShopLocation 42 5
+StairLocation 39 4
+PlayerStat 3 sorcerer 290 176 11 2
+CurrentStat sorcerer lala 290 176 19 10 9 239 2008
+CurrentWeapon 106
+CurrentArmor 109
+CurrentMisc 112
+SpecialSkill sorcerer santet 22 3 5
+HitChance 85
+CritChance 12
+DodgeChance 12

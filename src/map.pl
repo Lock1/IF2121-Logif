@@ -53,7 +53,6 @@ retractAllQuest :-
     !.
 
 scaleEnemy :-
-    deleteEnemy,
     currentFloor(Floor), (
         Floor is 3,
         asserta(monster(1, 'Queen Slime',     90, 15, 4,  9, 4)),
@@ -69,7 +68,15 @@ scaleEnemy :-
         asserta(monster(3, 'Rabid Wolf',         90, 11, 4, 17, 5)),
         asserta(monster(4, 'Hardened Skeleton', 100,  7, 7, 23, 6)),
         asserta(monster(5, 'Drowned',            90, 14, 3, 30, 7)),
-        asserta(monster(6, 'Moss Hornet',        25, 30, 2, 21, 4)), !
+        asserta(monster(6, 'Moss Hornet',        25, 30, 2, 21, 4)), !;
+
+        Floor is 1,
+        asserta(monster(1, 'Slime',    30,  6, 2, 5,  2)),
+        asserta(monster(2, 'Goblin',   50,  8, 3, 13, 4)),
+        asserta(monster(3, 'Wolf',     60,  7, 4, 16, 3)),
+        asserta(monster(4, 'Skeleton', 60,  5, 5, 19, 4)),
+        asserta(monster(5, 'Zombie',   65,  9, 2, 23, 4)),
+        asserta(monster(6, 'Bomber',   15, 14, 1, 16, 2)), !
     ), !.
 
 deleteEnemy :-

@@ -35,14 +35,6 @@ unicode(1). % Secara default, program ditargetkan untuk mode unicode
 /* ------------------------- Core Loop -------------------------- */
 main :-
     unicode(IsUnicodeMode),
-    setInitialMap, classInit, monsterInit,
-    randomize,
-    asserta(movementTick(1)),
-    asserta(currentFloor(1)),
-    addItem(16), addItem(16), addItem(16), addItem(16), addItem(16),
-    addItem(20), addItem(20),
-    random(37,11777,Rseed),
-    set_seed(Rseed),
     (
         IsUnicodeMode is 1,
         shell('clear'),
@@ -57,6 +49,16 @@ main :-
         gameLoop
     ).
 
+generateNewGame :-
+    setInitialMap, classInit, monsterInit,
+    randomize,
+    asserta(movementTick(1)),
+    asserta(currentFloor(1)),
+    addItem(16), addItem(16), addItem(16), addItem(16), addItem(16),
+    addItem(20), addItem(20),
+    random(37,11777,Rseed),
+    set_seed(Rseed), !.
+
 gameLoop :-
     repeat,
     write('> '),
@@ -64,10 +66,14 @@ gameLoop :-
     % Pembatasan input agar tidak dapat cheat :)
     catch(read(X), error(_,_), errorMessage), (
         X = 'start', call(start);
+        X = 'load', call(read_from_file('save'));
         X = 'help', call(help(IsUnicodeMode));
         X = 'clear', call(clear);
         X = 'quit', call(quit);
+        X = 'save', call(write_on_file('save'));
 
+        X = 's', call(write_on_file('save'));
+        X = 'l', call(read_from_file('save')); % TODO : Extra, anywhere save / load
         X = 'h', call(help(IsUnicodeMode));
         X = 'c', call(clear);
         X = 'q', call(quit);
@@ -94,7 +100,6 @@ gameLoop :-
             X = 'i', call(listInventory);
             X = 'd', call(drinkPot);
             X = 'x', call(deleteItemInventory);
-            % X = 'y', call(addItem(24));
             % X = 'y', call(addItem(25));
             % X = 'y', call(addItem(26));
             % X = 'y', call(addItem(27));
@@ -145,6 +150,7 @@ start :-
 
     \+isGameStarted(_),
     asserta(isGameStarted(1)),
+    generateNewGame,
     username_input,
     choose_class, !.
 
@@ -209,7 +215,7 @@ drinkPot :-
     inventoryP(_,_,_,_),
     listPotion,
     write('Masukkan ID Potion \n\33\[32m\33\[1mDrink >> \33\[m'),
-    catch(read(X), error(_,_), errorMessage), get_key_no_echo(_),
+    catch(read(X), error(_,_), errorMessage), get_key_no_echo(user_input,_),
     usePotion(X), !;
     write('\33\[37m\33\[1mKamu tidak memiliki potion\33\[m\n\n'), !.
 
@@ -232,22 +238,22 @@ greedisgood :-
     NewGold is Gold + 1000,
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, NewXP, NewGold)),
-    get_key_no_echo(_),
+    get_key_no_echo(user_input,_),
     checkLevelUp, !.
 
 whosyourdaddy :-
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     Atk >= 100000,
-    NewAtk is 20,
-    NewDef is 5,
+    NewAtk is Atk - 100000,
+    NewDef is Def - 100000,
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
     write('\33\[31m\33\[1mGod mode deactivated\33\[m\n'), !;
 
     statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold),
     Atk < 100000,
-    NewAtk is 100000,
-    NewDef is 100000,
+    NewAtk is Atk + 100000,
+    NewDef is Def + 100000,
     retract(statPlayer(IDTipe, Nama, HP, Mana, Atk, Def, Lvl, XP, Gold)),
     asserta(statPlayer(IDTipe, Nama, HP, Mana, NewAtk, NewDef, Lvl, XP, Gold)),
     write('\33\[33m\33\[1mGod mode activated\33\[m\n'), !.
@@ -505,14 +511,14 @@ collisionCheck(X,Y) :-
 
 moveNextFloor :-
     write('Lanjutkan ke lantai selanjutnya? (y/n)\n'),
-    get_key_no_echo(X),
+    get_key_no_echo(user_input,X),
     (
         X = 121, isQuest(1),
         write('\33\[31m\33\[1mSelesaikan quest terlebih dahulu\33\[m\n'), prompt, clear, !;
 
         X = 121, % Cant next floor if quest active
         randomize, width(W), height(H), destroyMap, incrementFloor, generateMap,
-        random(1, W, RAbsis), random(1, H, ROrdinat), scaleEnemy,
+        random(1, W, RAbsis), random(1, H, ROrdinat), deleteEnemy, scaleEnemy,
         setLocation(RAbsis, ROrdinat), clear, !;
 
         X = 110, clear, !;
@@ -614,6 +620,7 @@ help(X) :-
     % write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
     write('│   ┃  move. (m)      : Masuk ke mode movement        ┃    │ '), nl,
     write('│   ┃  help. (h)      : Menampilkan bantuan           ┃    │ '), nl,
+    write('│   ┃  save. (s)      : Menyimpan game                ┃    │ '), nl,
     write('│   ┃  clear. (c)     : Membersihkan layar            ┃    │ '), nl,
     write('│   ┖─────────────────────────────────────────────────┚    │ '), nl,
     write('╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ '), nl,
@@ -649,6 +656,7 @@ titleHelp :-
     % write('│   ┃  delete.    : Menghapus barang              ┃    │ '), nl,
     % write('│   ┃  w a s d    : Bergerak dengan arah wasd     ┃    │ '), nl,
     % write('│   ┃  move.      : Masuk ke mode movement        ┃    │ '), nl,
+    write('│   ┃  load.      : Load save game                ┃    │ '), nl,
     write('│   ┃  help.      : Menampilkan bantuan           ┃    │ '), nl,
     % write('│   ┃  clear.     : Membersihkan layar            ┃    │ '), nl,
     write('│   ┖─────────────────────────────────────────────┚    │ '), nl,
@@ -1013,7 +1021,7 @@ innerXPBar(C,M) :-
 
 
 inventoryUI :-
-    currentWeapon(WeID), currentArmor(ArID), currentMisc(MiID),
+    currentWeapon(WeID),  currentArmor(ArID), currentMisc(MiID),
     item(WeID, _, _, WeName, _, _),
     item(ArID, _, _, ArName, _, _),
     item(MiID, _, _, MiName, _, _),
@@ -1044,28 +1052,281 @@ inventoryUI :-
 /* Untuk save dan load */
 /*read from file*/
 read_from_file(File) :-
-    open(File, read, Stream),
+    \+ isGameStarted(_),
+    open(File, read, FileStream),
 
-    /*Get char from data Stream*/
-    get_char(Stream, Char1),
+    % PlayerPosition
+    read_token(FileStream, _),
+    read_token(FileStream, PPos1),
+    read_token(FileStream, PPos2),
+    asserta(playerLocation(PPos1,PPos2)),
 
-    /*Output all characters until end_of_file*/
-    process_the_stream(Char1, Stream),
+    % Current Floor
+    read_token(FileStream, _),
+    read_token(FileStream, Floor),
+    asserta(currentFloor(Floor)),
 
-    close(Stream).
+    % Quest
+    % FIXME : Currently random location quest
+    % FIXME : Cant keep track current quest
+    % FIXME : Cant load inventory
+    read_token(FileStream, _),
+    read_token(FileStream, QCount),
+    setQuest(QCount),
 
-process_the_stream(end_of_file, _) :- !.
-process_the_stream(Char, Stream) :-
-    write(Char),
-    get_char(Stream, Char2),
-    process_the_stream(Char2, Stream).
+    read_token(FileStream, _),
+    read_token(FileStream, GlobalQCount),
+    asserta(questCount(GlobalQCount)),
+
+    % Portal
+    read_token(FileStream, _),
+    read_token(FileStream, Port1X),
+    read_token(FileStream, Port1Y),
+
+    read_token(FileStream, _),
+    read_token(FileStream, Port2X),
+    read_token(FileStream, Port2Y),
+    asserta(portal1(Port1X,Port1Y)),
+    asserta(portal2(Port2X,Port2Y)),
+
+    % Shop
+    read_token(FileStream, _),
+    read_token(FileStream, ShPos1),
+    read_token(FileStream, ShPos2),
+    asserta(shop(ShPos1,ShPos2)),
+
+    % Stair
+    read_token(FileStream, _),
+    read_token(FileStream, StPos1),
+    read_token(FileStream, StPos2),
+    asserta(stair(StPos1,StPos2)),
+
+    %
+    read_token(FileStream, _),
+    read_token(FileStream, IDClass),
+    read_token(FileStream, Class),
+    read_token(FileStream, MaxHP),
+    read_token(FileStream, MaxMP),
+    read_token(FileStream, BaseAtk),
+    read_token(FileStream, BaseDef),
+    asserta(class(IDClass,Class,MaxHP,MaxMP,BaseAtk,BaseDef)),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CIDClass),
+    read_token(FileStream, CName),
+    read_token(FileStream, CHP),
+    read_token(FileStream, CMP),
+    read_token(FileStream, CAtk),
+    read_token(FileStream, CDef),
+    read_token(FileStream, CLevel),
+    read_token(FileStream, CXP),
+    read_token(FileStream, CGold),
+    asserta(statPlayer(CIDClass,CName,CHP,CMP,CAtk,CDef,CLevel,CXP,CGold)),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CWeapon),
+    asserta(currentWeapon(CWeapon)),
+    addItem(CWeapon),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CArmor),
+    asserta(currentArmor(CArmor)),
+    addItem(CArmor),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CMisc),
+    asserta(currentMisc(CMisc)),
+    addItem(CMisc),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CSkill),
+    read_token(FileStream, CSName),
+    read_token(FileStream, CMPCost),
+    read_token(FileStream, CMod),
+    read_token(FileStream, CCool),
+    asserta(special_skill(CSkill,CSName,CMPCost,CMod,CCool)),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CHit),
+    asserta(hitChance(CHit)),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CCrit),
+    asserta(critChance(CCrit)),
+
+    read_token(FileStream, _),
+    read_token(FileStream, CDodge),
+    asserta(dodgeChance(CDodge)),
+
+
+
+
+
+    scaleEnemy,
+    asserta(monster(99, 'Duragonballz', 999, 45, 25, 2000, 999)),
+    asserta(isGameStarted(1)),
+    asserta(player(CName)),
+    asserta(movementTick(1)),
+    write('\33\[33m\33\[1mGame loaded!\33\[m'), nl,
+    \+map,
+    gameLoop,
+    close(FileStream), !;
+
+
+    isGameStarted(_),
+    write('\33\[31m\33\[1mGame sudah dimulai\33\[m\n'), !;
+
+    write('\33\[31m\33\[1mLoad gagal.\33\[m \n'), !.
+
 
 /*write to file*/
-write_on_file(File, Text) :-
-    open(File, write, Stream), /*file will get overwritten*/
-    /*open(File, appen, Stream), file will not get overwritten*/
-    write(Stream, Text), nl,
-    close(Stream).
+:- dynamic(newFile/1).
+write_on_file(File) :-
+    flush_output,
+    % TODO : Extra, free naming save game and check overwrite
+    open(File, write, FStream), /*file will get overwritten*/
+    asserta(newFile(FStream)),
+
+    newFile(FileStream),
+    playerLocation(PLocX,PLocY),
+    write(FileStream, 'PlayerPosition '),
+    write(FileStream, PLocX),
+    write(FileStream, ' '),
+    write(FileStream, PLocY),
+    write(FileStream, '\n'),
+
+    currentFloor(CFloor),
+    write(FileStream, 'CurrentFloor '),
+    write(FileStream, CFloor),
+    write(FileStream, '\n'),
+
+    questCount(QCount),
+    write(FileStream, 'QuestCount '),
+    QLeft is 3 - QCount,
+    write(FileStream, QLeft), % TODO : Extra fix this
+    write(FileStream, '\n'),
+
+    write(FileStream, 'GlobalQuestCount '),
+    write(FileStream, QCount),
+    write(FileStream, '\n'),
+
+    % Portal
+    portal1(Port1X,Port1Y),
+    write(FileStream, 'BluePortal '),
+    write(FileStream, Port1X),
+    write(FileStream, ' '),
+    write(FileStream, Port1Y),
+    write(FileStream, '\n'),
+
+    portal2(Port2X,Port2Y),
+    write(FileStream, 'OrangePortal '),
+    write(FileStream, Port2X),
+    write(FileStream, ' '),
+    write(FileStream, Port2Y),
+    write(FileStream, '\n'),
+
+    % Shop
+    shop(ShX,ShY),
+    write(FileStream, 'ShopLocation '),
+    write(FileStream, ShX),
+    write(FileStream, ' '),
+    write(FileStream, ShY),
+    write(FileStream, '\n'),
+
+    % Stair
+    stair(StX,StY),
+    write(FileStream, 'StairLocation '),
+    write(FileStream, StX),
+    write(FileStream, ' '),
+    write(FileStream, StY),
+    write(FileStream, '\n'),
+
+    %
+    class(IDClass,Class,MaxHP,MaxMP,BaseAtk,BaseDef),
+    write(FileStream, 'PlayerStat '),
+    write(FileStream, IDClass),
+    write(FileStream, ' '),
+    write(FileStream, Class),
+    write(FileStream, ' '),
+    write(FileStream, MaxHP),
+    write(FileStream, ' '),
+    write(FileStream, MaxMP),
+    write(FileStream, ' '),
+    write(FileStream, BaseAtk),
+    write(FileStream, ' '),
+    write(FileStream, BaseDef),
+    write(FileStream, '\n'),
+
+    statPlayer(CIDClass,CName,CHP,CMP,CAtk,CDef,CLevel,CXP,CGold),
+    write(FileStream, 'CurrentStat '),
+    write(FileStream, CIDClass),
+    write(FileStream, ' '),
+    write(FileStream, CName),
+    write(FileStream, ' '),
+    write(FileStream, CHP),
+    write(FileStream, ' '),
+    write(FileStream, CMP),
+    write(FileStream, ' '),
+    write(FileStream, CAtk),
+    write(FileStream, ' '),
+    write(FileStream, CDef),
+    write(FileStream, ' '),
+    write(FileStream, CLevel),
+    write(FileStream, ' '),
+    write(FileStream, CXP),
+    write(FileStream, ' '),
+    write(FileStream, CGold),
+    write(FileStream, '\n'),
+
+    currentWeapon(CWeapon),
+    write(FileStream, 'CurrentWeapon '),
+    write(FileStream, CWeapon),
+    write(FileStream, '\n'),
+
+    currentArmor(CArmor),
+    write(FileStream, 'CurrentArmor '),
+    write(FileStream, CArmor),
+    write(FileStream, '\n'),
+
+    currentMisc(CMisc),
+    write(FileStream, 'CurrentMisc '),
+    write(FileStream, CMisc),
+    write(FileStream, '\n'),
+
+    special_skill(CIDClass,CSName,CMPCost,CMod,CCool),
+    write(FileStream, 'SpecialSkill '),
+    write(FileStream, CIDClass),
+    write(FileStream, ' '),
+    write(FileStream, CSName),
+    write(FileStream, ' '),
+    write(FileStream, CMPCost),
+    write(FileStream, ' '),
+    write(FileStream, CMod),
+    write(FileStream, ' '),
+    write(FileStream, CCool),
+    write(FileStream, '\n'),
+
+    hitChance(CHit),
+    write(FileStream, 'HitChance '),
+    write(FileStream, CHit),
+    write(FileStream, '\n'),
+
+    critChance(CCrit),
+    write(FileStream, 'CritChance '),
+    write(FileStream, CCrit),
+    write(FileStream, '\n'),
+
+    dodgeChance(CDodge),
+    write(FileStream, 'DodgeChance '),
+    write(FileStream, CDodge),
+    write(FileStream, '\n'),
+    close(FileStream),
+
+    write('\33\[33m\33\[1mFile telah disave!\33\[m\n'), !;
+    write('\33\[31m\33\[1mGagal dalam proses save.\33\[m\n'), !.
+
+
+    % close(FileStream).
 
 
 

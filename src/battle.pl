@@ -68,11 +68,14 @@ encounterDragon(_) :-
 	write('                                  ██─██▀██─▀─██▄▄▄▄─███─██████─▄████─██─██▄─█─▄─███─███'),nl,
 	write('                                  ▀▄▄▄▄▄▀▄▄▀▄▄▀▄▄▄▄▄▀▀▄▄▄▀▀▀▀▄▄▄▀▀▀▄▄▄▀▄▄▄▄▄▀▄▀▄▀▀▄▄▄▀▀'),nl,
 	write('\33\[31m\33\[1m\33\[m'),
-	battleStartHelp,
+
 	% TODO : Non essential, Special UI
 	random(1, 10, P1),
 	asserta(peluangLari(P1)),
 	asserta(isEnemyAlive(1)),
+	prompt,
+	clear,
+	battleStartHelp,
 	call(battleLoop), !.
 /********Lari********/
 
@@ -167,7 +170,7 @@ attackComment :-
 	isQuestCompleted,
 	checkLevelUp,
 	write('\33\[37m\33\[2mTekan sembarang tombol mengakhiri battle\33\[m\n'),
-	get_key_no_echo(_), !.
+	get_key_no_echo(user_input,_), !.
 % TODO : Non essential, auto fight for qol
 /********Belum ketemu musuh*********/
 normalAttack :-
@@ -317,7 +320,7 @@ battleLoop :-
 
 			% write('\33\[32m\33\[1mBattle >> \33\[m'), !
 		),
-		get_key(X),
+		get_key(user_input,X),
 		(
 	    % % catch(read(X), error(_,_), errorMessage), (
 	        X = 102, nl, call(fight), selectiveFightClear, battleUIDraw, battleLoop, !; % f key
@@ -559,11 +562,11 @@ cooldownUI :-
 	statPlayer(IDTipe, _, _, _, _, _, _, _, _),
 	special_skill(IDTipe, _, _, _, Cooldown),
 	write('\33\[100A\33\[100D\33\[35C\33\[3B'), flush_output,
-	write('\33\[37m\33\[1m╔═══════╦═══════════╦════╗'),
+	write('\33\[37m\33\[1m╔═══════╦════════════╦════╗'),
 	write('\33\[100A\33\[100D\33\[35C\33\[4B'), flush_output,
 	write('║ Skill ║ '),
-	CurrentPercent is ((Cooldown - CurrentCooldown)*9) // Cooldown,
-	Remain is 9 - CurrentPercent, % Not percent tho, its 90-cent
+	CurrentPercent is ((Cooldown - CurrentCooldown)*10) // Cooldown,
+	Remain is 10 - CurrentPercent, % Not percent tho, its 90-cent
 	(
 		CurrentPercent >= 0, CurrentPercent < 11,
 		cooldownBar(CurrentPercent, Remain), !;
@@ -577,7 +580,7 @@ cooldownUI :-
 	),
 
 	write('\33\[100A\33\[100D\33\[35C\33\[5B'), flush_output,
-	write('╚═══════╩═══════════╩════╝').
+	write('╚═══════╩════════════╩════╝').
 
 
 % ╩═══════════╝╚══════╩═════╝ cooldownBar,
