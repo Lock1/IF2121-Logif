@@ -12,7 +12,7 @@
 - Jika menggunakan terminal yang tidak mensupportnya, **sangat disarankan** untuk mendisable semua UI yang menggunakan kedua fitur diatas.
 - Program diuji dan didevelop dengan **WSL**.
 - Pastikan Distro menggunakan GLIBC versi **2.29** keatas (Untuk Ubuntu, 20.04+).
-- Jalankan linux executable play untuk mencoba permainan, **good luck have fun!**
+- Jalankan linux executable bernama **play** untuk mencoba permainan, **good luck have fun!**
 
 ### Style kode
 - Program ini menggunakan camel-case, dikarenakan tidak mengetahui prolog menggunakan snake-case.
