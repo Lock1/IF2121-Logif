@@ -24,13 +24,13 @@
 
 ## Snapshot
 **Now Loading** \
-![UI](/other/img/loading.gif) \
+![UI](/other/img/loading.gif) 
 
 **UI & Movement** \
-![UI](/other/img/movement.gif) \
+![UI](/other/img/movement.gif) 
 
 **Battle** \
-![UI](/other/img/battle.gif) \
+![UI](/other/img/battle.gif) 
 
 **I think I see it somewhere...** :thinking: \
 ![UI](/other/img/portal.gif)
