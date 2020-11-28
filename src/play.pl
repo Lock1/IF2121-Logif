@@ -538,7 +538,7 @@ clearFightStatus :-
     retract(isFighting(_));
     retract(isRun(_));!.
 
-% Terminal raw mode input, non-blocking mode for more fluid play
+% Terminal raw mode input per char, still blocking sadly
 % Press m to back to command mode
 switchMove(X) :-
     X is 119, w, movementTickEvaluate;
