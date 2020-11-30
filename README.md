@@ -8,7 +8,7 @@
 ### Tentang Program
 - Release versi **1.0** menandai bahwa release tersebut adalah **program yang dikumpulkan** ketika deadline, tanpa perubahan.
 - **Tidak disarankan untuk menjalankan program menggunakan terminal gprolog pada windows.**
-- Program ini menggunakan fitur pergerakan kursor & coloring ANSI dan Unicode box-drawing character yang hanya dapat ditampilkan pada terminal yang mensupportnya.
+- Program ini menggunakan fitur pergerakan kursor & coloring ANSI Escape Character dan Unicode box-drawing character yang hanya dapat ditampilkan pada terminal yang mensupportnya.
 - Jika menggunakan terminal yang tidak mensupportnya, **sangat disarankan** untuk mendisable semua UI yang menggunakan kedua fitur diatas.
 - Program diuji dan didevelop dengan **WSL**.
 - Pastikan Distro menggunakan GLIBC versi **2.29** keatas (Untuk Ubuntu, 20.04+).
