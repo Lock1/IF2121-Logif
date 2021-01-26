@@ -46,7 +46,7 @@ Tanggal Selesai      | 25 November 2020
 Tanggal Pengumpulan  | 27 November 2020
 Kelas                | 2
 Dosen                | Fariska Zakhralativa Ruskanda
-Asisten              | TBA
+Asisten              | -
 Nama Kelompok        | send help
 Kelompok             | 6
 
