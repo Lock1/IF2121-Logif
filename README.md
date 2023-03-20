@@ -1,6 +1,10 @@
 # Tugas Besar - Logika Komputasional - IF2121
 <!-- FAQ Link https://docs.google.com/spreadsheets/d/1QkNJaG0cs0F3fyr8cIbdDV4myj_dXvvyGqcqPybjT2A/edit#gid=0 -->
 
+## Extra sidenote
+*Looking back*, setelah mengkonsumsi sedikit dosis *Category Theory* (dan masih belum paham) dan LEAN, obviously pengerjaan tugas besar ini merupakan "imperative" didalam "declarative". Tidak berarti hasil pengerjaan tugas besar ini tidak niat, hanya saja struktur programnya mungkin terasa sekali "imperative"-nya.
+
+
 ### Release
 [v1.0](https://github.com/Lock1/Logif-IF2121/releases/tag/v1.0)
 
